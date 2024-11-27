@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Primary Color -->
+    <color name="colorPrimary">#6200EE</color> <!-- Purple -->
+    <color name="colorPrimaryDark">#3700B3</color> <!-- Darker Purple -->
+    <color name="colorPrimaryLight">#BB86FC</color> <!-- Lighter Purple -->
+
+    <!-- Secondary Color -->
+    <color name="colorSecondary">#03DAC5</color> <!-- Teal -->
+
+    <!-- Accent Color -->
+    <color name="colorAccent">#FF4081</color>  <!-- Pink -->
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="app_bg">#ECF0F0</color>
+    <color name="inventory_btn">#32ba9f</color>
+    <color name="client_btn">#eb6755</color>
+    <color name="text_color">#22215B</color>
+    <color name="dark_gray">#656262</color>
+    <color name="light_gray">#958C8C</color>
+    <color name="buttons_color">#315ee7</color>
+    <color name="payment_color">#f2994a</color>
+    <color name="red">#F44336</color>
+    <color name="green">#4CAF50</color>
+    <color name="blue">#003DFF</color>
+    <color name="toolbar_color">#03A9F4</color>
+
 </resources>

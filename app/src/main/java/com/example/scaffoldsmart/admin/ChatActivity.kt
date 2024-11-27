@@ -1,27 +1,30 @@
-package com.example.scaffoldsmart
+package com.example.scaffoldsmart.admin
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.navigation.findNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.databinding.ActivityChatBinding
 
-class MainActivity : AppCompatActivity() {
+class ChatActivity : AppCompatActivity() {
+    private val binding by lazy {
+        ActivityChatBinding.inflate(layoutInflater)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        val navController = findNavController(R.id.fragmentView)
-        val bottomNav = findViewById<BottomNavigationView>(R.id.nav_bottom)
-        bottomNav.setupWithNavController(navController)
+        val profilePic = intent.getIntExtra("USERPROFILE", R.drawable.man)
+        val userName = intent.getStringExtra("USERNAME")
+        binding.userProfile.setImageResource(profilePic)
+        binding.userName.text = userName
     }
 }
