@@ -29,16 +29,19 @@
                 android:textSize="@dimen/_20ssp"
                 android:textStyle="bold"
                 android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginStart="@dimen/_25sdp"
                 app:layout_constraintEnd_toStartOf="@+id/settingBtn"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/settingBtn"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:scaleType="fitCenter"
                 android:layout_marginEnd="@dimen/_10sdp"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:src="@drawable/setting"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -127,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
                     android:src="@drawable/wallet"
-                    app:tint="@color/toolbar_color"
+                    app:tint="@color/item_color"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

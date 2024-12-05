@@ -1,9 +1,15 @@
 package com.example.scaffoldsmart.admin
 
+import android.graphics.Color
 import android.os.Bundle
+import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
@@ -30,14 +36,48 @@ class InventoryActivity : AppCompatActivity() {
             insets
         }
 
-        binding.rcv.layoutManager = LinearLayoutManager(this@InventoryActivity, LinearLayoutManager.VERTICAL, false)
-        adapter = InventoryRcvAdapter(this, itemList)
-        binding.rcv.adapter = adapter
-        binding.rcv.setHasFixedSize(true)
+        setStatusBarColor()
+        setRcv()
+        setSearchView()
 
         binding.addInventoryItem.setOnClickListener {
             showBottomSheet()
         }
+    }
+
+    private fun setStatusBarColor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
+    }
+
+    private fun setRcv() {
+        binding.rcv.layoutManager = LinearLayoutManager(this@InventoryActivity, LinearLayoutManager.VERTICAL, false)
+        adapter = InventoryRcvAdapter(this, itemList)
+        binding.rcv.adapter = adapter
+        binding.rcv.setHasFixedSize(true)
+    }
+
+    private fun setSearchView() {
+        // Change text color to white of search view
+        binding.search.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)?.apply {
+            setTextColor(Color.BLACK)
+            setHintTextColor(Color.GRAY)
+        }
+
+        // Get app color from colors.xml
+        val appColor = ContextCompat.getColor(this, R.color.item_color)
+
+        binding.search.findViewById<ImageView>(androidx.appcompat.R.id.search_mag_icon)?.setColorFilter(appColor)
+        binding.search.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.setColorFilter(appColor)
+
+        binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                adapter.filter(newText ?: "") // Call filter method on text change
+                return true
+            }
+        })
     }
 
     private fun showBottomSheet() {

@@ -62,7 +62,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/editItem"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/bin"
-                app:tint="@color/menu_item_selector" />
+                app:tint="@color/item_color" />
 
             <ImageButton
                 android:id="@+id/editItem"
@@ -75,7 +75,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/edit"
-                app:tint="@color/menu_item_selector" />
+                app:tint="@color/item_color" />
 
 
             <TextView

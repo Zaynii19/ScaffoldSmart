@@ -39,11 +39,12 @@
             android:id="@+id/clientName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_8sdp"
             android:text="@string/danish_ashfaq"
             android:textColor="@color/black"
             android:textSize="@dimen/_20ssp"
             android:textStyle="bold"
-            android:layout_marginTop="@dimen/_10sdp"
             app:layout_constraintStart_toStartOf="@+id/userProfile"
             app:layout_constraintTop_toBottomOf="@+id/userProfile" />
 
@@ -65,53 +66,13 @@
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="@dimen/_40sdp"
             android:layout_height="@dimen/_40sdp"
-            android:layout_marginTop="@dimen/_20sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
             android:scaleType="fitCenter"
-            app:layout_constraintEnd_toStartOf="@+id/editItem"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/bin"
-            app:tint="@color/menu_item_selector" />
-
-        <ImageButton
-            android:id="@+id/editItem"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="@dimen/_40sdp"
-            android:layout_height="@dimen/_40sdp"
             android:layout_marginTop="@dimen/_20sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:scaleType="fitCenter"
+            android:layout_marginEnd="@dimen/_15sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/edit"
-            app:tint="@color/menu_item_selector" />
-
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_30sdp"
-            android:layout_marginTop="@dimen/_12sdp"
-            android:text="@string/status"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_10ssp"
-            app:layout_constraintEnd_toEndOf="@+id/delItem"
-            app:layout_constraintStart_toStartOf="@+id/delItem"
-            app:layout_constraintTop_toBottomOf="@+id/delItem" />
-
-
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="@dimen/_16sdp"
-            android:layout_height="@dimen/_16sdp"
-            android:background="@drawable/status_blue"
-            android:gravity="center"
-            android:layout_marginStart="@dimen/_10sdp"
-            app:layout_constraintBottom_toBottomOf="@+id/textView2"
-            app:layout_constraintStart_toEndOf="@+id/textView2"
-            app:layout_constraintTop_toTopOf="@+id/textView2" />
-
+            app:srcCompat="@drawable/bin"
+            app:tint="@color/item_color" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

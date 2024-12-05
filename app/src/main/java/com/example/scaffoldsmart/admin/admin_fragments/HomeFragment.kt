@@ -25,20 +25,20 @@ class HomeFragment : Fragment() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         initializeInfoList()
-
-        binding.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        adapter = ScafoldRcvAdapter(requireActivity(), infoList)
-        binding.rcv.adapter = adapter
-        binding.rcv.setHasFixedSize(true)
-
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setRcv()
+        // Inflate the layout for this fragment
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.inventoryBtn.setOnClickListener {
             startActivity(Intent(context, InventoryActivity::class.java))
@@ -51,9 +51,13 @@ class HomeFragment : Fragment() {
         binding.settingBtn.setOnClickListener {
             startActivity(Intent(context, SettingActivity::class.java))
         }
+    }
 
-        // Inflate the layout for this fragment
-        return binding.root
+    private fun setRcv() {
+        binding.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        adapter = ScafoldRcvAdapter(requireActivity(), infoList)
+        binding.rcv.adapter = adapter
+        binding.rcv.setHasFixedSize(true)
     }
 
     private fun initializeInfoList() {

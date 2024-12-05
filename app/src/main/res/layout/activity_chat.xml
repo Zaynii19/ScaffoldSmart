@@ -6,12 +6,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".admin.ChatActivity"
-    android:background="@color/app_bg">
+    android:background="@color/app_bg"
+    android:fitsSystemWindows="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/chatInfo"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_50sdp"
+        android:layout_height="@dimen/_40sdp"
         android:background="@color/toolbar_color"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -126,13 +127,13 @@
         android:layout_width="@dimen/_40sdp"
         android:layout_height="@dimen/_40sdp"
         style="@style/Widget.AppCompat.Button.Borderless"
+        android:scaleType="fitCenter"
+        android:src="@drawable/camera"
+        app:tint="@color/item_color"
         android:layout_marginStart="@dimen/_10sdp"
         app:layout_constraintBottom_toBottomOf="@+id/textInputLayout4"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textInputLayout4"
-        android:src="@drawable/camera"
-        android:scaleType="fitCenter"
-        app:tint="@color/menu_item_selector"/>
+        app:layout_constraintTop_toTopOf="@+id/textInputLayout4"/>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout4"
@@ -148,7 +149,7 @@
         app:boxCornerRadiusBottomStart="@dimen/_15sdp"
         app:boxCornerRadiusTopEnd="@dimen/_15sdp"
         app:boxCornerRadiusTopStart="@dimen/_15sdp"
-        app:boxStrokeColor="@color/menu_item_selector"
+        app:boxStrokeColor="@drawable/menu_item_selector"
         app:cursorColor="@color/dark_gray"
         app:hintTextColor="@color/light_gray"
         app:layout_constraintBottom_toBottomOf="parent"

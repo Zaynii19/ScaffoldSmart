@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ActivityChatBinding
@@ -22,9 +23,14 @@ class ChatActivity : AppCompatActivity() {
             insets
         }
 
-        val profilePic = intent.getIntExtra("USERPROFILE", R.drawable.man)
+        setStatusBarColor()
+
         val userName = intent.getStringExtra("USERNAME")
-        binding.userProfile.setImageResource(profilePic)
         binding.userName.text = userName
+    }
+
+    private fun setStatusBarColor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
     }
 }

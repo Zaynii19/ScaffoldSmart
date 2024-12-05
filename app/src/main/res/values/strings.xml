@@ -5,8 +5,6 @@
     <string name="rental">Rental</string>
     <string name="chat">Chat</string>
     <string name="profile">Profile</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="dashboard">Dashboard</string>
     <string name="welcome_sallar">Welcome, Sallar</string>
     <string name="inventory">Inventory</string>
@@ -15,8 +13,6 @@
     <string name="sign_in">Sign in</string>
     <string name="password">Password</string>
     <string name="email">Email</string>
-    <string name="your_email">Your Email</string>
-    <string name="your_password">Your Password</string>
     <string name="login">Login</string>
     <string name="don_t_have_an_account">Don\'t have an account?</string>
     <string name="create_an_account">Create an Account</string>
@@ -79,7 +75,7 @@
     <string name="full_name">Full Name</string>
     <string name="address">Address</string>
     <string name="phone_number">Phone Number</string>
-    <string name="id_number">ID Number</string>
+    <string name="cnic">CNIC</string>
     <string name="gender">Gender</string>
     <string name="scaffolding_rental_material_info">Scaffolding Rental Material Info</string>
     <string name="items">Items</string>
@@ -104,5 +100,37 @@
     <string name="phone">Phone</string>
     <string name="abc_gmail_com">abc@gmail.com</string>
     <string name="_9212345678">+9212345678</string>
+    <string name="due_payment">Due Payment</string>
+    <string name="admin_s_other_platforms">Admin\'s other platforms</string>
+    <string name="send_rental_request">Send Rental Request</string>
+    <string name="compare_items_cost">Compare items cost</string>
+    <string name="due_date_reminders">Due date reminders</string>
+    <string name="overdue_fee_alerts">Overdue fee alerts</string>
+    <string name="pipes_and_joints">Pipes and Joints</string>
+    <string name="view_rental_history">View rental history</string>
+    <string name="search_rental">Search rental</string>
+    <string name="search_inventory">Search inventory</string>
+    <string name="search_client">Search client</string>
+    <string name="enter_your_email">Enter your email</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="request_rental">Request Rental</string>
+    <string name="item">Item</string>
+    <string name="joints">Joints</string>
+    <string name="generators">Generators</string>
+    <string name="motors">Motors</string>
+    <string name="wench">Wench</string>
+    <string name="slug_pumps">Slug Pumps</string>
+    <string name="wheel_borrows">Wheel Borrows</string>
+    <string name="send">Send</string>
+    <string name="length">Length</string>
+    <string name="weight">Weight</string>
+    <string name="_7_kg_per_meter">7 Kg per meter</string>
+    <string name="_3_0_meters_10_feet">3.0 meters (10 feet)</string>
+    <string name="in_stock">In-Stock</string>
+    <string name="pipes_quantity">Pipes Quantity</string>
+    <string name="pipes_length">Pipes Length</string>
+    <string name="joints_quantity">Joints Quantity</string>
+    <string name="duration_end">Duration End</string>
+    <string name="duration_start">Duration Start</string>
 
 </resources>

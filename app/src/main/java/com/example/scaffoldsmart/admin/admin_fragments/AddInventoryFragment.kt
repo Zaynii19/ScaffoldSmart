@@ -31,30 +31,13 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setSpinner()
+        // Inflate the layout for this fragment
+        return binding.root
+    }
 
-        // Define the options for the Spinner
-        val lengthOptions = listOf("3.0 meters (10 feet)", "4.0 meters (13 feet)", "5.0 meters (16 feet)", "6.0 meters (20 feet)")
-        val weightOptions = listOf("7 kg per meter", "8 kg per meter", "9 kg per meter", "10 kg per meter")
-        val conditionOptions = listOf("Intact", "Damaged")
-        val availabilityOptions = listOf("In-stock", "Rented")
-
-        // Create an ArrayAdapter using the string array and a default Spinner layout
-        val lengthAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, lengthOptions)
-        val weightAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, weightOptions)
-        val conditionAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, conditionOptions)
-        val availabilityAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, availabilityOptions)
-
-        // Specify the layout to use when the list of choices appears
-        lengthAdapter.setDropDownViewResource(R.layout.spinner_item)
-        weightAdapter.setDropDownViewResource(R.layout.spinner_item)
-        conditionAdapter.setDropDownViewResource(R.layout.spinner_item)
-        availabilityAdapter.setDropDownViewResource(R.layout.spinner_item)
-
-        // Apply the adapter to the Spinner
-        binding.lengthSpinner.adapter = lengthAdapter
-        binding.weightSpinner.adapter = weightAdapter
-        binding.conditionSpinner.adapter = conditionAdapter
-        binding.availabilitySpinner.adapter = availabilityAdapter
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.saveBtn.setOnClickListener {
             val itemName = binding.itemName.text.toString()
@@ -68,8 +51,24 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
             }
         }
 
-        // Inflate the layout for this fragment
-        return binding.root
+    }
+
+    private fun setSpinner() {
+        // Define the options for the Spinner
+        val lengthOptions = listOf("5 to 10 feet", "10 to 15 feet", "15 to 20 feet")
+        val availabilityOptions = listOf("In-stock", "Rented")
+
+        // Create an ArrayAdapter using the string array and a default Spinner layout
+        val lengthAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, lengthOptions)
+        val availabilityAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, availabilityOptions)
+
+        // Specify the layout to use when the list of choices appears
+        lengthAdapter.setDropDownViewResource(R.layout.spinner_item)
+        availabilityAdapter.setDropDownViewResource(R.layout.spinner_item)
+
+        // Apply the adapter to the Spinner
+        binding.lengthSpinner.adapter = lengthAdapter
+        binding.availabilitySpinner.adapter = availabilityAdapter
     }
 
     companion object {

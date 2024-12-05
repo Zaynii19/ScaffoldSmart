@@ -1,9 +1,14 @@
 package com.example.scaffoldsmart.admin
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -25,9 +30,19 @@ class AdminMainActivity : AppCompatActivity() {
             insets
         }
 
+        setStatusBarColor()
+
+        setBottomNav()
+    }
+
+    private fun setStatusBarColor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
+    }
+
+    private fun setBottomNav() {
         val navController = findNavController(R.id.fragmentView)
         val bottomNav = findViewById<BottomNavigationView>(R.id.nav_bottom)
         bottomNav.setupWithNavController(navController)
-
     }
 }

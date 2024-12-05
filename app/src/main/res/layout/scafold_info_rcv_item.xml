@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/rentalQuantity"
+        android:id="@+id/rentalItems"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/_10sdp"
@@ -50,5 +50,5 @@
         android:background="@android:color/darker_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rentalQuantity" />
+        app:layout_constraintTop_toBottomOf="@+id/rentalItems" />
 </androidx.constraintlayout.widget.ConstraintLayout>

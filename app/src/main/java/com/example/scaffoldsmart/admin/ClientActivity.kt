@@ -1,17 +1,21 @@
 package com.example.scaffoldsmart.admin
 
+import android.graphics.Color
 import android.os.Bundle
+import android.widget.EditText
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.ClientModel
 import com.example.scaffoldsmart.admin.admin_adapters.ClientRcvAdapter
 import com.example.scaffoldsmart.databinding.ActivityClientBinding
-import com.example.scaffoldsmart.admin.admin_fragments.AddClientFragment
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class ClientActivity : AppCompatActivity() {
     private val binding by lazy {
@@ -30,27 +34,52 @@ class ClientActivity : AppCompatActivity() {
             insets
         }
 
+        setStatusBarColor()
+        initializeClientList()
+        setRcv()
+        setSearchView()
+
+    }
+
+    private fun setStatusBarColor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
+    }
+
+    private fun setRcv() {
         binding.rcv.layoutManager = LinearLayoutManager(this@ClientActivity, LinearLayoutManager.VERTICAL, false)
         adapter = ClientRcvAdapter(this, clientList)
         binding.rcv.adapter = adapter
         binding.rcv.setHasFixedSize(true)
-
-        binding.addInventoryItem.setOnClickListener {
-            showBottomSheet()
-        }
-
     }
 
-    private fun showBottomSheet() {
-        val bottomSheetDialog: BottomSheetDialogFragment = AddClientFragment.newInstance(object : AddClientFragment.OnClientUpdatedListener {
-            override fun onClientUpdated(clientName: String, gender:String, status:String) {
-                // Add the new item to the list
-                clientList.add(ClientModel(clientName, status, gender))
+    private fun initializeClientList() {
+        clientList.add(ClientModel("Danish"))
+        clientList.add(ClientModel("Fatima"))
+        clientList.add(ClientModel("Noman"))
+        clientList.add(ClientModel("Amna"))
+    }
 
-                // Notify the adapter that a new item has been added
-                adapter.notifyItemInserted(clientList.size - 1)
+    private fun setSearchView() {
+        // Change text color to white of search view
+        binding.search.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)?.apply {
+            setTextColor(Color.BLACK)
+            setHintTextColor(Color.GRAY)
+        }
+
+        // Get app color from colors.xml
+        val appColor = ContextCompat.getColor(this, R.color.item_color)
+
+        binding.search.findViewById<ImageView>(androidx.appcompat.R.id.search_mag_icon)?.setColorFilter(appColor)
+        binding.search.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.setColorFilter(appColor)
+
+        binding.search.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                adapter.filter(newText ?: "") // Call filter method on text change
+                return true
             }
         })
-        bottomSheetDialog.show(this.supportFragmentManager, "Client")
     }
 }

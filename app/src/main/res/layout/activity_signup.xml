@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".SignupActivity">
+    tools:context=".client.SignupActivity"
+    android:fitsSystemWindows="true">
 
 
     <ImageView
@@ -50,7 +51,7 @@
         android:layout_width="@dimen/_140sdp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_10sdp"
-        android:layout_marginEnd="@dimen/_2sdp"
+        android:layout_marginEnd="@dimen/_7sdp"
         android:hint="@string/firstname"
         android:textColorHint="@color/dark_gray"
         app:boxBackgroundColor="@color/app_bg"
@@ -80,7 +81,7 @@
         android:layout_width="@dimen/_140sdp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/_10sdp"
-        android:layout_marginStart="@dimen/_2sdp"
+        android:layout_marginStart="@dimen/_7sdp"
         android:hint="@string/lastname"
         android:textColorHint="@color/dark_gray"
         app:boxBackgroundColor="@color/app_bg"
@@ -91,7 +92,6 @@
         app:boxStrokeColor="@color/app_bg"
         app:cursorColor="@color/dark_gray"
         app:hintTextColor="@color/light_gray"
-
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/textInputLayout"

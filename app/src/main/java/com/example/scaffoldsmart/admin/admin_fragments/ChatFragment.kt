@@ -29,12 +29,47 @@ class ChatFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initializeChatList()
+    }
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        setRcv()
+        // Inflate the layout for this fragment
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setSearchView()
+    }
+
+    private fun setRcv() {
         binding.chatRCV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         adapter = ChatRcvAdapter(requireActivity(), chatList)
         binding.chatRCV.adapter = adapter
         binding.chatRCV.setHasFixedSize(true)
+    }
 
+    private fun initializeChatList() {
+        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+        // Get current time and date as strings
+        val currentTimeString = timeFormat.format(Date())
+        val currentDateString = dateFormat.format(Date())
+
+        chatList.add(ChatModel("Hasan", "Scaffolding rental available for your next project.", currentTimeString, 3))
+        chatList.add(ChatModel("Fatima", "Secure your job site with our premium scaffolding rental.", currentDateString, 4))
+        chatList.add(ChatModel("Ali", "Affordable scaffolding solutions for all construction needs.", currentTimeString, 5))
+        chatList.add(ChatModel("Laiba", "Reliable scaffolding rental services near you.", currentDateString, 13))
+        chatList.add(ChatModel("Danish", "Get the best deals on scaffolding rental equipment.", currentTimeString, 1))
+        chatList.add(ChatModel("Rabia", "We provide scaffolding rentals for commercial and residential projects.", currentDateString, 2))
+        chatList.add(ChatModel("Haider", "Fast and efficient scaffolding rental service.", currentTimeString, 7))
+    }
+
+    private fun setSearchView() {
         // Change text color to white of search view
         binding.search.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)?.apply {
             setTextColor(Color.BLACK)
@@ -42,7 +77,7 @@ class ChatFragment : Fragment() {
         }
 
         // Get app color from colors.xml
-        val appColor = ContextCompat.getColor(requireContext(), R.color.menu_item_selector)
+        val appColor = ContextCompat.getColor(requireContext(), R.color.item_color)
 
         binding.search.findViewById<ImageView>(androidx.appcompat.R.id.search_mag_icon)?.setColorFilter(appColor)
         binding.search.findViewById<ImageView>(androidx.appcompat.R.id.search_close_btn)?.setColorFilter(appColor)
@@ -55,31 +90,5 @@ class ChatFragment : Fragment() {
                 return true
             }
         })
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        // Inflate the layout for this fragment
-        return binding.root
-    }
-
-    private fun initializeChatList() {
-        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-        // Get current time and date as strings
-        val currentTimeString = timeFormat.format(Date())
-        val currentDateString = dateFormat.format(Date())
-
-        chatList.add(ChatModel(R.drawable.man, "Hasan", "Scaffolding rental available for your next project.", currentTimeString, 3))
-        chatList.add(ChatModel(R.drawable.woman, "Fatima", "Secure your job site with our premium scaffolding rental.", currentDateString, 4))
-        chatList.add(ChatModel(R.drawable.man, "Ali", "Affordable scaffolding solutions for all construction needs.", currentTimeString, 5))
-        chatList.add(ChatModel(R.drawable.woman, "Laiba", "Reliable scaffolding rental services near you.", currentDateString, 13))
-        chatList.add(ChatModel(R.drawable.man, "Danish", "Get the best deals on scaffolding rental equipment.", currentTimeString, 1))
-        chatList.add(ChatModel(R.drawable.woman, "Rabia", "We provide scaffolding rentals for commercial and residential projects.", currentDateString, 2))
-        chatList.add(ChatModel(R.drawable.man, "Haider", "Fast and efficient scaffolding rental service.", currentTimeString, 7))
     }
 }

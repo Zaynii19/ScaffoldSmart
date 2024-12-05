@@ -21,7 +21,7 @@ class ScafoldRcvAdapter (val context: Context, private var infoList: ArrayList<S
 
     override fun onBindViewHolder(holder: MyInfoViewHolder, position: Int) {
         holder.binding.clientName.text = infoList[position].clientName
-        holder.binding.rentalQuantity.text = infoList[position].pipesQuantity
+        holder.binding.rentalItems.text = infoList[position].items
         holder.binding.status.setBackgroundResource(
             when (infoList[position].status) {
                 "overdue" -> R.drawable.status_red

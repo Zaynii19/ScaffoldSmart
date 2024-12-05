@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nevigation"
+    app:startDestination="@id/clientHomeFragment">
+    <fragment
+        android:id="@+id/clientHomeFragment"
+        android:name="com.example.scaffoldsmart.client.client_fragments.ClientHomeFragment"
+        android:label="fragment_client_home"
+        tools:layout="@layout/fragment_client_home" />
+    <fragment
+        android:id="@+id/clientInventoryFragment"
+        android:name="com.example.scaffoldsmart.client.client_fragments.ClientInventoryFragment"
+        android:label="fragment_client_inventory"
+        tools:layout="@layout/fragment_client_inventory" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.scaffoldsmart.admin.admin_fragments.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" />
+    <fragment
+        android:id="@+id/clientProfileFragment"
+        android:name="com.example.scaffoldsmart.client.client_fragments.ClientProfileFragment"
+        android:label="fragment_client_profile"
+        tools:layout="@layout/fragment_client_profile" />
+</navigation>

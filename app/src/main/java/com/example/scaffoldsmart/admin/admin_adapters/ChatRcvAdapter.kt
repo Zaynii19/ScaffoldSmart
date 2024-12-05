@@ -28,7 +28,6 @@ class ChatRcvAdapter(val context: Context, private var chatList: ArrayList<ChatM
     }
 
     override fun onBindViewHolder(holder: MyChatViewHolder, position: Int) {
-        holder.binding.userProfile.setImageResource(chatList[position].userImage)
         holder.binding.userName.text = chatList[position].userName
         holder.binding.message.text = chatList[position].message
         holder.binding.lastMessageTime.text = chatList[position].time
@@ -37,7 +36,6 @@ class ChatRcvAdapter(val context: Context, private var chatList: ArrayList<ChatM
         holder.binding.root.setOnClickListener {
             val intent = Intent(context, ChatActivity::class.java)
             intent.putExtra("USERNAME", chatList[position].userName)
-            intent.putExtra("USERPROFILE", chatList[position].userImage) // Pass the resource ID
             context.startActivity(intent)
         }
     }

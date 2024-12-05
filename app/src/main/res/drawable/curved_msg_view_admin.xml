@@ -7,5 +7,5 @@
 
     <gradient android:angle="120"
         android:startColor="@color/buttons_color"
-        android:endColor="@color/menu_item_selector"/>
+        android:endColor="@drawable/menu_item_selector"/>
 </shape>

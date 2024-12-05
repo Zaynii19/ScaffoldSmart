@@ -1,11 +1,14 @@
-package com.example.scaffoldsmart
+package com.example.scaffoldsmart.client
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.scaffoldsmart.LoginActivity
+import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ActivitySignupBinding
 
 class SignupActivity : AppCompatActivity() {
@@ -22,9 +25,16 @@ class SignupActivity : AppCompatActivity() {
             insets
         }
 
+        setStatusBarColor()
+
         binding.backTxt.setOnClickListener {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
+    }
+
+    private fun setStatusBarColor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
     }
 }

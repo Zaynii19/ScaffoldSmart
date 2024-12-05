@@ -8,5 +8,4 @@ class RentalModel (
     var address: String,
     var cost: String,
     var duration: String,
-    var gender: String
 )

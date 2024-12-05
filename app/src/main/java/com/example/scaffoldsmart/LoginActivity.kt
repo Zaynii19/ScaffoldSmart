@@ -2,23 +2,26 @@ package com.example.scaffoldsmart
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.ArrayAdapter
-import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.scaffoldsmart.admin.AdminMainActivity
+import com.example.scaffoldsmart.client.ClientMainActivity
+import com.example.scaffoldsmart.client.SignupActivity
 import com.example.scaffoldsmart.databinding.ActivityLoginBinding
-import com.google.android.material.bottomsheet.BottomSheetDialog
 
 
 class LoginActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityLoginBinding.inflate(layoutInflater)
     }
+    private var userType = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -29,28 +32,54 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
-        // Define the options for the Spinner
-        val userTypeOptions = listOf("Admin", "Client")
+        setStatusBarColor()
+        onUserSelection()
 
-        // Create an ArrayAdapter using the string array and a default Spinner layout
-        val lengthAdapter = ArrayAdapter(this@LoginActivity, R.layout.spinner_item, userTypeOptions)
-
-        // Specify the layout to use when the list of choices appears
-        lengthAdapter.setDropDownViewResource(R.layout.spinner_item)
-
-        // Apply the adapter to the Spinner
-        binding.userType.adapter = lengthAdapter
-
-        val userType = binding.userType.selectedItem.toString()
+        binding.loginBtn.setOnClickListener {
+            when (userType) {
+                "Admin" -> {
+                    startActivity(Intent(this, AdminMainActivity::class.java))
+                    finish()
+                }
+                "Client" -> {
+                    startActivity(Intent(this, ClientMainActivity::class.java))
+                    finish()
+                }
+                else -> {
+                    startActivity(Intent(this, ClientMainActivity::class.java))
+                    finish()
+                }
+            }
+        }
 
         binding.createAccountBtn.setOnClickListener {
             startActivity(Intent(this, SignupActivity::class.java))
             finish()
         }
+    }
 
-        binding.loginBtn.setOnClickListener {
-            startActivity(Intent(this, AdminMainActivity::class.java))
-            finish()
+    private fun setStatusBarColor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
+    }
+
+    private fun onUserSelection() {
+        binding.adminBtn.setOnClickListener {
+            userType = binding.adminBtn.text.toString()
+            // Set the background tint using a color resource
+            binding.adminBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.buttons_color)
+            binding.clientBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.dark_gray)
+            binding.notHaveAccountTxt.visibility = View.GONE
+            binding.createAccountBtn.visibility = View.GONE
+        }
+
+        binding.clientBtn.setOnClickListener {
+            userType = binding.clientBtn.text.toString()
+            // Set the background tint using a color resource
+            binding.clientBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.buttons_color)
+            binding.adminBtn.backgroundTintList = ContextCompat.getColorStateList(this, R.color.dark_gray)
+            binding.notHaveAccountTxt.visibility = View.VISIBLE
+            binding.createAccountBtn.visibility = View.VISIBLE
         }
     }
 }

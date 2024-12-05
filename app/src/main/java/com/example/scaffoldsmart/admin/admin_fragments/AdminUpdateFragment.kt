@@ -28,33 +28,23 @@ class AdminUpdateFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        // Inflate the layout for this fragment
+        return binding.root
+    }
 
-        // Define the options for the Spinner
-        val genderOptions = listOf("Male", "Female")
-
-        // Create an ArrayAdapter using the string array and a default Spinner layout
-        val genderAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, genderOptions)
-
-        // Specify the layout to use when the list of choices appears
-        genderAdapter.setDropDownViewResource(R.layout.spinner_item)
-
-        // Apply the adapter to the Spinner
-        binding.genderSpinner.adapter = genderAdapter
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.saveBtn.setOnClickListener {
 
-            val gender = binding.genderSpinner.selectedItem.toString()
-
-            if (gender.isNotEmpty()) {
+            val name = binding.adminName.text
+            if (name!!.isNotEmpty()) {
                 //onAdminUpdatedListener?.onAdminUpdated(gender)
                 dismiss() // Dismiss only after saving data
             } else {
-                Toast.makeText(context, "Please add Name and Price", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Please add Name", Toast.LENGTH_SHORT).show()
             }
         }
-
-        // Inflate the layout for this fragment
-        return binding.root
     }
 
     companion object {

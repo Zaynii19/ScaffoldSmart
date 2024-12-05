@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ActivitySettingBinding
@@ -24,9 +25,17 @@ class SettingActivity : AppCompatActivity() {
             insets
         }
 
+        setStatusBarColor()
+
         binding.accountSettingBtn.setOnClickListener {
             showBottomSheet()
         }
+
+    }
+
+    private fun setStatusBarColor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
     }
 
     private fun showBottomSheet() {

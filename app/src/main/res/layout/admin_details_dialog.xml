@@ -91,11 +91,11 @@
 
             <ImageView
                 android:id="@+id/imageView2"
-                android:layout_width="@dimen/_23sdp"
-                android:layout_height="@dimen/_23sdp"
+                android:layout_width="@dimen/_22sdp"
+                android:layout_height="@dimen/_22sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:src="@drawable/email"
-                app:tint="@color/menu_item_selector"
+                app:tint="@color/item_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -136,7 +136,7 @@
                 android:layout_height="@dimen/_22sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:src="@drawable/building"
-                app:tint="@color/menu_item_selector"
+                app:tint="@color/item_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -179,7 +179,7 @@
                 android:layout_height="@dimen/_20sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:src="@drawable/address"
-                app:tint="@color/menu_item_selector"
+                app:tint="@color/item_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -222,7 +222,7 @@
                 android:layout_height="@dimen/_22sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:src="@drawable/phone"
-                app:tint="@color/menu_item_selector"
+                app:tint="@color/item_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

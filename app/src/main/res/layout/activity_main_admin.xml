@@ -7,7 +7,8 @@
     android:layout_height="match_parent"
     tools:context=".admin.AdminMainActivity"
     android:theme="@style/Base.Theme.ScaffoldSmart"
-    android:background="@color/app_bg">
+    android:background="@color/app_bg"
+    android:fitsSystemWindows="true">
 
     <fragment
         android:id="@+id/fragmentView"
@@ -15,7 +16,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/navigation"
+        app:navGraph="@navigation/admin_navigation"
         app:layout_constraintBottom_toTopOf="@id/nav_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -27,13 +28,13 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:pointerIcon="zoom_in"
-        app:itemIconTint="@color/menu_item_selector"
-        app:itemTextColor="@color/menu_item_selector"
+        app:itemIconTint="@drawable/menu_item_selector"
+        app:itemTextColor="@drawable/menu_item_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/nav_menu"
-        />
+        app:menu="@menu/admin_nav_menu"
+        app:itemActiveIndicatorStyle="@color/white" />
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -47,6 +48,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginBottom="@dimen/_30sdp"
-        app:tint="@color/menu_item_selector" />
+        app:tint="@color/item_color" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

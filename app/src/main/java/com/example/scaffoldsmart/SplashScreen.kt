@@ -8,6 +8,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import android.os.Handler
 import android.os.Looper
+import androidx.core.view.WindowCompat
 import com.example.scaffoldsmart.admin.AdminMainActivity
 
 class SplashScreen : AppCompatActivity() {
@@ -21,10 +22,17 @@ class SplashScreen : AppCompatActivity() {
             insets
         }
 
+        setStatusBarColor()
+
         Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this, AdminMainActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
         },3000)
+    }
+
+    private fun setStatusBarColor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
     }
 }

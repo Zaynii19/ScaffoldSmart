@@ -25,5 +25,7 @@
     <color name="green">#4CAF50</color>
     <color name="blue">#003DFF</color>
     <color name="toolbar_color">#03A9F4</color>
+    <color name="item_color">#8ACCE9</color>
+    <color name="transparent">#00000000</color>
 
 </resources>

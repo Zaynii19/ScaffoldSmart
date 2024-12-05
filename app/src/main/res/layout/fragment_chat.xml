@@ -20,10 +20,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/backBtn"
-                android:layout_width="@dimen/_25sdp"
-                android:layout_height="@dimen/_25sdp"
+                android:layout_width="@dimen/_40sdp"
+                android:layout_height="@dimen/_40sdp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:scaleType="fitCenter"
                 android:src="@drawable/back"
                 app:tint="@color/white"
                 android:layout_marginStart="@dimen/_10sdp"
@@ -44,10 +46,12 @@
                 app:layout_constraintStart_toEndOf="@+id/backBtn"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
+            <ImageButton
                 android:id="@+id/settingBtn"
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:scaleType="fitCenter"
                 android:layout_marginEnd="@dimen/_10sdp"
                 android:src="@drawable/setting"
                 app:tint="@color/white"
