@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.example.scaffoldsmart.R
@@ -16,10 +17,12 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
         FragmentAddInventoryBinding.inflate(layoutInflater)
     }
 
+    private var selectedAvailability = ""
+
     private var onInventoryUpdatedListener: OnInventoryUpdatedListener? = null
 
     interface OnInventoryUpdatedListener {
-        fun onInventoryUpdated(itemName: String, price: String)
+        fun onInventoryUpdated(itemName: String, price: String, quantity: String, availability: String)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,15 +42,19 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        getSpinnerValues()
+
         binding.saveBtn.setOnClickListener {
             val itemName = binding.itemName.text.toString()
             val price = binding.itemPrice.text.toString()
+            val quantity = binding.itemQuantity.text.toString()
+            val statusValue = selectedAvailability
 
-            if (itemName.isNotEmpty() && price.isNotEmpty()) {
-                onInventoryUpdatedListener?.onInventoryUpdated(itemName, price)
+            if (itemName.isNotEmpty() && price.isNotEmpty() && quantity.isNotEmpty() && statusValue.isNotEmpty()) {
+                onInventoryUpdatedListener?.onInventoryUpdated(itemName, price, quantity, statusValue)
                 dismiss() // Dismiss only after saving data
             } else {
-                Toast.makeText(context, "Please add Name and Price", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Please add require information", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -55,20 +62,28 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
 
     private fun setSpinner() {
         // Define the options for the Spinner
-        val lengthOptions = listOf("5 to 10 feet", "10 to 15 feet", "15 to 20 feet")
         val availabilityOptions = listOf("In-stock", "Rented")
 
         // Create an ArrayAdapter using the string array and a default Spinner layout
-        val lengthAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, lengthOptions)
         val availabilityAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, availabilityOptions)
 
         // Specify the layout to use when the list of choices appears
-        lengthAdapter.setDropDownViewResource(R.layout.spinner_item)
         availabilityAdapter.setDropDownViewResource(R.layout.spinner_item)
 
         // Apply the adapter to the Spinner
-        binding.lengthSpinner.adapter = lengthAdapter
         binding.availabilitySpinner.adapter = availabilityAdapter
+    }
+
+    private fun getSpinnerValues() {
+        binding.availabilitySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                // Get the selected item
+                selectedAvailability = parent.getItemAtPosition(position) as String
+            }
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // No action needed
+            }
+        }
     }
 
     companion object {

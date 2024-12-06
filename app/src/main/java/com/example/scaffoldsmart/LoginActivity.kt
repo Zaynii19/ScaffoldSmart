@@ -2,6 +2,7 @@ package com.example.scaffoldsmart
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -21,7 +22,10 @@ class LoginActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityLoginBinding.inflate(layoutInflater)
     }
-    private var userType = ""
+    private var userType: String = ""
+    private var userEmail: String = ""
+    private var userPass: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -36,6 +40,8 @@ class LoginActivity : AppCompatActivity() {
         onUserSelection()
 
         binding.loginBtn.setOnClickListener {
+            getUserValues()
+            Log.d("LoginDebug", "UserEmail: $userEmail UserPass: $userPass")
             when (userType) {
                 "Admin" -> {
                     startActivity(Intent(this, AdminMainActivity::class.java))
@@ -81,5 +87,10 @@ class LoginActivity : AppCompatActivity() {
             binding.notHaveAccountTxt.visibility = View.VISIBLE
             binding.createAccountBtn.visibility = View.VISIBLE
         }
+    }
+
+    private fun getUserValues() {
+        userEmail = binding.email.text.toString()
+        userPass = binding.pass.text.toString()
     }
 }

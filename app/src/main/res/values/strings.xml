@@ -132,5 +132,8 @@
     <string name="joints_quantity">Joints Quantity</string>
     <string name="duration_end">Duration End</string>
     <string name="duration_start">Duration Start</string>
+    <string name="_1_kg_per_feet">1 kg per feet</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

@@ -82,9 +82,9 @@ class InventoryActivity : AppCompatActivity() {
 
     private fun showBottomSheet() {
         val bottomSheetDialog: BottomSheetDialogFragment = AddInventoryFragment.newInstance(object : AddInventoryFragment.OnInventoryUpdatedListener {
-            override fun onInventoryUpdated(itemName: String, price:String) {
+            override fun onInventoryUpdated(itemName: String, price:String, quantity: String, availability: String) {
                 // Add the new item to the list
-                itemList.add(InventoryItemIModel(itemName, price))
+                itemList.add(InventoryItemIModel(itemName, price, quantity, availability))
 
                 // Notify the adapter that a new item has been added
                 adapter.notifyItemInserted(itemList.size - 1)

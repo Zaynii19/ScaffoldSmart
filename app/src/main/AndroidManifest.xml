@@ -13,6 +13,9 @@
         android:theme="@style/Theme.ScaffoldSmart"
         tools:targetApi="31">
         <activity
+            android:name=".client.client_fragments.ClientChatActivity"
+            android:exported="false" />
+        <activity
             android:name=".client.ClientSettingActivity"
             android:exported="false" />
         <activity
@@ -32,7 +35,7 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".client.SignupActivity"
             android:exported="false" />

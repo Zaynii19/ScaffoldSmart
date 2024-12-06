@@ -110,39 +110,15 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/item_length"
-            android:textColor="@color/dark_gray"
-            android:textSize="@dimen/_11ssp"
-            app:layout_constraintBottom_toBottomOf="@+id/lengthSpinner"
-            app:layout_constraintEnd_toStartOf="@+id/lengthSpinner"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/lengthSpinner" />
-
-        <Spinner
-            android:id="@+id/lengthSpinner"
-            android:layout_width="@dimen/_180sdp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_40sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:backgroundTint="@color/black"
-            android:minHeight="48dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
-
-        <TextView
             android:id="@+id/textView7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/availability"
             android:textColor="@color/dark_gray"
             android:textSize="@dimen/_11ssp"
+            android:layout_marginStart="@dimen/_20sdp"
             app:layout_constraintBottom_toBottomOf="@+id/availabilitySpinner"
-            app:layout_constraintEnd_toEndOf="@+id/textView2"
-            app:layout_constraintStart_toStartOf="@+id/textView2"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/availabilitySpinner" />
 
         <Spinner
@@ -152,9 +128,9 @@
             android:layout_marginTop="@dimen/_10sdp"
             android:backgroundTint="@color/black"
             android:minHeight="48dp"
-            app:layout_constraintEnd_toEndOf="@+id/lengthSpinner"
-            app:layout_constraintStart_toStartOf="@+id/lengthSpinner"
-            app:layout_constraintTop_toBottomOf="@id/lengthSpinner" />
+            app:layout_constraintEnd_toEndOf="@+id/textInputLayout3"
+            app:layout_constraintStart_toEndOf="@+id/textView7"
+            app:layout_constraintTop_toBottomOf="@id/textInputLayout3" />
 
         <Button
             android:id="@+id/saveBtn"

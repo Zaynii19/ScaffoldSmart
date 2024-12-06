@@ -15,7 +15,7 @@
         android:title="" />
     <item
         android:title="@string/chat"
-        android:id="@+id/chatFragment"
+        android:id="@+id/clientChatFragment"
         android:icon="@drawable/chat"/>
     <item
         android:title="@string/profile"
