@@ -13,7 +13,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.admin_models.ClientModel
+import com.example.scaffoldsmart.admin.admin_models.RentalClientModel
 import com.example.scaffoldsmart.admin.admin_adapters.ClientRcvAdapter
 import com.example.scaffoldsmart.databinding.ActivityClientBinding
 
@@ -21,7 +21,7 @@ class ClientActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityClientBinding.inflate(layoutInflater)
     }
-    private var clientList = ArrayList<ClientModel>()
+    private var clientList = ArrayList<RentalClientModel>()
     private lateinit var adapter: ClientRcvAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,10 +54,10 @@ class ClientActivity : AppCompatActivity() {
     }
 
     private fun initializeClientList() {
-        clientList.add(ClientModel("Danish"))
-        clientList.add(ClientModel("Fatima"))
-        clientList.add(ClientModel("Noman"))
-        clientList.add(ClientModel("Amna"))
+        clientList.add(RentalClientModel("Danish"))
+        clientList.add(RentalClientModel("Fatima"))
+        clientList.add(RentalClientModel("Noman"))
+        clientList.add(RentalClientModel("Amna"))
     }
 
     private fun setSearchView() {

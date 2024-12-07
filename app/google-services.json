@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "116961317466",
+    "project_id": "scaffold-smart-fyp24",
+    "storage_bucket": "scaffold-smart-fyp24.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:116961317466:android:7fd60a8514c52dc8c5fe63",
+        "android_client_info": {
+          "package_name": "com.example.scaffoldsmart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmLy3Fr_FVcJnQ8C9vT63vH4Wf4fkfzrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

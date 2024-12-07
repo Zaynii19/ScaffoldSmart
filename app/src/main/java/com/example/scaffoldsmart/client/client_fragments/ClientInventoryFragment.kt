@@ -6,9 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.scaffoldsmart.admin.admin_fragments.AddInventoryFragment
-import com.example.scaffoldsmart.admin.admin_models.ClientModel
-import com.example.scaffoldsmart.admin.admin_models.InventoryItemIModel
+import com.example.scaffoldsmart.admin.admin_models.RentalClientModel
 import com.example.scaffoldsmart.client.client_adapters.ClientInventoryRcvAdapter
 import com.example.scaffoldsmart.client.client_models.ClientInventoryItemIModel
 import com.example.scaffoldsmart.databinding.FragmentClientInventoryBinding
@@ -18,7 +16,7 @@ class ClientInventoryFragment : Fragment() {
     private val binding by lazy {
         FragmentClientInventoryBinding.inflate(layoutInflater)
     }
-    private var reqList = ArrayList<ClientModel>()
+    private var reqList = ArrayList<RentalClientModel>()
     private var itemList = ArrayList<ClientInventoryItemIModel>()
     private lateinit var adapter: ClientInventoryRcvAdapter
 
@@ -59,7 +57,7 @@ class ClientInventoryFragment : Fragment() {
         val bottomSheetDialog: BottomSheetDialogFragment = RentalReqFragment.newInstance(object : RentalReqFragment.OnSendReqListener {
             override fun onReqSendUpdated(clientName: String) {
                 // Add the new item to the list
-                reqList.add(ClientModel(clientName))
+                reqList.add(RentalClientModel(clientName))
             }
         })
         bottomSheetDialog.show(requireActivity().supportFragmentManager, "RentalReq")

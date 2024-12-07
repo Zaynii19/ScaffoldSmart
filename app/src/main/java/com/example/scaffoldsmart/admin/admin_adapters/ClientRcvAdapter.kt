@@ -1,7 +1,6 @@
 package com.example.scaffoldsmart.admin.admin_adapters
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,15 +9,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.ChatActivity
 import com.example.scaffoldsmart.databinding.ClientRcvItemBinding
-import com.example.scaffoldsmart.admin.admin_models.ClientModel
-import com.example.scaffoldsmart.admin.admin_models.InventoryItemIModel
+import com.example.scaffoldsmart.admin.admin_models.RentalClientModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class ClientRcvAdapter (val context: Context, private var clientList: ArrayList<ClientModel>): RecyclerView.Adapter<ClientRcvAdapter.MyClientViewHolder>() {
+class ClientRcvAdapter (val context: Context, private var clientList: ArrayList<RentalClientModel>): RecyclerView.Adapter<ClientRcvAdapter.MyClientViewHolder>() {
     class MyClientViewHolder(val binding: ClientRcvItemBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(client: ClientModel) {
+        fun bind(client: RentalClientModel) {
             // Bind your chat item to UI elements here.
             binding.clientName.text = client.clientName
         }

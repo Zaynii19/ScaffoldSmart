@@ -1,6 +1,7 @@
 package com.example.scaffoldsmart
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,6 +17,8 @@ import com.example.scaffoldsmart.admin.AdminMainActivity
 import com.example.scaffoldsmart.client.ClientMainActivity
 import com.example.scaffoldsmart.client.SignupActivity
 import com.example.scaffoldsmart.databinding.ActivityLoginBinding
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 
 
 class LoginActivity : AppCompatActivity() {
@@ -25,6 +28,7 @@ class LoginActivity : AppCompatActivity() {
     private var userType: String = ""
     private var userEmail: String = ""
     private var userPass: String = ""
+    private lateinit var userPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,26 +40,13 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
+        userPreferences = getSharedPreferences("LOGIN", MODE_PRIVATE)
         setStatusBarColor()
         onUserSelection()
 
         binding.loginBtn.setOnClickListener {
             getUserValues()
-            Log.d("LoginDebug", "UserEmail: $userEmail UserPass: $userPass")
-            when (userType) {
-                "Admin" -> {
-                    startActivity(Intent(this, AdminMainActivity::class.java))
-                    finish()
-                }
-                "Client" -> {
-                    startActivity(Intent(this, ClientMainActivity::class.java))
-                    finish()
-                }
-                else -> {
-                    startActivity(Intent(this, ClientMainActivity::class.java))
-                    finish()
-                }
-            }
+            loginUser()
         }
 
         binding.createAccountBtn.setOnClickListener {
@@ -92,5 +83,44 @@ class LoginActivity : AppCompatActivity() {
     private fun getUserValues() {
         userEmail = binding.email.text.toString()
         userPass = binding.pass.text.toString()
+    }
+
+    private fun loginUser() {
+        if (userEmail.isEmpty() || userPass.isEmpty()){
+            Toast.makeText(this, "Please fill all the details", Toast.LENGTH_LONG).show()
+        }else{
+            Firebase.auth.signInWithEmailAndPassword(userEmail, userPass)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Toast.makeText(this, "SignIn successful", Toast.LENGTH_SHORT).show()
+                        when (userType) {
+                            "Admin" -> {
+                                // Storing alarm status value in shared preferences
+                                val editor = userPreferences.edit()
+                                editor.putString("USERTYPE", userType)
+                                editor.apply()
+                                startActivity(Intent(this, AdminMainActivity::class.java))
+                                finish()
+                            }
+                            "Client" -> {
+                                // Storing alarm status value in shared preferences
+                                val editor = userPreferences.edit()
+                                editor.putString("USERTYPE", userType)
+                                editor.apply()
+                                startActivity(Intent(this, ClientMainActivity::class.java))
+                                finish()
+                            }
+                            else -> {
+                                startActivity(Intent(this, ClientMainActivity::class.java))
+                                finish()
+                            }
+                        }
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Toast.makeText(this, "SignIn Failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+        }
     }
 }

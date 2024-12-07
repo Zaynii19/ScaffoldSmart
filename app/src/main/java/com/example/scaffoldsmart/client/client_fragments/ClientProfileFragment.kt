@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.client.client_fragments
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,13 +8,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ClientDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentClientProfileBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 
 class ClientProfileFragment : Fragment() {
     private val binding by lazy {
@@ -40,6 +44,13 @@ class ClientProfileFragment : Fragment() {
 
         binding.otherPlatformBtn.setOnClickListener {
             adminPlatformDialog()
+        }
+
+        binding.logoutBtn.setOnClickListener {
+            val auth = FirebaseAuth.getInstance()
+            auth.signOut()
+            Toast.makeText(requireActivity(), "Logout Successful", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(requireActivity(), LoginActivity::class.java))
         }
 
     }
