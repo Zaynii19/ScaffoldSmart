@@ -11,8 +11,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ClientDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentClientProfileBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
@@ -23,14 +25,24 @@ class ClientProfileFragment : Fragment() {
     private val binding by lazy {
         FragmentClientProfileBinding.inflate(layoutInflater)
     }
+    private var email: String = ""
+    private var name: String = ""
+    private var cnic: String = ""
+    private var address: String = ""
+    private var phone: String = ""
+    private lateinit var viewModel: ClientViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this)[ClientViewModel::class.java]
+        viewModel.retrieveClientData()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        observeClientLiveData()
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -55,9 +67,30 @@ class ClientProfileFragment : Fragment() {
 
     }
 
+    private fun observeClientLiveData() {
+        viewModel.observeClientLiveData().observe(viewLifecycleOwner) { client ->
+            if (client != null) {
+                name = client.name
+                email = client.email
+                cnic = client.cnic
+                address = client.address
+                phone = client.phone
+
+                binding.userName.text = name
+                binding.email.text = email
+            }
+        }
+    }
+
     private fun clientDetailsDialog(){
         val customDialog = LayoutInflater.from(requireActivity()).inflate(R.layout.client_details_dialog, null)
         val binder = ClientDetailsDialogBinding.bind(customDialog)
+
+        binder.clientName.text = name
+        binder.email.text = email
+        binder.cnic.text = cnic
+        binder.address.text = address
+        binder.phoneNum.text = phone
 
         val builder = MaterialAlertDialogBuilder(requireActivity())
         builder.setView(customDialog)
@@ -73,8 +106,6 @@ class ClientProfileFragment : Fragment() {
                 // Set button color
                 getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
             }
-
-
     }
 
     private fun adminPlatformDialog(){

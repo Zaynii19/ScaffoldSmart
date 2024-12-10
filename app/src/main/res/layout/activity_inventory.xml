@@ -79,7 +79,8 @@
         app:layout_constraintStart_toStartOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
         app:queryHint="@string/search_inventory"
-        app:searchIcon="@drawable/search" />
+        app:searchIcon="@drawable/search"
+        android:inputType="textCapSentences"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rcv"

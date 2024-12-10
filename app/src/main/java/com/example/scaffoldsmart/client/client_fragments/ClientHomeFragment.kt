@@ -6,24 +6,28 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.scaffoldsmart.admin.admin_adapters.ScafoldRcvAdapter
-import com.example.scaffoldsmart.admin.admin_models.ScafoldInfoModel
 import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_adapters.ClientScafoldRcvAdapter
 import com.example.scaffoldsmart.client.client_models.ClientScafoldInfoModel
+import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
 
 class ClientHomeFragment : Fragment() {
     private val binding by lazy {
         FragmentClientHomeBinding.inflate(layoutInflater)
     }
+    private var name: String = ""
     private var infoList = ArrayList<ClientScafoldInfoModel>()
     private lateinit var adapter: ClientScafoldRcvAdapter
+    private lateinit var viewModel: ClientViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initializeInfoList()
+        viewModel = ViewModelProvider(this)[ClientViewModel::class.java]
+        viewModel.retrieveClientData()
     }
 
     override fun onCreateView(
@@ -31,6 +35,7 @@ class ClientHomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         setRcv()
+        observeClientLiveData()
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -55,5 +60,18 @@ class ClientHomeFragment : Fragment() {
         infoList.add(ClientScafoldInfoModel("Joints", "300 Pipes and 200 Joints", "5 Weeks"))
         infoList.add(ClientScafoldInfoModel("Generators", "300 Pipes and 200 Joints", "12 Weeks"))
         infoList.add(ClientScafoldInfoModel("Motors", "300 Pipes and 200 Joints", "8 Weeks"))
+    }
+
+    private fun observeClientLiveData() {
+        viewModel.observeClientLiveData().observe(viewLifecycleOwner) { client ->
+            if (client != null) {
+                name = client.name
+
+                binding.welcomeTxt.text = buildString {
+                    append("Welcome, ")
+                    append(name)
+                }
+            }
+        }
     }
 }

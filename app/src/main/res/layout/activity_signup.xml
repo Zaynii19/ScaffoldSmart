@@ -44,45 +44,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="@dimen/_140sdp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_10sdp"
-        android:layout_marginEnd="@dimen/_7sdp"
-        android:hint="@string/firstname"
-        android:textColorHint="@color/dark_gray"
-        app:boxBackgroundColor="@color/app_bg"
-        app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
-        app:boxCornerRadiusBottomStart="@dimen/_15sdp"
-        app:boxCornerRadiusTopEnd="@dimen/_15sdp"
-        app:boxCornerRadiusTopStart="@dimen/_15sdp"
-        app:boxStrokeColor="@color/app_bg"
-        app:cursorColor="@color/dark_gray"
-        app:hintTextColor="@color/light_gray"
-        app:layout_constraintEnd_toStartOf="@+id/textInputLayout2"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/firstName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout2"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="@dimen/_140sdp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/_10sdp"
-        android:layout_marginStart="@dimen/_7sdp"
-        android:hint="@string/lastname"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:hint="@string/full_name"
         android:textColorHint="@color/dark_gray"
         app:boxBackgroundColor="@color/app_bg"
         app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
@@ -94,13 +62,14 @@
         app:hintTextColor="@color/light_gray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/textInputLayout"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/lastName"
+            android:id="@+id/clientName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textCapSentences"
             android:textColor="@color/black" />
     </com.google.android.material.textfield.TextInputLayout>
 

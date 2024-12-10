@@ -11,8 +11,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
+import com.example.scaffoldsmart.databinding.AdminDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentProfileBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -22,14 +25,24 @@ class ProfileFragment : Fragment() {
     private val binding by lazy {
         FragmentProfileBinding.inflate(layoutInflater)
     }
+    private var name: String = ""
+    private var email: String = ""
+    private var company: String = ""
+    private var address: String = ""
+    private var phone: String = ""
+
+    private lateinit var viewModel: AdminViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(this)[AdminViewModel::class.java]
+        viewModel.retrieveAdminData()
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        observeAdminLiveData()
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -54,8 +67,30 @@ class ProfileFragment : Fragment() {
 
     }
 
+    private fun observeAdminLiveData() {
+        viewModel.observeAdminLiveData().observe(viewLifecycleOwner) { admin ->
+            if (admin != null) {
+                name = admin.name
+                email = admin.email
+                company = admin.company
+                phone = admin.phone
+                address = admin.address
+
+                binding.userName.text = name
+                binding.companyName.text = company
+            }
+        }
+    }
+
     private fun adminDetailsDialog(){
         val customDialog = LayoutInflater.from(requireActivity()).inflate(R.layout.admin_details_dialog, null)
+        val binder = AdminDetailsDialogBinding.bind(customDialog)
+
+        binder.adminName.text = name
+        binder.email.text = email
+        binder.address.text = address
+        binder.companyName.text = company
+        binder.phoneNum.text = phone
 
         val builder = MaterialAlertDialogBuilder(requireActivity())
         builder.setView(customDialog)
@@ -97,7 +132,5 @@ class ProfileFragment : Fragment() {
                 // Set button color
                 getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
             }
-
-
     }
 }

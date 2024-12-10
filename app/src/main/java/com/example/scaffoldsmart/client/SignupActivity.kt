@@ -2,12 +2,14 @@ package com.example.scaffoldsmart.client
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.scaffoldsmart.util.EncryptionUtil
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.client.client_models.ClientModel
@@ -21,11 +23,12 @@ class SignupActivity : AppCompatActivity() {
         ActivitySignupBinding.inflate(layoutInflater)
     }
     private var id: String = ""
-    private var firstName: String = ""
-    private var lastName: String = ""
+    private var name: String = ""
     private var email: String = ""
     private var pass: String = ""
     private var confirmPass: String = ""
+    private var userType: String = ""
+    private var encryptedPassword: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,10 +59,16 @@ class SignupActivity : AppCompatActivity() {
     }
 
     private fun getClientValues() {
-        firstName = binding.firstName.text.toString()
-        lastName = binding.lastName.text.toString()
-        email = binding.email.text.toString()
+        name = binding.clientName.text.toString()
+        if (binding.email.text.toString() != "@" || binding.email.text.toString() != ".com") {
+            Toast.makeText(this@SignupActivity, "Enter a valid email", Toast.LENGTH_SHORT).show()
+            binding.email.setText("")
+            email = ""
+        } else {
+            email = binding.email.text.toString()
+        }
         pass = binding.pass.text.toString()
+        encryptedPassword = EncryptionUtil.encrypt(pass)
         if (binding.confrmPass.text.toString() != pass) {
             Toast.makeText(this@SignupActivity, "Confirm password not matched", Toast.LENGTH_SHORT).show()
             binding.confrmPass.setText("")
@@ -71,8 +80,7 @@ class SignupActivity : AppCompatActivity() {
 
     private fun signupClient() {
         //Checks if fields are empty or not
-        if (binding.firstName.text.toString() == "" ||
-            binding.lastName.text.toString() == "" ||
+        if (binding.clientName.text.toString() == "" ||
             binding.email.text.toString() == "" ||
             binding.pass.text.toString() == "" ||
             binding.confrmPass.text.toString() == ""
@@ -87,7 +95,8 @@ class SignupActivity : AppCompatActivity() {
                         // Create client model with generated Firebase key
                         val clientRef = Firebase.database.reference.child("Client").child(userId)
                         id = clientRef.push().key ?: return@addOnCompleteListener // Safely handle null keys
-                        val client = ClientModel(id, firstName, lastName, email, pass)
+                        userType = "Client"
+                        val client = ClientModel(userType, id, name, email, encryptedPassword, "", "", "")
 
                         // Store user data in Firebase Database
                         clientRef.setValue(client).addOnCompleteListener { storeTask ->

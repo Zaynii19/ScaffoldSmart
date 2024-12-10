@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.client.client_fragments
+package com.example.scaffoldsmart.client
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

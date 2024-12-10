@@ -73,7 +73,8 @@
             app:layout_constraintStart_toStartOf="@+id/toolBar"
             app:layout_constraintTop_toBottomOf="@+id/toolBar"
             app:queryHint="@string/search_messages"
-            app:searchIcon="@drawable/search" />
+            app:searchIcon="@drawable/search"
+            android:inputType="textCapSentences"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chatRCV"

@@ -1,22 +1,20 @@
 package com.example.scaffoldsmart.admin
 
-import android.app.Activity
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_adapters.InventoryRcvAdapter
@@ -24,9 +22,9 @@ import com.example.scaffoldsmart.databinding.ActivityInventoryBinding
 import com.example.scaffoldsmart.admin.admin_fragments.AddInventoryFragment
 import com.example.scaffoldsmart.admin.admin_fragments.AddInventoryFragment.OnInventoryUpdatedListener
 import com.example.scaffoldsmart.admin.admin_models.InventoryItemIModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
@@ -45,6 +43,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     private lateinit var adapter: InventoryRcvAdapter
     private var isUpdate = false
     private lateinit var inventoryPreferences: SharedPreferences
+    private lateinit var viewModel: InventoryViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,11 +56,14 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         }
 
         inventoryPreferences = getSharedPreferences("INVENTORY", MODE_PRIVATE)
-
         setStatusBarColor()
         setRcv()
         setSearchView()
-        retrieveInventory()
+
+        viewModel = ViewModelProvider(this)[InventoryViewModel::class.java]
+        viewModel.retrieveInventory()
+        observeInventoryLiveData()
+
 
         binding.backBtn.setOnClickListener {
             finish()
@@ -107,12 +109,10 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Convert newText to lower case for case insensitive search
-                val searchText = newText?.lowercase(Locale.getDefault()) ?: ""
 
-                // Filter the itemList based on the search text
+                // Filter the itemList based on the search text (case-insensitive)
                 val filteredList = itemList.filter { item ->
-                    item.itemName.contains(searchText)
+                    item.itemName.lowercase().contains(newText!!.lowercase())
                 }
 
                 // Update the adapter with the filtered list
@@ -137,6 +137,17 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         bottomSheetDialog.show(this.supportFragmentManager, "Inventory")
     }
 
+    private fun observeInventoryLiveData() {
+        viewModel.observeInventoryLiveData().observe(this) { items ->
+            itemList.clear()
+            items?.let {
+                itemList.addAll(it)
+                Log.d("InventoryDebug", "observeInventoryLiveData: ${it.size}")
+            }
+            adapter.updateList(itemList) // Notify the adapter about the changes
+        }
+    }
+
     private fun storeInventoryItem(itemName: String, price: String, quantity: String, availability: String) {
         val databaseRef = Firebase.database.reference.child("Inventory").child(Firebase.auth.currentUser!!.uid)
         val newItemRef = databaseRef.push()
@@ -155,32 +166,6 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         } else {
             Toast.makeText(this@InventoryActivity, "Failed to generate item ID", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun retrieveInventory() {
-        Firebase.database.reference.child("Inventory").child(Firebase.auth.currentUser!!.uid)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val newItems = ArrayList<InventoryItemIModel>()
-                    for (child in snapshot.children) {
-                        val inventory = child.getValue<InventoryItemIModel>()
-                        if (inventory != null) {
-                            inventory.itemId = child.key ?: "" // Assign Firebase key as itemId
-                            newItems.add(inventory)
-                        }
-                    }
-
-                    // Update the itemList directly
-                    itemList.clear()
-                    itemList.addAll(newItems)
-                    // Notify the adapter about the changes
-                    adapter.updateList(itemList)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("InventoryActivity", "Failed to retrieve inventory", error.toException())
-                }
-            })
     }
 
     private fun updateInventoryItem(itemId: String, itemName: String, price: String, quantity: String, availability: String) {

@@ -53,7 +53,8 @@
                     android:id="@+id/name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:inputType="textCapSentences"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -81,7 +82,8 @@
                     android:id="@+id/address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black" />
+                    android:textColor="@color/black"
+                    android:inputType="textCapSentences"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -319,39 +321,6 @@
                     android:inputType="none"
                     android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <!--<androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item1Length"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_10sdp"
-                android:layout_marginStart="@dimen/_20sdp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayout9">
-
-                <TextView
-                    android:id="@+id/pipesLength"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/pipes_length"
-                    android:textColor="@color/dark_gray"
-                    android:textSize="@dimen/_11ssp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <NumberPicker
-                    android:id="@+id/pipesLengthPicker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="@dimen/_80sdp"
-                    android:layout_marginStart="@dimen/_10sdp"
-                    android:backgroundTint="@color/black"
-                    android:editTextColor="@color/black"
-                    app:layout_constraintBottom_toBottomOf="@+id/pipesLength"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/pipesLength"
-                    app:layout_constraintTop_toTopOf="@+id/pipesLength" />
-            </androidx.constraintlayout.widget.ConstraintLayout>-->
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/item3"

@@ -56,4 +56,9 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation (libs.ssp.android)
     implementation (libs.sdp.android)
+
+    // ViewModel
+    implementation (libs.androidx.lifecycle.viewmodel.ktx)
+    // LiveData
+    implementation (libs.androidx.lifecycle.livedata.ktx)
 }
