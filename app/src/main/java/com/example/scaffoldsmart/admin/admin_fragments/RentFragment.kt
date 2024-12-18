@@ -1,7 +1,12 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,12 +14,15 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_adapters.RentalRcvAdapter
 import com.example.scaffoldsmart.databinding.FragmentRentBinding
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
+import com.google.firebase.messaging.FirebaseMessaging
 
 class RentFragment : Fragment() {
     private val binding by lazy {

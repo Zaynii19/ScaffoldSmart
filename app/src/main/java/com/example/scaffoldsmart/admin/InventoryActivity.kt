@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
@@ -38,7 +39,6 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     private val binding by lazy {
         ActivityInventoryBinding.inflate(layoutInflater)
     }
-
     private var itemList = ArrayList<InventoryItemIModel>()
     private lateinit var adapter: InventoryRcvAdapter
     private var isUpdate = false
@@ -64,6 +64,13 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         viewModel.retrieveInventory()
         observeInventoryLiveData()
 
+        binding.swipeRefresh.setColorSchemeResources(R.color.item_color)
+        binding.swipeRefresh.setOnRefreshListener {
+            // Refresh data here
+            viewModel.retrieveInventory() // Call your method to fetch data again
+            observeInventoryLiveData()
+            binding.swipeRefresh.isRefreshing = false // Hide the refresh animation after data is fetched
+        }
 
         binding.backBtn.setOnClickListener {
             finish()
@@ -138,7 +145,9 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     }
 
     private fun observeInventoryLiveData() {
+        binding.loading.visibility = View.VISIBLE
         viewModel.observeInventoryLiveData().observe(this) { items ->
+            binding.loading.visibility = View.GONE
             itemList.clear()
             items?.let {
                 itemList.addAll(it)
@@ -148,17 +157,22 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         }
     }
 
+    // Store inventory in common node accessible by both admin and client
     private fun storeInventoryItem(itemName: String, price: String, quantity: String, availability: String) {
-        val databaseRef = Firebase.database.reference.child("Inventory").child(Firebase.auth.currentUser!!.uid)
+        // Reference to the inventory in Firebase
+        val databaseRef = Firebase.database.reference.child("Inventory")
         val newItemRef = databaseRef.push()
         val itemId = newItemRef.key // Get the generated key
 
         if (itemId != null) {
+            // Create new inventory item model
             val newItem = InventoryItemIModel(itemId, itemName, price, quantity, availability)
 
+            // Store the new item in Firebase
             newItemRef.setValue(newItem)
                 .addOnSuccessListener {
                     Toast.makeText(this@InventoryActivity, "Item added successfully", Toast.LENGTH_SHORT).show()
+                    viewModel.retrieveInventory() // Refresh to reflect changes
                 }
                 .addOnFailureListener {
                     Toast.makeText(this@InventoryActivity, "Failed to add item", Toast.LENGTH_SHORT).show()
@@ -168,10 +182,10 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         }
     }
 
+
     private fun updateInventoryItem(itemId: String, itemName: String, price: String, quantity: String, availability: String) {
-        // Get a reference to the specific item in Firebase
+        // Reference to the specific item in Firebase
         val databaseRef = Firebase.database.reference.child("Inventory")
-            .child(Firebase.auth.currentUser!!.uid)
             .child(itemId) // Reference to the specific item using itemId
 
         // Create a map of the fields you want to update
@@ -186,6 +200,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         databaseRef.updateChildren(updates)
             .addOnSuccessListener {
                 Toast.makeText(this@InventoryActivity, "Item updated successfully", Toast.LENGTH_SHORT).show()
+                viewModel.retrieveInventory() // Refresh to reflect changes
             }
             .addOnFailureListener {
                 Toast.makeText(this@InventoryActivity, "Failed to update item", Toast.LENGTH_SHORT).show()

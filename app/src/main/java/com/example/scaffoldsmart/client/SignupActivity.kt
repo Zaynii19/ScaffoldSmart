@@ -3,6 +3,7 @@ package com.example.scaffoldsmart.client
 import android.content.Intent
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -60,12 +61,12 @@ class SignupActivity : AppCompatActivity() {
 
     private fun getClientValues() {
         name = binding.clientName.text.toString()
-        if (binding.email.text.toString() != "@" || binding.email.text.toString() != ".com") {
+        if (binding.email.text.toString().contains("@")  || binding.email.text.toString().contains(".com")) {
+            email = binding.email.text.toString()
+        } else {
             Toast.makeText(this@SignupActivity, "Enter a valid email", Toast.LENGTH_SHORT).show()
             binding.email.setText("")
             email = ""
-        } else {
-            email = binding.email.text.toString()
         }
         pass = binding.pass.text.toString()
         encryptedPassword = EncryptionUtil.encrypt(pass)
@@ -88,7 +89,10 @@ class SignupActivity : AppCompatActivity() {
         {
             Toast.makeText(this@SignupActivity, "Please fill all the details first", Toast.LENGTH_SHORT).show()
         }else{
+            binding.loading.visibility = View.VISIBLE
+            binding.signupBtn.setOnClickListener(null)
             Firebase.auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
+                binding.loading.visibility = View.GONE
                 if (task.isSuccessful) {
                     val userId = Firebase.auth.currentUser?.uid
                     if (userId != null) {

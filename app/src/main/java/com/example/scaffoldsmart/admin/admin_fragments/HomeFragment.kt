@@ -21,6 +21,17 @@ import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.IOException
 
 class HomeFragment : Fragment() {
 
@@ -131,7 +142,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeAdminLiveData() {
+        binding.loading.visibility = View.VISIBLE
         viewModel.observeAdminLiveData().observe(viewLifecycleOwner) { admin ->
+            binding.loading.visibility = View.GONE
             if (admin != null) {
                 userType = admin.userType
                 id = admin.id

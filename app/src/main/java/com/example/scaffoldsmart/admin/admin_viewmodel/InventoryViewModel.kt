@@ -15,7 +15,7 @@ class InventoryViewModel: ViewModel() {
     private var inventoryLiveData = MutableLiveData<List<InventoryItemIModel>?>()
 
     fun retrieveInventory() {
-        Firebase.database.reference.child("Inventory").child(Firebase.auth.currentUser!!.uid)
+        Firebase.database.reference.child("Inventory")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val itemList = mutableListOf<InventoryItemIModel>()

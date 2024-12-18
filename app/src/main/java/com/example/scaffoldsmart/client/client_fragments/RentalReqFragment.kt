@@ -32,7 +32,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         FragmentRentalReqBinding.inflate(layoutInflater)
     }
     private var clientName: String = ""
-    private var clientAddress: String = ""
+    private var rentalAddress: String = ""
     private var clientPhone: String = ""
     private var clientEmail: String = ""
     private var clientCnic: String = ""
@@ -48,6 +48,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     private var selectedPipeLength: Int = 0
     private var pipeLength: String = ""
     private var wenchQuantity : String = ""
+    private var jointsQuantity : String = ""
     private var pumpsQuantity : String = ""
     private var motorsQuantity : String = ""
     private var generatorsQuantity : String = ""
@@ -57,7 +58,21 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     private var onSendReqListener: OnSendReqListener? = null
 
     interface OnSendReqListener {
-        fun onReqSendUpdated(clientName: String)
+        fun onReqSendUpdated(clientName: String,
+                             rentalAddress: String,
+                             clientEmail: String,
+                             clientPhone: String,
+                             clientCnic: String,
+                             startDuration: String,
+                             endDuration: String,
+                             pipes: String,
+                             pipesLength: String,
+                             joints: String,
+                             wench: String,
+                             pumps: String,
+                             motors: String,
+                             generators: String,
+                             wheel: String)
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,21 +97,35 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         binding.sendBtn.setOnClickListener {
             getClientInfo()
 
-            if (clientName.isNotEmpty()) {
-                onSendReqListener?.onReqSendUpdated(clientName)
-                dismiss() // Dismiss only after saving data
-            } else {
-                Toast.makeText(context, "Please add Name", Toast.LENGTH_SHORT).show()
+            if (!isClientInfoValid()) {
+                Toast.makeText(context, "Please fill client info", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-            Log.d("RentalReqDebug", "ClientInfo $clientName, $clientAddress, $clientPhone, $clientEmail, $clientCnic" )
-            Log.d("RentalReqDebug", "RentalInfo $durationStart, $durationEnd, $pipeQuantity, $pipeLength, $wenchQuantity, $pumpsQuantity, $motorsQuantity, $generatorsQuantity, $wheelQuantity" )
+            if (!isDurationValid()) {
+                Toast.makeText(context, "Please add start and end duration", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (!isRentalItemSelected()) {
+                Toast.makeText(context, "Please add at least one rental item", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // If all validations pass, proceed with the action
+            onSendReqListener?.onReqSendUpdated(
+                clientName, rentalAddress, clientEmail, clientPhone, clientCnic,
+                durationStart, durationEnd, pipeQuantity, pipeLength, jointsQuantity,
+                wenchQuantity, pumpsQuantity, motorsQuantity, generatorsQuantity, wheelQuantity
+
+            )
+            dismiss() // Dismiss only after saving data
         }
     }
 
     private fun getClientInfo() {
         clientName = binding.name.text.toString()
-        clientAddress = binding.address.text.toString()
+        rentalAddress = binding.address.text.toString()
         clientEmail = binding.email.text.toString()
         clientPhone = binding.phone.text.toString()
         clientCnic = binding.cnic.text.toString()
@@ -138,6 +167,8 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             }
         })
 
+
+        jointsQuantity = binding.joints.text.toString()
         getSpinnerValues()
 
     }
@@ -210,6 +241,10 @@ class RentalReqFragment : BottomSheetDialogFragment() {
 
             datePickerDialog!!.datePicker.minDate = System.currentTimeMillis() - 1000
             datePickerDialog!!.show()
+
+            // Customize button colors after the dialog is shown
+            datePickerDialog!!.getButton(DatePickerDialog.BUTTON_POSITIVE)?.setTextColor(Color.BLUE)
+            datePickerDialog!!.getButton(DatePickerDialog.BUTTON_NEGATIVE)?.setTextColor(Color.BLUE)
         }
     }
 
@@ -350,6 +385,22 @@ class RentalReqFragment : BottomSheetDialogFragment() {
                 // No action needed
             }
         }
+    }
+
+    // Validation functions
+    private fun isClientInfoValid(): Boolean {
+        return clientName.isNotEmpty() && rentalAddress.isNotEmpty() &&
+                clientPhone.isNotEmpty() && clientEmail.isNotEmpty() && clientCnic.isNotEmpty()
+    }
+
+    private fun isDurationValid(): Boolean {
+        return durationStart.isNotEmpty() && durationEnd.isNotEmpty()
+    }
+
+    private fun isRentalItemSelected(): Boolean {
+        return pipeQuantity.isNotEmpty() || wenchQuantity.isNotEmpty() ||
+                pumpsQuantity.isNotEmpty() || motorsQuantity.isNotEmpty() ||
+                generatorsQuantity.isNotEmpty() || wheelQuantity.isNotEmpty()
     }
 
     companion object {

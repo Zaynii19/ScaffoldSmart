@@ -200,5 +200,16 @@
         app:layout_constraintStart_toStartOf="@+id/notHaveAccountTxt"
         app:layout_constraintTop_toBottomOf="@+id/notHaveAccountTxt" />
 
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="@dimen/_50sdp"
+        android:layout_height="@dimen/_50sdp"
+        android:visibility="gone"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/buttons_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
