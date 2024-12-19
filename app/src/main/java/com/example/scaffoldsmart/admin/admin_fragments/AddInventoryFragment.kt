@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.admin_models.InventoryItemIModel
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.FragmentAddInventoryBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -105,7 +105,7 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
     }
 
     private fun setValuesForUpdate() {
-        val item: InventoryItemIModel = arguments?.getSerializable(ARG_LIST) as InventoryItemIModel
+        val item: InventoryModel = arguments?.getSerializable(ARG_LIST) as InventoryModel
         binding.title.text = getString(R.string.update_inventory)
         itemId = item.itemId
         binding.itemName.setText(item.itemName)
@@ -117,7 +117,7 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
 
     companion object {
         private const val ARG_LIST = "arg_list"
-        fun newInstance(listener: OnInventoryUpdatedListener, item: InventoryItemIModel): AddInventoryFragment {
+        fun newInstance(listener: OnInventoryUpdatedListener, item: InventoryModel): AddInventoryFragment {
             val fragment = AddInventoryFragment()
 
             fragment.onInventoryUpdatedListener = listener

@@ -17,11 +17,25 @@ import com.google.firebase.messaging.RemoteMessage
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // Create the notification channelF
-        createNotificationChannel(applicationContext)
+
+        // Extract data from the notification payload
+        val notificationId = remoteMessage.data["notification_id"]
+        Log.d("FMService", "onMessageReceived: Notification ID: $notificationId")
+
+        val onesignal = OnesignalService(applicationContext)
+        val reqPreferences = getSharedPreferences("RENTALREQ", MODE_PRIVATE)
+        val prevNotiCompletedAt = reqPreferences.getString("CompletedAt", "")!!
+
+        if (notificationId != null) {
+            onesignal.getOneSignalNoti(notificationId, prevNotiCompletedAt)
+        }
+
+
+        // Create the notification channel
+        //createNotificationChannel(applicationContext)
 
         // Extract notification data and handle both notification and data payloads
-        if (remoteMessage.notification != null) {
+        /*if (remoteMessage.notification != null) {
             val title = remoteMessage.notification?.title ?: "New Rental Request"
             val message = remoteMessage.notification?.body ?: "A new rental request has been submitted."
             showNotification(title, message)
@@ -46,7 +60,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             showNotificationWithData(clientName, rentalAddress, clientEmail, clientPhone, clientCnic,
                 startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel)
-        }
+        }*/
     }
 
     private fun showNotification(title: String, message: String) {

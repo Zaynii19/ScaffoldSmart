@@ -17,17 +17,21 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_adapters.RentalRcvAdapter
 import com.example.scaffoldsmart.databinding.FragmentRentBinding
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.RentalReqViewModel
 import com.google.firebase.messaging.FirebaseMessaging
 
 class RentFragment : Fragment() {
     private val binding by lazy {
         FragmentRentBinding.inflate(layoutInflater)
     }
+
     private var rentalList = ArrayList<RentalModel>()
     private lateinit var adapter: RentalRcvAdapter
 
@@ -84,5 +88,10 @@ class RentFragment : Fragment() {
                 return true
             }
         })
+    }
+
+    companion object {
+        //var rentalList = ArrayList<RentalModel>()
+        //private lateinit var adapter: RentalRcvAdapter
     }
 }

@@ -83,7 +83,6 @@ dependencies {
 
     // define a BOM and its version
     implementation(platform(libs.okhttp.bom))
-
     // define any required OkHttp artifacts without version
     implementation(libs.okhttp)
     implementation(libs.logging.interceptor)

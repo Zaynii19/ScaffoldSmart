@@ -22,24 +22,17 @@ import com.example.scaffoldsmart.admin.admin_adapters.InventoryRcvAdapter
 import com.example.scaffoldsmart.databinding.ActivityInventoryBinding
 import com.example.scaffoldsmart.admin.admin_fragments.AddInventoryFragment
 import com.example.scaffoldsmart.admin.admin_fragments.AddInventoryFragment.OnInventoryUpdatedListener
-import com.example.scaffoldsmart.admin.admin_models.InventoryItemIModel
-import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
-import com.google.firebase.database.getValue
-import java.util.Locale
 
 class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionListener {
     private val binding by lazy {
         ActivityInventoryBinding.inflate(layoutInflater)
     }
-    private var itemList = ArrayList<InventoryItemIModel>()
+    private var itemList = ArrayList<InventoryModel>()
     private lateinit var adapter: InventoryRcvAdapter
     private var isUpdate = false
     private lateinit var inventoryPreferences: SharedPreferences
@@ -82,7 +75,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
             editor.putBoolean("Update", isUpdate)
             editor.apply()
             // Dummy item
-            val item = InventoryItemIModel()
+            val item = InventoryModel()
             showBottomSheet(item)
         }
     }
@@ -123,13 +116,13 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
                 }
 
                 // Update the adapter with the filtered list
-                adapter.updateList(filteredList as ArrayList<InventoryItemIModel>)
+                adapter.updateList(filteredList as ArrayList<InventoryModel>)
                 return true
             }
         })
     }
 
-    private fun showBottomSheet(item: InventoryItemIModel) {
+    private fun showBottomSheet(item: InventoryModel) {
         val bottomSheetDialog: BottomSheetDialogFragment = AddInventoryFragment.newInstance(
             object : OnInventoryUpdatedListener {
                 override fun onInventoryUpdated(itemId: String, itemName: String, price: String, quantity: String, availability: String) {
@@ -166,7 +159,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
 
         if (itemId != null) {
             // Create new inventory item model
-            val newItem = InventoryItemIModel(itemId, itemName, price, quantity, availability)
+            val newItem = InventoryModel(itemId, itemName, price, quantity, availability)
 
             // Store the new item in Firebase
             newItemRef.setValue(newItem)
@@ -207,7 +200,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
             }
     }
 
-    override fun onEditButtonClick(item: InventoryItemIModel) {
+    override fun onEditButtonClick(item: InventoryModel) {
         isUpdate = true
         val editor = inventoryPreferences.edit()
         editor.putBoolean("Update", isUpdate)

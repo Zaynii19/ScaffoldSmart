@@ -20,6 +20,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <ImageButton
+                android:id="@+id/notiAlert"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/alert"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/white" />
+
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
@@ -29,7 +43,7 @@
                 android:textSize="@dimen/_20ssp"
                 android:textStyle="bold"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:layout_marginStart="@dimen/_25sdp"
+                android:layout_marginStart="@dimen/_30sdp"
                 app:layout_constraintEnd_toStartOf="@+id/settingBtn"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -54,7 +68,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_60sdp"
             android:layout_marginStart="@dimen/_10sdp"
-            android:text="@string/welcome_sallar"
             android:textColor="@color/white"
             android:textSize="@dimen/_26ssp"
             android:textStyle="bold"
@@ -151,7 +164,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
-                    android:text="@string/_250000_rs"
                     android:textColor="@color/payment_color"
                     android:textSize="@dimen/_10ssp"
                     app:layout_constraintEnd_toEndOf="@+id/textView2"
@@ -159,8 +171,6 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-
-
         </androidx.cardview.widget.CardView>
 
 
@@ -269,6 +279,5 @@
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </FrameLayout>

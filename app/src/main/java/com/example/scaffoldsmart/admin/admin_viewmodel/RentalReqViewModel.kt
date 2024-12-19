@@ -3,29 +3,29 @@ package com.example.scaffoldsmart.admin.admin_viewmodel
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.scaffoldsmart.admin.admin_models.InventoryModel
+import com.example.scaffoldsmart.admin.admin_models.RentalReqModel
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 
-class InventoryViewModel: ViewModel() {
-    private var inventoryLiveData = MutableLiveData<List<InventoryModel>?>()
+class RentalReqViewModel(): ViewModel() {
+    private var rentalReqLiveData = MutableLiveData<List<RentalReqModel>?>()
 
-    fun retrieveInventory() {
-        Firebase.database.reference.child("Inventory")
+    fun retrieveRentalReq() {
+        Firebase.database.reference.child("Rentals")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val itemList = mutableListOf<InventoryModel>()
+                    val reqList = mutableListOf<RentalReqModel>()
                     for (child in snapshot.children) {
-                        val inventoryItem = child.getValue(InventoryModel::class.java)
-                        if (inventoryItem != null) {
-                            itemList.add(inventoryItem)
+                        val req = child.getValue(RentalReqModel::class.java)
+                        if (req != null) {
+                            reqList.add(req)
                         }
                     }
                     // Update the LiveData with the complete list at once
-                    inventoryLiveData.value = itemList
+                    rentalReqLiveData.value = reqList
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -35,7 +35,7 @@ class InventoryViewModel: ViewModel() {
     }
 
     //use from home fragment to listen live data
-    fun observeInventoryLiveData(): MutableLiveData<List<InventoryModel>?> {
-        return inventoryLiveData
+    fun observeRentalReqLiveData(): MutableLiveData<List<RentalReqModel>?> {
+        return rentalReqLiveData
     }
 }

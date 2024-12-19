@@ -1,6 +1,8 @@
-package com.example.scaffoldsmart.client.client_models
+package com.example.scaffoldsmart.admin.admin_models
 
-class RentalReqModel{
+import java.io.Serializable
+
+class RentalReqModel : Serializable {
     var rentalId = ""
     var clientName = ""
     var clientEmail = ""
@@ -17,6 +19,7 @@ class RentalReqModel{
     var pumps = ""
     var generators = ""
     var wheel = ""
+    var status = ""
 
     constructor()
 
@@ -36,7 +39,8 @@ class RentalReqModel{
         motors: String,
         pumps: String,
         generators: String,
-        wheel: String
+        wheel: String,
+        status: String
     ) {
         this.rentalId = rentalId
         this.clientName = clientName
@@ -54,5 +58,6 @@ class RentalReqModel{
         this.pumps = pumps
         this.generators = generators
         this.wheel = wheel
+        this.status = status
     }
 }

@@ -44,11 +44,8 @@
     <string name="choose_your_user_type">Choose your User-Type</string>
     <string name="admin">Admin</string>
     <string name="client">Client</string>
-    <string name="user_type_admin">User-Type: Admin</string>
-    <string name="user_type_client">User-Type: Client</string>
     <string name="payment_received">Payment Received</string>
-    <string name="_250000_rs">250000. Rs</string>
-    <string name="scaffolding_info">Scaffolding Info</string>
+    <string name="scaffolding_info">Rental Info</string>
     <string name="quantity">Quantity</string>
     <string name="status">Status</string>
     <string name="_300_pipes_and_two_hundred_joints">300 Pipes and Two Hundred Joints</string>
@@ -68,7 +65,6 @@
     <string name="condition">Condition:</string>
     <string name="availability">Availability:</string>
     <string name="client_panel">Client Panel</string>
-    <string name="add_update_delete_client">Add, Update, Delete Client!</string>
     <string name="client_info">Client Info</string>
     <string name="view_client_details">View client details</string>
     <string name="add_new_client">Add New Client</string>
@@ -83,8 +79,6 @@
     <string name="abc_street_abc_town_abc_city">abc street abc town abc city</string>
     <string name="cost">Cost</string>
     <string name="duration">Duration</string>
-    <string name="_6_weeks">6 Weeks</string>
-    <string name="_300">300</string>
     <string name="rental_info">Rental Info</string>
     <string name="logout">Logout</string>
     <string name="settings">Settings</string>
@@ -98,8 +92,6 @@
     <string name="company_address">Company Address</string>
     <string name="company">Company</string>
     <string name="phone">Phone</string>
-    <string name="abc_gmail_com">abc@gmail.com</string>
-    <string name="_9212345678">+9212345678</string>
     <string name="due_payment">Due Payment</string>
     <string name="admin_s_other_platforms">Admin\'s other platforms</string>
     <string name="send_rental_request">Send Rental Request</string>
@@ -124,18 +116,32 @@
     <string name="send">Send</string>
     <string name="length">Length</string>
     <string name="weight">Weight</string>
-    <string name="_7_kg_per_meter">7 Kg per meter</string>
-    <string name="_3_0_meters_10_feet">3.0 meters (10 feet)</string>
     <string name="in_stock">In-Stock</string>
     <string name="pipes_quantity">Pipes Quantity</string>
     <string name="pipes_length">Pipes Length</string>
     <string name="joints_quantity">Joints Quantity</string>
     <string name="duration_end">Duration End</string>
     <string name="duration_start">Duration Start</string>
-    <string name="_1_kg_per_feet">1 kg per feet</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="update_inventory">Update Inventory</string>
     <string name="update_account_info">Update Account Info</string>
+    <string name="_1_kg_per_feet">1 kg per feet</string>
+    <string name="view_rental_request">View rental request</string>
+    <string name="rental_requests">Rental Requests</string>
+    <string name="client_name">Client Name:</string>
+    <string name="_address">Address:</string>
+    <string name="_phone_number">Phone Number:</string>
+    <string name="_email">Email:</string>
+    <string name="_cnic">CNIC:</string>
+    <string name="_duration_start">Duration Start:</string>
+    <string name="_duration_end">Duration End:</string>
+    <string name="_pipes">Pipes:</string>
+    <string name="_pipes_length">Pipes Length:</string>
+    <string name="_joints">Joints:</string>
+    <string name="_wench">Wench:</string>
+    <string name="_slug_pumps">Slug Pumps:</string>
+    <string name="_motors">Motors:</string>
+    <string name="_generators">Generators:</string>
+    <string name="_wheel_borrows">Wheel Borrows:</string>
+    <string name="rental_request">Rental Request</string>
 
 </resources>

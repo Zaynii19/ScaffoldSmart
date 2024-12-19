@@ -11,27 +11,21 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.admin_models.RentalReqModel
 import com.example.scaffoldsmart.client.client_fragments.ClientInventoryFragment
 import com.example.scaffoldsmart.databinding.ActivityMainAdminBinding
 import com.example.scaffoldsmart.util.OnesignalService
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.messaging.FirebaseMessaging
-import com.onesignal.OneSignal
-import com.onesignal.debug.LogLevel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
+import org.json.JSONObject
 
 class AdminMainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMainAdminBinding.inflate(layoutInflater)
     }
 
-    // NOTE: Replace the below with your own ONESIGNAL_APP_ID
-    private val ONESIGNAL_APP_ID = "4c3f5def-07a5-46b9-9fbb-f8336f1dfa8a"
-
-    //private var currentNotiCompletedAt = ""
+    private lateinit var onesignal: OnesignalService
     private var prevNotiCompletedAt = ""
     private lateinit var reqPreferences: SharedPreferences
 
@@ -44,7 +38,6 @@ class AdminMainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         reqPreferences = getSharedPreferences("RENTALREQ", MODE_PRIVATE)
         prevNotiCompletedAt = reqPreferences.getString("CompletedAt", "")!!
 
@@ -52,10 +45,11 @@ class AdminMainActivity : AppCompatActivity() {
         setBottomNav()
 
         // Initialize OneSignal
-        val onesignal = OnesignalService(this@AdminMainActivity)
+        onesignal = OnesignalService(this@AdminMainActivity)
         val tags: Map<String, String> = mapOf("role" to "Admin")
         onesignal.initializeOneSignal(this@AdminMainActivity, tags)
 
+        // Get rental notification data first start
         val notificationId = ClientInventoryFragment.notificationId
         onesignal.getOneSignalNoti(notificationId, prevNotiCompletedAt)
 
@@ -83,6 +77,13 @@ class AdminMainActivity : AppCompatActivity() {
             }*/
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Get rental notification data on when noti clicks
+        val notificationId = ClientInventoryFragment.notificationId
+        onesignal.getOneSignalNoti(notificationId, prevNotiCompletedAt)
+    }
+
     private fun setStatusBarColor() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
@@ -92,5 +93,87 @@ class AdminMainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.fragmentView)
         val bottomNav = findViewById<BottomNavigationView>(R.id.nav_bottom)
         bottomNav.setupWithNavController(navController)
+    }
+
+    companion object {
+        fun handleReqData(reqData: JSONObject) {
+            reqData.let { data ->
+                val clientName = data.optString("clientName", "N/A")
+                val rentalAddress = data.optString("rentalAddress", "N/A")
+                val clientEmail = data.optString("clientEmail", "N/A")
+                val clientPhone = data.optString("clientPhone", "N/A")
+                val clientCnic = data.optString("clientCnic", "N/A")
+                val startDuration = data.optString("startDuration", "N/A")
+                val endDuration = data.optString("endDuration", "N/A")
+                val pipes = data.optString("pipes", "N/A")
+                val pipesLength = data.optString("pipesLength", "N/A")
+                val joints = data.optString("joints", "N/A")
+                val wench = data.optString("wench", "N/A")
+                val pumps = data.optString("pumps", "N/A")
+                val motors = data.optString("motors", "N/A")
+                val generators = data.optString("generators", "N/A")
+                val wheel = data.optString("wheel", "N/A")
+
+                storeRentalReq(clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel)
+
+               /* Log.d("AdminMainDebug", """
+                                                Client Name: $clientName
+                                                Rental Address: $rentalAddress
+                                                Email: $clientEmail
+                                                Phone: $clientPhone
+                                                CNIC: $clientCnic
+                                                Start Duration: $startDuration
+                                                End Duration: $endDuration
+                                                Pipes: $pipes
+                                                Pipes Length: $pipesLength
+                                                Joints: $joints
+                                                Wench: $wench
+                                                Pumps: $pumps
+                                                Motors: $motors
+                                                Generators: $generators
+                                                Wheel: $wheel
+                                                """.trimIndent())*/
+            }
+        }
+
+        fun storeRentalReq(
+            clientName: String,
+            rentalAddress: String,
+            clientEmail: String,
+            clientPhone: String,
+            clientCnic: String,
+            startDuration: String,
+            endDuration: String,
+            pipes: String,
+            pipesLength: String,
+            joints: String,
+            wench: String,
+            pumps: String,
+            motors: String,
+            generators: String,
+            wheel: String
+        ) {
+            // Reference to the inventory in Firebase
+            val databaseRef = Firebase.database.reference.child("Rentals")
+            val newItemRef = databaseRef.push()
+            val rentalId = newItemRef.key // Get the generated key
+
+            if (rentalId != null) {
+                // Create new rental request model
+                val newReq = RentalReqModel(rentalId, clientName, clientEmail, rentalAddress, clientCnic, clientPhone,
+                    startDuration, endDuration, pipes, pipesLength, joints, wench, motors, pumps, generators, wheel,"")
+
+                // Store the new request in Firebase
+                newItemRef.setValue(newReq)
+                    .addOnSuccessListener {
+                        Log.d("AdminMainDebug", "Rental data stored successfully")
+                    }
+                    .addOnFailureListener {
+                        Log.e("AdminMainDebug", "Failed to stored rental data: ${it.message}")
+                    }
+            } else {
+                Log.d("AdminMainDebug", "Failed to generate request ID")
+            }
+        }
     }
 }

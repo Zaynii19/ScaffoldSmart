@@ -14,24 +14,18 @@ import com.example.scaffoldsmart.admin.ClientActivity
 import com.example.scaffoldsmart.admin.InventoryActivity
 import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_adapters.ScafoldRcvAdapter
+import com.example.scaffoldsmart.admin.admin_fragments.AddInventoryFragment.OnInventoryUpdatedListener
 import com.example.scaffoldsmart.admin.admin_models.AdminModel
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
+import com.example.scaffoldsmart.admin.admin_models.RentalReqModel
 import com.example.scaffoldsmart.databinding.FragmentHomeBinding
 import com.example.scaffoldsmart.admin.admin_models.ScafoldInfoModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.RentalReqViewModel
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
-import java.io.IOException
 
 class HomeFragment : Fragment() {
 
@@ -49,7 +43,9 @@ class HomeFragment : Fragment() {
     private var pass: String = ""
     private var infoList = ArrayList<ScafoldInfoModel>()
     private lateinit var adapter: ScafoldRcvAdapter
+    private var reqList = ArrayList<RentalReqModel>()
     private lateinit var viewModel: AdminViewModel
+    private lateinit var reqViewModel: RentalReqViewModel
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +53,9 @@ class HomeFragment : Fragment() {
         viewModel = ViewModelProvider(this)[AdminViewModel::class.java]
         viewModel.retrieveAdminData()
         storeAdminData()
+
+        reqViewModel = ViewModelProvider(this)[RentalReqViewModel::class.java]
+        reqViewModel.retrieveRentalReq()
     }
 
     override fun onCreateView(
@@ -65,6 +64,7 @@ class HomeFragment : Fragment() {
     ): View {
         setRcv()
         observeAdminLiveData()
+        observeRentalReqLiveData()
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -82,6 +82,10 @@ class HomeFragment : Fragment() {
 
         binding.settingBtn.setOnClickListener {
             startActivity(Intent(context, SettingActivity::class.java))
+        }
+
+        binding.notiAlert.setOnClickListener {
+            showBottomSheet()
         }
     }
 
@@ -161,5 +165,30 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun observeRentalReqLiveData() {
+        binding.loading.visibility = View.VISIBLE
+        reqViewModel.observeRentalReqLiveData().observe(viewLifecycleOwner) { requests ->
+            binding.loading.visibility = View.GONE
+            if (requests != null) {
+                reqList.clear()
+                // Filter requests where the status is empty
+                val filteredRequests = requests.filter { it.status.isEmpty() }
+                reqList.addAll(filteredRequests)
+                if (filteredRequests.isNotEmpty()) {
+                    binding.notiAlert.visibility = View.VISIBLE
+                    Log.d("HomeFragDebug", "observeRentalReqLiveData: ${filteredRequests.size} empty status requests")
+                } else {
+                    binding.notiAlert.visibility = View.GONE // Hide if no empty status requests
+                    Log.d("HomeFragDebug", "observeRentalReqLiveData: No empty status requests")
+                }
+            }
+        }
+    }
+
+    private fun showBottomSheet() {
+        val bottomSheetDialog: BottomSheetDialogFragment = AdminRentalReqFragment.newInstance(reqList)
+        bottomSheetDialog.show(requireActivity().supportFragmentManager, "Request")
     }
 }

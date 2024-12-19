@@ -151,7 +151,12 @@ class LoginActivity : AppCompatActivity() {
             userPreferences.edit().putString("USERTYPE", expectedUserType).apply()
 
             // Login as OneSignal user
-            OneSignal.login(userEmail)
+            if (userEmail.isNotEmpty()) {
+                OneSignal.login(userEmail)
+            } else {
+                Log.e("LoginDebug", "User email is null or empty")
+            }
+
 
             // Navigate to the correct dashboard
             when (expectedUserType) {

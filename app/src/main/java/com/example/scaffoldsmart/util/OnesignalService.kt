@@ -2,6 +2,7 @@ package com.example.scaffoldsmart.util
 
 import android.content.Context
 import android.util.Log
+import com.example.scaffoldsmart.admin.AdminMainActivity
 import com.onesignal.OneSignal
 import com.onesignal.debug.LogLevel
 import kotlinx.coroutines.CoroutineScope
@@ -164,7 +165,7 @@ class OnesignalService(context: Context) {
         generators: String,
         wheel: String
     ) {
-        val message = "A new rental request has been submitted."
+        val message = "A new rental request has been submitted. Click to view rental details."
         val title = "Rental Request Alert"
 
         // Create custom data JSON
@@ -272,41 +273,7 @@ class OnesignalService(context: Context) {
 
                                         if (currentNotiCompletedAt != prevNotiCompletedAt) {
                                             Log.d("OneSignalDebug", "New rental request found!")
-                                            reqData.let { data ->
-                                                val clientName = data.optString("clientName", "N/A")
-                                                val rentalAddress = data.optString("rentalAddress", "N/A")
-                                                val clientEmail = data.optString("clientEmail", "N/A")
-                                                val clientPhone = data.optString("clientPhone", "N/A")
-                                                val clientCnic = data.optString("clientCnic", "N/A")
-                                                val startDuration = data.optString("startDuration", "N/A")
-                                                val endDuration = data.optString("endDuration", "N/A")
-                                                val pipes = data.optString("pipes", "N/A")
-                                                val pipesLength = data.optString("pipesLength", "N/A")
-                                                val joints = data.optString("joints", "N/A")
-                                                val wench = data.optString("wench", "N/A")
-                                                val pumps = data.optString("pumps", "N/A")
-                                                val motors = data.optString("motors", "N/A")
-                                                val generators = data.optString("generators", "N/A")
-                                                val wheel = data.optString("wheel", "N/A")
-
-                                                Log.d("AdminMainDebug", """
-                                                Client Name: $clientName
-                                                Rental Address: $rentalAddress
-                                                Email: $clientEmail
-                                                Phone: $clientPhone
-                                                CNIC: $clientCnic
-                                                Start Duration: $startDuration
-                                                End Duration: $endDuration
-                                                Pipes: $pipes
-                                                Pipes Length: $pipesLength
-                                                Joints: $joints
-                                                Wench: $wench
-                                                Pumps: $pumps
-                                                Motors: $motors
-                                                Generators: $generators
-                                                Wheel: $wheel
-                                                """.trimIndent())
-                                            }
+                                            AdminMainActivity.handleReqData(reqData)
                                         } else {
                                             Log.d("OneSignalDebug", "Request data already found!")
                                         }

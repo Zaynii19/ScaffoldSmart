@@ -13,7 +13,6 @@ import com.example.scaffoldsmart.client.client_adapters.ClientScafoldRcvAdapter
 import com.example.scaffoldsmart.client.client_models.ClientScafoldInfoModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
-import com.example.scaffoldsmart.util.NotificationService
 
 class ClientHomeFragment : Fragment() {
     private val binding by lazy {
@@ -69,7 +68,6 @@ class ClientHomeFragment : Fragment() {
             binding.loading.visibility = View.GONE
             if (client != null) {
                 name = client.name
-
                 binding.welcomeTxt.text = buildString {
                     append("Welcome, ")
                     append(name)

@@ -10,13 +10,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.admin_models.InventoryItemIModel
-import com.example.scaffoldsmart.databinding.InventoryRcvItemBinding
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.ClientInventoryRcvItemBinding
 import com.example.scaffoldsmart.databinding.InventoryDetailsDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class ClientInventoryRcvAdapter (val context: Context, private var itemList: ArrayList<InventoryItemIModel>): RecyclerView.Adapter<ClientInventoryRcvAdapter.MyItemViewHolder>() {
+class ClientInventoryRcvAdapter (val context: Context, private var itemList: ArrayList<InventoryModel>): RecyclerView.Adapter<ClientInventoryRcvAdapter.MyItemViewHolder>() {
     class MyItemViewHolder(val binding: ClientInventoryRcvItemBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyItemViewHolder {
@@ -40,7 +39,7 @@ class ClientInventoryRcvAdapter (val context: Context, private var itemList: Arr
         }
     }
 
-    private fun inventoryDetailsDialog(item: InventoryItemIModel) {
+    private fun inventoryDetailsDialog(item: InventoryModel) {
         val customDialog = LayoutInflater.from(context).inflate(R.layout.inventory_details_dialog, null)
         val builder = MaterialAlertDialogBuilder(context)
         val binder = InventoryDetailsDialogBinding.bind(customDialog)
@@ -82,7 +81,7 @@ class ClientInventoryRcvAdapter (val context: Context, private var itemList: Arr
             }
     }
 
-    fun updateList(newItems: ArrayList<InventoryItemIModel>) {
+    fun updateList(newItems: ArrayList<InventoryModel>) {
         itemList = newItems
         notifyDataSetChanged()
     }

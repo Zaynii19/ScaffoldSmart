@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.InventoryRcvItemBinding
-import com.example.scaffoldsmart.admin.admin_models.InventoryItemIModel
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.InventoryDetailsDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -23,16 +23,16 @@ import com.google.firebase.database.database
 
 class InventoryRcvAdapter(
     val context: Context,
-    private var itemList: ArrayList<InventoryItemIModel>,
+    private var itemList: ArrayList<InventoryModel>,
     private val listener: OnItemActionListener
 ) : RecyclerView.Adapter<InventoryRcvAdapter.MyItemViewHolder>() {
 
     interface OnItemActionListener {
-        fun onEditButtonClick(item: InventoryItemIModel)
+        fun onEditButtonClick(item: InventoryModel)
     }
 
     class MyItemViewHolder(val binding: InventoryRcvItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(inventory: InventoryItemIModel) {
+        fun bind(inventory: InventoryModel) {
             binding.itemName.text = inventory.itemName
         }
     }
@@ -66,7 +66,7 @@ class InventoryRcvAdapter(
         }
     }
 
-    private fun inventoryDetailsDialog(item: InventoryItemIModel) {
+    private fun inventoryDetailsDialog(item: InventoryModel) {
         val customDialog = LayoutInflater.from(context).inflate(R.layout.inventory_details_dialog, null)
         val builder = MaterialAlertDialogBuilder(context)
         val binder = InventoryDetailsDialogBinding.bind(customDialog)
@@ -146,7 +146,7 @@ class InventoryRcvAdapter(
         }
     }
 
-    private fun undoDeleteItem(position: Int, itemToDelete: InventoryItemIModel) {
+    private fun undoDeleteItem(position: Int, itemToDelete: InventoryModel) {
         val snackbar: Snackbar = Snackbar.make((context as Activity).findViewById(android.R.id.content),
             "Item deleted successfully", Snackbar.LENGTH_LONG)
         snackbar.setAction("UNDO") {
@@ -163,7 +163,7 @@ class InventoryRcvAdapter(
         snackbar.setBackgroundTint(Color.WHITE)
     }
 
-    fun updateList(newItems: ArrayList<InventoryItemIModel>) {
+    fun updateList(newItems: ArrayList<InventoryModel>) {
         itemList = newItems
         notifyDataSetChanged()
     }

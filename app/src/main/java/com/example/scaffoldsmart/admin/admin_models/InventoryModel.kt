@@ -2,7 +2,7 @@ package com.example.scaffoldsmart.admin.admin_models
 
 import java.io.Serializable
 
-class InventoryItemIModel : Serializable {
+class InventoryModel : Serializable {
     var itemId = ""
     var itemName = ""
     var price = ""
