@@ -1,7 +1,6 @@
 package com.example.scaffoldsmart.admin.admin_adapters
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -9,25 +8,22 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.admin_models.RentalReqModel
-import com.example.scaffoldsmart.admin.admin_viewmodel.RentalReqViewModel
+import com.example.scaffoldsmart.admin.admin_models.RentalModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.ReqRcvItemBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.database.database
 
 class RequestRcvAdapter(
     val context: Context,
-    private var reqList: ArrayList<RentalReqModel>,
-    private val viewModel: RentalReqViewModel,
+    private var reqList: ArrayList<RentalModel>,
+    private val viewModel: RentalViewModel,
     private val listener: OnItemActionListener
 ): RecyclerView.Adapter<RequestRcvAdapter.MyRequestViewHolder>() {
 
@@ -51,11 +47,11 @@ class RequestRcvAdapter(
         holder.binding.clientName.text = currentReq.clientName
 
         holder.binding.root.setOnClickListener {
-            reqDetailsDialog(currentReq)
+            showReqDetailsDialog(currentReq)
         }
     }
 
-    private fun reqDetailsDialog(currentReq: RentalReqModel) {
+    private fun showReqDetailsDialog(currentReq: RentalModel) {
         val customDialog = LayoutInflater.from(context).inflate(R.layout.rentals_details_dialog, null)
         val builder = MaterialAlertDialogBuilder(context)
         val binder = RentalsDetailsDialogBinding.bind(customDialog)
@@ -107,7 +103,7 @@ class RequestRcvAdapter(
         }
     }
 
-    private fun approveRentalReq(currentReq: RentalReqModel) {
+    private fun approveRentalReq(currentReq: RentalModel) {
         // Reference to the specific req in Firebase
         val databaseRef = Firebase.database.reference.child("Rentals")
             .child(currentReq.rentalId) // Reference to the specific req using reqId
@@ -122,15 +118,16 @@ class RequestRcvAdapter(
         databaseRef.updateChildren(updates)
             .addOnSuccessListener {
                 Toast.makeText(context, "Request Approved", Toast.LENGTH_SHORT).show()
-                reqList.clear()
+                reqList.remove(currentReq)
                 viewModel.retrieveRentalReq() // Refresh to reflect changes
+                notifyDataSetChanged()
             }
             .addOnFailureListener {
                 Toast.makeText(context, "Failed to approve request", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun delRentalReq(currentReq: RentalReqModel) {
+    private fun delRentalReq(currentReq: RentalModel) {
         // Reference to the specific req in Firebase
         val databaseRef = Firebase.database.reference.child("Rentals")
             .child(currentReq.rentalId) // Reference to the specific req using reqId

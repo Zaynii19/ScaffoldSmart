@@ -1,7 +1,6 @@
 package com.example.scaffoldsmart.client
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -23,6 +22,7 @@ class ClientMainActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityClientMainBinding.inflate(layoutInflater)
     }
+    private lateinit var onesignal: OnesignalService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,11 +36,8 @@ class ClientMainActivity : AppCompatActivity() {
 
         setStatusBarColor()
         setBottomNav()
-
-        // Initialize OneSignal
-        val tags: Map<String, String> = mapOf("role" to "Client")
-        val onesignal = OnesignalService(this@ClientMainActivity)
-        onesignal.initializeOneSignal(this@ClientMainActivity, tags)
+        onesignal = OnesignalService(this@ClientMainActivity)
+        onesignal.initializeOneSignal(this@ClientMainActivity)
 
         // Initialize Python
         // "context" must be an Activity, Service or Application object from your app.

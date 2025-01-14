@@ -1,11 +1,72 @@
 package com.example.scaffoldsmart.admin.admin_models
 
-class RentalModel (
-    var clientName: String,
-    var status: String,
-    var item: String,
-    var quantity:String,
-    var address: String,
-    var cost: String,
-    var duration: String,
-)
+import java.io.Serializable
+
+class RentalModel : Serializable {
+    var clientID = ""
+    var rentalId = ""
+    var clientName = ""
+    var clientEmail = ""
+    var rentalAddress = ""
+    var clientCnic = ""
+    var clientPhone = ""
+    var startDuration = ""
+    var endDuration = ""
+    var pipes = ""
+    var pipesLength = ""
+    var joints = ""
+    var wench = ""
+    var motors = ""
+    var pumps = ""
+    var generators = ""
+    var wheel = ""
+    var status = ""
+    var rent = ""
+    var rentStatus = ""
+
+    constructor()
+
+    constructor(
+        clientID: String,
+        rentalId: String,
+        clientName: String,
+        clientEmail: String,
+        rentalAddress: String,
+        clientCnic: String,
+        clientPhone: String,
+        startDuration: String,
+        endDuration: String,
+        pipes: String,
+        pipesLength: String,
+        joints: String,
+        wench: String,
+        motors: String,
+        pumps: String,
+        generators: String,
+        wheel: String,
+        status: String,
+        rent: String,
+        rentStatus: String
+    ) {
+        this.clientID = clientID
+        this.rentalId = rentalId
+        this.clientName = clientName
+        this.clientEmail = clientEmail
+        this.rentalAddress = rentalAddress
+        this.clientCnic = clientCnic
+        this.clientPhone = clientPhone
+        this.startDuration = startDuration
+        this.endDuration = endDuration
+        this.pipes = pipes
+        this.pipesLength = pipesLength
+        this.joints = joints
+        this.wench = wench
+        this.motors = motors
+        this.pumps = pumps
+        this.generators = generators
+        this.wheel = wheel
+        this.status = status
+        this.rent = rent
+        this.rentStatus = rentStatus
+    }
+}

@@ -12,6 +12,7 @@ import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.client.client_adapters.ClientInventoryRcvAdapter
+import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientInventoryBinding
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -24,11 +25,16 @@ class ClientInventoryFragment : Fragment() {
     private var itemList = ArrayList<InventoryModel>()
     private lateinit var adapter: ClientInventoryRcvAdapter
     private lateinit var viewModel: InventoryViewModel
+    private lateinit var viewModel2: ClientViewModel
+    private var clientID: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[InventoryViewModel::class.java]
         viewModel.retrieveInventory()
+
+        viewModel2 = ViewModelProvider(this)[ClientViewModel::class.java]
+        viewModel2.retrieveClientData()
     }
 
     override fun onCreateView(
@@ -37,6 +43,7 @@ class ClientInventoryFragment : Fragment() {
     ): View {
         setRcv()
         observeInventoryLiveData()
+        observeClientLiveData()
 
         // Inflate the layout for this fragment
         return binding.root
@@ -78,6 +85,16 @@ class ClientInventoryFragment : Fragment() {
         }
     }
 
+    private fun observeClientLiveData() {
+        binding.loading.visibility = View.VISIBLE
+        viewModel2.observeClientLiveData().observe(viewLifecycleOwner) { client ->
+            binding.loading.visibility = View.GONE
+            if (client != null) {
+                clientID = client.id
+            }
+        }
+    }
+
     private fun showBottomSheet() {
         val bottomSheetDialog: BottomSheetDialogFragment = RentalReqFragment.newInstance(object : RentalReqFragment.OnSendReqListener {
             override fun onReqSendUpdated(
@@ -98,7 +115,7 @@ class ClientInventoryFragment : Fragment() {
                 wheel: String
             ) {
                 val onesignal = OnesignalService(requireActivity())
-                onesignal.sendReqNotiByOneSignalToSegment(clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel)
+                onesignal.sendReqNotiByOneSignalToSegment(clientID, clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel)
             }
         })
         bottomSheetDialog.show(requireActivity().supportFragmentManager, "RentalReq")

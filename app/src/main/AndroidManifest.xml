@@ -26,7 +26,8 @@
             android:exported="false" />
         <activity
             android:name=".client.ClientMainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan"/>
         <activity
             android:name=".admin.SettingActivity"
             android:exported="false" />
@@ -56,7 +57,9 @@
         </activity>
         <activity
             android:name=".admin.AdminMainActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:windowSoftInputMode="adjustPan"/>
+        <!--android:windowSoftInputMode="adjustPan"   to fix bottom Nav -->
     </application>
 
 </manifest>

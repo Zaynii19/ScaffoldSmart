@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.admin.admin_adapters.RequestRcvAdapter
-import com.example.scaffoldsmart.admin.admin_models.RentalReqModel
-import com.example.scaffoldsmart.admin.admin_viewmodel.RentalReqViewModel
+import com.example.scaffoldsmart.admin.admin_models.RentalModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.databinding.FragmentAdminRentalReqBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -18,12 +18,12 @@ class AdminRentalReqFragment : BottomSheetDialogFragment(), RequestRcvAdapter.On
     }
 
     private lateinit var adapter: RequestRcvAdapter
-    private lateinit var reqList: ArrayList<RentalReqModel>
-    private lateinit var reqViewModel: RentalReqViewModel
+    private lateinit var reqList: ArrayList<RentalModel>
+    private lateinit var reqViewModel: RentalViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        reqViewModel = ViewModelProvider(requireActivity())[RentalReqViewModel::class.java]
+        reqViewModel = ViewModelProvider(requireActivity())[RentalViewModel::class.java]
         reqViewModel.retrieveRentalReq()
     }
 
@@ -36,11 +36,10 @@ class AdminRentalReqFragment : BottomSheetDialogFragment(), RequestRcvAdapter.On
         return binding.root
     }
 
-
     private fun setRcv() {
         // Retrieve the list of rental requests from arguments safely
         arguments?.let {
-            reqList = it.getSerializable(ARG_LIST) as ArrayList<RentalReqModel>
+            reqList = it.getSerializable(ARG_LIST) as ArrayList<RentalModel>
         }
         // Set up the RecyclerView only if reqList is not null
         binding.rcv.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
@@ -55,7 +54,7 @@ class AdminRentalReqFragment : BottomSheetDialogFragment(), RequestRcvAdapter.On
         private const val ARG_LIST = "arg_list"
 
         // Modify the function to accept a list of RentalReqModel
-        fun newInstance(reqList: List<RentalReqModel>): AdminRentalReqFragment {
+        fun newInstance(reqList: List<RentalModel>): AdminRentalReqFragment {
             val fragment = AdminRentalReqFragment()
             val args = Bundle()
 

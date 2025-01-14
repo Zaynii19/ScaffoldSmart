@@ -1,10 +1,6 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.Context
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,18 +10,21 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_adapters.RentalRcvAdapter
-import com.example.scaffoldsmart.databinding.FragmentRentBinding
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
-import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
-import com.example.scaffoldsmart.admin.admin_viewmodel.RentalReqViewModel
-import com.google.firebase.messaging.FirebaseMessaging
+import com.example.scaffoldsmart.databinding.FragmentRentBinding
+import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class RentFragment : Fragment() {
     private val binding by lazy {
@@ -34,10 +33,14 @@ class RentFragment : Fragment() {
 
     private var rentalList = ArrayList<RentalModel>()
     private lateinit var adapter: RentalRcvAdapter
+    private lateinit var viewModel: RentalViewModel
+    private var rentStatus: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initializeRentalList()
+
+        viewModel = ViewModelProvider(this)[RentalViewModel::class.java]
+        viewModel.retrieveRentalReq()
     }
 
     override fun onCreateView(
@@ -46,6 +49,7 @@ class RentFragment : Fragment() {
     ): View {
         setRcv()
         setSearchView()
+        observeRentalLiveData()
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -57,14 +61,19 @@ class RentFragment : Fragment() {
         binding.rcv.setHasFixedSize(true)
     }
 
-    private fun initializeRentalList() {
-        rentalList.add(RentalModel("Hasan", "returned", "PiPe","1200","Gulzar-e-Quaid, Satellite Town, Rawalpindi","12000 .Rs","7 Weeks"))
-        rentalList.add(RentalModel("Fatima",  "overdue",  "Joints","1000","Holy Family Hospital, Murree Road","15000 .Rs","2 Weeks"))
-        rentalList.add(RentalModel("Ali",  "ongoing", "Generators","5","Commercial Market, Satellite Town, Rawalpindi","20000 .Rs","8 Weeks"))
-        rentalList.add(RentalModel("Laiba",  "returned", "Slugs Pump","2","Rawalpindi Railway Station, Mall Road","2000 .Rs","1 Week"))
-        rentalList.add(RentalModel("Danish",  "overdue", "Wench","3","Bahria Town Phase Eight, Rawalpindi","22000 .Rs","6 Weeks"))
-        rentalList.add(RentalModel("Rabia", "ongoing", "Wheel Barrows","2","Holy Family Hospital, Murree Road","2200 .Rs","9 Weeks"))
-        rentalList.add(RentalModel("Haider",  "returned", "Motors","5","Rawalpindi Railway Station, Mall Road","7000 .Rs","3 Weeks"))
+    private fun observeRentalLiveData() {
+        binding.loading.visibility = View.VISIBLE
+        viewModel.observeRentalReqLiveData().observe(viewLifecycleOwner) { rentals ->
+            binding.loading.visibility = View.GONE
+            val filteredRentals = rentals?.filter { it.status.isNotEmpty() } // Get only approved rentals
+            rentalList.clear()
+            filteredRentals?.let {
+                rentalList.addAll(it)
+                Log.d("RentFragDebug", "observeRentalReqLiveData: ${rentalList.size} ")
+            }
+            adapter.updateList(rentalList)
+            calculateRentalStatus(rentalList)
+        }
     }
 
     private fun setSearchView() {
@@ -84,14 +93,67 @@ class RentFragment : Fragment() {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                adapter.filter(newText ?: "") // Call filter method on text change
+                // Filter the itemList based on the search text (case-insensitive)
+                val filteredList = rentalList.filter { item ->
+                    item.clientName.lowercase().contains(newText!!.lowercase())
+                }
+
+                // Update the adapter with the filtered list
+                adapter.updateList(filteredList as ArrayList<RentalModel>)
                 return true
             }
         })
     }
 
-    companion object {
-        //var rentalList = ArrayList<RentalModel>()
-        //private lateinit var adapter: RentalRcvAdapter
+    private fun calculateRentalStatus(rentalList: ArrayList<RentalModel>) {
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+
+        for (rental in rentalList) {
+            try {
+                // Convert start and end duration strings to Date type
+                val startDate = dateFormat.parse(rental.startDuration)
+                val endDate = dateFormat.parse(rental.endDuration)
+
+                if (startDate != null && endDate != null) {
+                    // Get current date and format it
+                    val currentDate = LocalDate.now() // Get current date
+                    val currentDateFormatted = currentDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+                    val currentDateParsed = dateFormat.parse(currentDateFormatted)
+
+                    // Determine the status
+                    rentStatus = if (currentDateParsed?.after(endDate) == true) {
+                        "overdue"
+                    } else {
+                        "ongoing"
+                    }
+
+                    // Call method to update the database with the new status
+                    updateRentalStatus(rental.rentalId, rentStatus)
+
+                }
+            } catch (e: ParseException) {
+                Log.e("RentFragDebug", "Date parsing error for rental: ${rental.clientName} - ${e.message}")
+            }
+        }
     }
+
+    private fun updateRentalStatus(rentalId: String, newStatus: String) {
+        // Reference to the specific rental in Firebase
+        val databaseRef = Firebase.database.reference.child("Rentals").child(rentalId)
+
+        // Create a map of the fields you want to update
+        val updates = hashMapOf<String, Any>(
+            "rentStatus" to newStatus
+        )
+
+        // Update the item with the new values
+        databaseRef.updateChildren(updates)
+            .addOnSuccessListener {
+                Log.i("RentFragDebug", "Successfully updated status for rental ID: $rentalId to $newStatus")
+            }
+            .addOnFailureListener {
+                Log.e("RentFragDebug", "Failed to update status for rental ID: $rentalId")
+            }
+    }
+
 }

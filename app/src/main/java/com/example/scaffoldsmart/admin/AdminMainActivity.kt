@@ -11,7 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.admin_models.RentalReqModel
+import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.client.client_fragments.ClientInventoryFragment
 import com.example.scaffoldsmart.databinding.ActivityMainAdminBinding
 import com.example.scaffoldsmart.util.OnesignalService
@@ -43,11 +43,8 @@ class AdminMainActivity : AppCompatActivity() {
 
         setStatusBarColor()
         setBottomNav()
-
-        // Initialize OneSignal
         onesignal = OnesignalService(this@AdminMainActivity)
-        val tags: Map<String, String> = mapOf("role" to "Admin")
-        onesignal.initializeOneSignal(this@AdminMainActivity, tags)
+        onesignal.initializeOneSignal(this@AdminMainActivity)
 
         // Get rental notification data first start
         val notificationId = ClientInventoryFragment.notificationId
@@ -98,6 +95,7 @@ class AdminMainActivity : AppCompatActivity() {
     companion object {
         fun handleReqData(reqData: JSONObject) {
             reqData.let { data ->
+                val clientID = data.optString("clientID", "N/A")
                 val clientName = data.optString("clientName", "N/A")
                 val rentalAddress = data.optString("rentalAddress", "N/A")
                 val clientEmail = data.optString("clientEmail", "N/A")
@@ -114,29 +112,13 @@ class AdminMainActivity : AppCompatActivity() {
                 val generators = data.optString("generators", "N/A")
                 val wheel = data.optString("wheel", "N/A")
 
-                storeRentalReq(clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel)
+                storeRentalReq(clientID, clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel)
 
-               /* Log.d("AdminMainDebug", """
-                                                Client Name: $clientName
-                                                Rental Address: $rentalAddress
-                                                Email: $clientEmail
-                                                Phone: $clientPhone
-                                                CNIC: $clientCnic
-                                                Start Duration: $startDuration
-                                                End Duration: $endDuration
-                                                Pipes: $pipes
-                                                Pipes Length: $pipesLength
-                                                Joints: $joints
-                                                Wench: $wench
-                                                Pumps: $pumps
-                                                Motors: $motors
-                                                Generators: $generators
-                                                Wheel: $wheel
-                                                """.trimIndent())*/
             }
         }
 
-        fun storeRentalReq(
+        private fun storeRentalReq(
+            clientID: String,
             clientName: String,
             rentalAddress: String,
             clientEmail: String,
@@ -160,8 +142,8 @@ class AdminMainActivity : AppCompatActivity() {
 
             if (rentalId != null) {
                 // Create new rental request model
-                val newReq = RentalReqModel(rentalId, clientName, clientEmail, rentalAddress, clientCnic, clientPhone,
-                    startDuration, endDuration, pipes, pipesLength, joints, wench, motors, pumps, generators, wheel,"")
+                val newReq = RentalModel(clientID, rentalId, clientName, clientEmail, rentalAddress, clientCnic, clientPhone,
+                    startDuration, endDuration, pipes, pipesLength, joints, wench, motors, pumps, generators, wheel,"","","")
 
                 // Store the new request in Firebase
                 newItemRef.setValue(newReq)

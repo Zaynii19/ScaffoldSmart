@@ -16,7 +16,7 @@ import com.google.firebase.messaging.RemoteMessage
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
-    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+    /*override fun onMessageReceived(remoteMessage: RemoteMessage) {
 
         // Extract data from the notification payload
         val notificationId = remoteMessage.data["notification_id"]
@@ -35,7 +35,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         //createNotificationChannel(applicationContext)
 
         // Extract notification data and handle both notification and data payloads
-        /*if (remoteMessage.notification != null) {
+        *//*if (remoteMessage.notification != null) {
             val title = remoteMessage.notification?.title ?: "New Rental Request"
             val message = remoteMessage.notification?.body ?: "A new rental request has been submitted."
             showNotification(title, message)
@@ -60,8 +60,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             showNotificationWithData(clientName, rentalAddress, clientEmail, clientPhone, clientCnic,
                 startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel)
-        }*/
-    }
+        }*//*
+    }*/
 
     private fun showNotification(title: String, message: String) {
         // Intent to launch EnterPinActivity when the notification is clicked

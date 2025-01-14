@@ -2,6 +2,7 @@ package com.example.scaffoldsmart.client
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
@@ -18,6 +19,7 @@ import com.example.scaffoldsmart.databinding.ActivitySignupBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
+import com.onesignal.OneSignal
 
 class SignupActivity : AppCompatActivity() {
     private val binding by lazy {
@@ -81,16 +83,15 @@ class SignupActivity : AppCompatActivity() {
 
     private fun signupClient() {
         //Checks if fields are empty or not
-        if (binding.clientName.text.toString() == "" ||
-            binding.email.text.toString() == "" ||
-            binding.pass.text.toString() == "" ||
+        if (binding.clientName.text.toString() == "" &&
+            binding.email.text.toString() == "" &&
+            binding.pass.text.toString() == "" &&
             binding.confrmPass.text.toString() == ""
         )
         {
             Toast.makeText(this@SignupActivity, "Please fill all the details first", Toast.LENGTH_SHORT).show()
         }else{
             binding.loading.visibility = View.VISIBLE
-            binding.signupBtn.setOnClickListener(null)
             Firebase.auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                 binding.loading.visibility = View.GONE
                 if (task.isSuccessful) {

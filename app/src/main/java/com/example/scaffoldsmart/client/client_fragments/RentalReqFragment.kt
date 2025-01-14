@@ -58,21 +58,22 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     private var onSendReqListener: OnSendReqListener? = null
 
     interface OnSendReqListener {
-        fun onReqSendUpdated(clientName: String,
-                             rentalAddress: String,
-                             clientEmail: String,
-                             clientPhone: String,
-                             clientCnic: String,
-                             startDuration: String,
-                             endDuration: String,
-                             pipes: String,
-                             pipesLength: String,
-                             joints: String,
-                             wench: String,
-                             pumps: String,
-                             motors: String,
-                             generators: String,
-                             wheel: String)
+        fun onReqSendUpdated(
+            clientName: String,
+            rentalAddress: String,
+            clientEmail: String,
+            clientPhone: String,
+            clientCnic: String,
+            startDuration: String,
+            endDuration: String,
+            pipes: String,
+            pipesLength: String,
+            joints: String,
+            wench: String,
+            pumps: String,
+            motors: String,
+            generators: String,
+            wheel: String)
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {

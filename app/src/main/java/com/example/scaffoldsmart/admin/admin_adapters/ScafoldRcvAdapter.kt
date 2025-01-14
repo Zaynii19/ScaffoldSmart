@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.ScafoldInfoRcvItemBinding
 import com.example.scaffoldsmart.admin.admin_models.ScafoldInfoModel
 
@@ -21,7 +22,8 @@ class ScafoldRcvAdapter (val context: Context, private var infoList: ArrayList<S
 
     override fun onBindViewHolder(holder: MyInfoViewHolder, position: Int) {
         holder.binding.clientName.text = infoList[position].clientName
-        holder.binding.rentalItems.text = infoList[position].items
+        holder.binding.duration.text = infoList[position].duration
+
         holder.binding.status.setBackgroundResource(
             when (infoList[position].status) {
                 "overdue" -> R.drawable.status_red
@@ -30,8 +32,11 @@ class ScafoldRcvAdapter (val context: Context, private var infoList: ArrayList<S
                 else -> R.drawable.status_blue
             }
         )
+    }
 
-
+    fun updateList(newItems: ArrayList<ScafoldInfoModel>) {
+        infoList = newItems
+        notifyDataSetChanged()
     }
 
 }

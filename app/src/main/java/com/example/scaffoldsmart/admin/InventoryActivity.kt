@@ -32,7 +32,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     private val binding by lazy {
         ActivityInventoryBinding.inflate(layoutInflater)
     }
-    private var itemList = ArrayList<InventoryModel>()
+    //private var itemList = ArrayList<InventoryModel>()
     private lateinit var adapter: InventoryRcvAdapter
     private var isUpdate = false
     private lateinit var inventoryPreferences: SharedPreferences
@@ -206,5 +206,9 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         editor.putBoolean("Update", isUpdate)
         editor.apply()
         showBottomSheet(item)
+    }
+
+    companion object {
+        var itemList = ArrayList<InventoryModel>()
     }
 }

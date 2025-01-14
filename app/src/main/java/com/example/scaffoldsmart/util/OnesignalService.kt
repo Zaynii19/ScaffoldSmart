@@ -26,19 +26,34 @@ class OnesignalService(context: Context) {
     private val apiKey = "os_v2_app_jq7v33yhuvdlth537azw6hp2rir3kktmejgui44gno5haipvnp2bjxn3nfjx4yrhzmcwsj5ajhphiqfwfs7zdltixzcfsuot5av5tki"
     private val reqPreferences = context.getSharedPreferences("RENTALREQ", Context.MODE_PRIVATE)
 
-    fun initializeOneSignal(context: Context, tags: Map<String, String>) {
+    // Initialize OneSignal
+    fun initializeOneSignal(context: Context) {
         // Verbose Logging set to help debug issues, remove before releasing your app.
         OneSignal.Debug.logLevel = LogLevel.VERBOSE
 
         // OneSignal Initialization
         OneSignal.initWithContext(context, appId)
 
-        OneSignal.User.addTags(tags)
-
         // requestPermission will show the native Android notification permission prompt.
         // NOTE: It's recommended to use a OneSignal In-App Message to prompt instead.
         CoroutineScope(Dispatchers.IO).launch {
             OneSignal.Notifications.requestPermission(false)
+        }
+    }
+
+    // Login as OneSignal user
+    fun oneSignalLogin(email: String, role: String) {
+        val tags: Map<String, String> = mapOf("role" to role)
+        if (email.isNotEmpty()) {
+            Log.d("HomeFragDebug", "Admin Email: $email")
+            try {
+                OneSignal.login(email)
+                OneSignal.User.addTags(tags)
+            } catch (e: Exception) {
+                Log.e("HomeFragDebug", "Failed to log in to OneSignal: ${e.message}")
+            }
+        } else {
+            Log.e("HomeFragDebug", "User email is null or empty")
         }
     }
 
@@ -149,6 +164,7 @@ class OnesignalService(context: Context) {
     }
 
     fun sendReqNotiByOneSignalToSegment(
+        clientID: String,
         clientName: String,
         rentalAddress: String,
         clientEmail: String,
@@ -170,6 +186,7 @@ class OnesignalService(context: Context) {
 
         // Create custom data JSON
         val customData = JSONObject().apply {
+            put("clientID", clientID)
             put("clientName", clientName)
             put("rentalAddress", rentalAddress)
             put("clientEmail", clientEmail)

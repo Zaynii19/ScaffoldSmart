@@ -150,14 +150,6 @@ class LoginActivity : AppCompatActivity() {
             // Store user type in SharedPreferences
             userPreferences.edit().putString("USERTYPE", expectedUserType).apply()
 
-            // Login as OneSignal user
-            if (userEmail.isNotEmpty()) {
-                OneSignal.login(userEmail)
-            } else {
-                Log.e("LoginDebug", "User email is null or empty")
-            }
-
-
             // Navigate to the correct dashboard
             when (expectedUserType) {
                 "Admin" -> startActivity(Intent(this, AdminMainActivity::class.java))
