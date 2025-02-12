@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ClientDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentClientProfileBinding
@@ -49,6 +50,10 @@ class ClientProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.settingBtn.setOnClickListener {
+            startActivity(Intent(context, ClientSettingActivity::class.java))
+        }
 
         binding.personalDetailBtn.setOnClickListener {
             clientDetailsDialog()

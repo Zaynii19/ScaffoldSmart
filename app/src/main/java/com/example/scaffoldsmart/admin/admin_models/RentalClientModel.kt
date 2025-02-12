@@ -1,4 +1,3 @@
 package com.example.scaffoldsmart.admin.admin_models
 
-//class ClientModel (var clientName: String, var clientId: String, var address: String)
-class RentalClientModel (var clientName: String)
+class RentalClientModel (var rentalId: String, var clientName: String, var email: String, var cnic: String, var address: String, var phone: String)

@@ -44,7 +44,7 @@ class AdminMainActivity : AppCompatActivity() {
         setStatusBarColor()
         setBottomNav()
         onesignal = OnesignalService(this@AdminMainActivity)
-        onesignal.initializeOneSignal(this@AdminMainActivity)
+        onesignal.initializeOneSignal()
 
         // Get rental notification data first start
         val notificationId = ClientInventoryFragment.notificationId
@@ -111,8 +111,9 @@ class AdminMainActivity : AppCompatActivity() {
                 val motors = data.optString("motors", "N/A")
                 val generators = data.optString("generators", "N/A")
                 val wheel = data.optString("wheel", "N/A")
+                val totalRent = data.optString("rent", "N/A")
 
-                storeRentalReq(clientID, clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel)
+                storeRentalReq(clientID, clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel, totalRent)
 
             }
         }
@@ -133,7 +134,8 @@ class AdminMainActivity : AppCompatActivity() {
             pumps: String,
             motors: String,
             generators: String,
-            wheel: String
+            wheel: String,
+            totalRent: String
         ) {
             // Reference to the inventory in Firebase
             val databaseRef = Firebase.database.reference.child("Rentals")
@@ -143,7 +145,7 @@ class AdminMainActivity : AppCompatActivity() {
             if (rentalId != null) {
                 // Create new rental request model
                 val newReq = RentalModel(clientID, rentalId, clientName, clientEmail, rentalAddress, clientCnic, clientPhone,
-                    startDuration, endDuration, pipes, pipesLength, joints, wench, motors, pumps, generators, wheel,"","","")
+                    startDuration, endDuration, pipes, pipesLength, joints, wench, motors, pumps, generators, wheel,"",totalRent,"")
 
                 // Store the new request in Firebase
                 newItemRef.setValue(newReq)

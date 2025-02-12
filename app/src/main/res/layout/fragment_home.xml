@@ -218,9 +218,8 @@
                     android:id="@+id/textView8"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/_20sdp"
-                    android:layout_marginTop="@dimen/_10sdp"
-                    android:text="@string/client"
+                    android:layout_marginStart="@dimen/_15sdp"
+                    android:text="@string/sr"
                     android:textColor="@color/dark_gray"
                     app:layout_constraintEnd_toStartOf="@+id/textView9"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -232,24 +231,39 @@
                     android:id="@+id/textView9"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/duration"
+                    android:text="@string/client"
                     android:textColor="@color/dark_gray"
+                    android:layout_marginStart="@dimen/_48sdp"
                     app:layout_constraintEnd_toStartOf="@+id/textView10"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/textView8"
-                    app:layout_constraintTop_toTopOf="@+id/textView8" />
+                    app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
 
                 <TextView
                     android:id="@+id/textView10"
+                    android:layout_width="55dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="@dimen/_48sdp"
+                    android:text="@string/duration"
+                    android:textColor="@color/dark_gray"
+                    app:layout_constraintEnd_toStartOf="@+id/textView12"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/textView9"
+                    app:layout_constraintTop_toBottomOf="@+id/textView11" />
+
+                <TextView
+                    android:id="@+id/textView12"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="@dimen/_20sdp"
                     android:text="@string/status"
                     android:textColor="@color/dark_gray"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginStart="@dimen/_48sdp"
+                    app:layout_constraintEnd_toStartOf="@+id/textView10"
                     app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toEndOf="@+id/textView9"
-                    app:layout_constraintTop_toTopOf="@+id/textView9" />
+                    app:layout_constraintStart_toEndOf="@+id/textView10"
+                    app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
                 <View
                     android:id="@+id/line"
@@ -265,7 +279,7 @@
                     android:id="@+id/rcv"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:layout_marginHorizontal="@dimen/_10sdp"
+                    android:layout_marginHorizontal="@dimen/_2sdp"
                     android:layout_marginTop="@dimen/_10sdp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

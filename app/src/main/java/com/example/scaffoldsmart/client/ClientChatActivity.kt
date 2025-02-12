@@ -24,6 +24,9 @@ class ClientChatActivity : AppCompatActivity() {
         }
 
         setStatusBarColor()
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
 
         val userName = intent.getStringExtra("USERNAME")
         binding.userName.text = userName

@@ -1,23 +1,27 @@
 package com.example.scaffoldsmart.client.client_fragments
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.scaffoldsmart.admin.admin_models.RentalModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_adapters.ClientScafoldRcvAdapter
 import com.example.scaffoldsmart.client.client_models.ClientScafoldInfoModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
 import com.example.scaffoldsmart.util.OnesignalService
-import com.onesignal.OneSignal
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class ClientHomeFragment : Fragment() {
     private val binding by lazy {
@@ -26,18 +30,24 @@ class ClientHomeFragment : Fragment() {
     private var name: String = ""
     private var email: String = ""
     private var role: String = ""
+    private var clientID: String = ""
+    private var diffInDays: Long = 0
     private var infoList = ArrayList<ClientScafoldInfoModel>()
+    private var dueRequests = ArrayList<RentalModel>()
     private lateinit var adapter: ClientScafoldRcvAdapter
     private lateinit var viewModel: ClientViewModel
     private lateinit var onesignal: OnesignalService
+    private lateinit var rentViewModel: RentalViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         onesignal = OnesignalService(requireActivity())
-        initializeInfoList()
         viewModel = ViewModelProvider(this)[ClientViewModel::class.java]
         viewModel.retrieveClientData()
+
+        rentViewModel = ViewModelProvider(this)[RentalViewModel::class.java]
+        rentViewModel.retrieveRentalReq()
     }
 
     override fun onCreateView(
@@ -46,6 +56,7 @@ class ClientHomeFragment : Fragment() {
     ): View {
         setRcv()
         observeClientLiveData()
+        observeRentalLiveData()
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -56,6 +67,11 @@ class ClientHomeFragment : Fragment() {
         binding.settingBtn.setOnClickListener {
             startActivity(Intent(context, ClientSettingActivity::class.java))
         }
+
+        binding.totalPaymentDue.text = buildString {
+            append(totalDueRent())
+            append(" .Rs")
+        }
     }
 
     private fun setRcv() {
@@ -63,13 +79,6 @@ class ClientHomeFragment : Fragment() {
         adapter = ClientScafoldRcvAdapter(requireActivity(), infoList)
         binding.rcv.adapter = adapter
         binding.rcv.setHasFixedSize(true)
-    }
-
-    private fun initializeInfoList() {
-        infoList.add(ClientScafoldInfoModel("Pipes", "300 Pipes and 200 Joints", "3 Weeks"))
-        infoList.add(ClientScafoldInfoModel("Joints", "300 Pipes and 200 Joints", "5 Weeks"))
-        infoList.add(ClientScafoldInfoModel("Generators", "300 Pipes and 200 Joints", "12 Weeks"))
-        infoList.add(ClientScafoldInfoModel("Motors", "300 Pipes and 200 Joints", "8 Weeks"))
     }
 
     private fun observeClientLiveData() {
@@ -86,7 +95,60 @@ class ClientHomeFragment : Fragment() {
                 email = client.email
                 role = client.userType
                 onesignal.oneSignalLogin(email, role)
+
+                clientID = client.id
             }
         }
+    }
+
+    private fun observeRentalLiveData() {
+        binding.loading.visibility = View.VISIBLE
+        rentViewModel.observeRentalReqLiveData().observe(viewLifecycleOwner) { rentals ->
+            binding.loading.visibility = View.GONE
+            if (rentals != null) {
+                // Filter rentals where the status is not empty
+                val filteredRentals = rentals.filter { it.clientID == clientID && it.status == "approved"}
+                populateInfoList(filteredRentals)
+
+                dueRequests = rentals.filter { it.clientID == clientID && it.status.isEmpty()} as ArrayList<RentalModel>
+
+            }
+        }
+    }
+
+    private fun populateInfoList(rentals: List<RentalModel>) {
+        infoList.clear()
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+
+        for (rental in rentals) {
+            try {
+                // Convert start and end duration strings to Date type
+                val startDate = dateFormat.parse(rental.startDuration)
+                val endDate = dateFormat.parse(rental.endDuration)
+
+                if (startDate != null && endDate != null) {
+                    // Calculate difference in milliseconds
+                    val diffInMillis = endDate.time - startDate.time
+                    // Calculate difference in days
+                    diffInDays = diffInMillis / (1000 * 60 * 60 * 24)
+                    // Convert to months (approximately)
+                    val durationInMonths = diffInDays / 30  // Assuming 30 days in a month
+
+                    // Create a ScafoldInfoModel instance and add to infoList
+                    infoList.add(ClientScafoldInfoModel(rental.rent, "$durationInMonths months", rental.rentStatus))
+                    adapter.updateList(infoList)
+                }
+            } catch (e: ParseException) {
+                Log.e("ClientHomeFragDebug", "Date parsing error for rental: ${rental.rentalId} - ${e.message}")
+            }
+        }
+    }
+
+    private fun totalDueRent(): Int {
+        var total = 0
+        for (request in dueRequests) {
+            total += request.rent.toInt()
+        }
+        return total
     }
 }

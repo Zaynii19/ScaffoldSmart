@@ -44,6 +44,11 @@ class SettingActivity : AppCompatActivity() {
         }
 
         setStatusBarColor()
+
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+
         viewModel = ViewModelProvider(this)[AdminViewModel::class.java]
         viewModel.retrieveAdminData()
 

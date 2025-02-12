@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_adapters.RentalRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.FragmentRentBinding
@@ -52,6 +54,14 @@ class RentFragment : Fragment() {
         observeRentalLiveData()
         // Inflate the layout for this fragment
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.settingBtn.setOnClickListener {
+            startActivity(Intent(context, SettingActivity::class.java))
+        }
     }
 
     private fun setRcv() {

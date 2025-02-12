@@ -37,7 +37,7 @@ class ClientMainActivity : AppCompatActivity() {
         setStatusBarColor()
         setBottomNav()
         onesignal = OnesignalService(this@ClientMainActivity)
-        onesignal.initializeOneSignal(this@ClientMainActivity)
+        onesignal.initializeOneSignal()
 
         // Initialize Python
         // "context" must be an Activity, Service or Application object from your app.

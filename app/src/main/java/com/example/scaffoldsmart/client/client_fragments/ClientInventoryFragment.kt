@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.client.client_fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,8 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
+import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_adapters.ClientInventoryRcvAdapter
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientInventoryBinding
@@ -51,6 +54,10 @@ class ClientInventoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.settingBtn.setOnClickListener {
+            startActivity(Intent(context, ClientSettingActivity::class.java))
+        }
 
         binding.rentalRequestBtn.setOnClickListener {
             showBottomSheet()
@@ -112,10 +119,11 @@ class ClientInventoryFragment : Fragment() {
                 pumps: String,
                 motors: String,
                 generators: String,
-                wheel: String
+                wheel: String,
+                rent: Int
             ) {
                 val onesignal = OnesignalService(requireActivity())
-                onesignal.sendReqNotiByOneSignalToSegment(clientID, clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel)
+                onesignal.sendReqNotiByOneSignalToSegment(clientID, clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel, rent)
             }
         })
         bottomSheetDialog.show(requireActivity().supportFragmentManager, "RentalReq")

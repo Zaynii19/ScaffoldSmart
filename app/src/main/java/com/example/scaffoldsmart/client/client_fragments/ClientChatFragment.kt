@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.client.client_fragments
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_adapters.ChatRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.ChatModel
+import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_adapters.ClientChatRcvAdapter
 import com.example.scaffoldsmart.client.client_models.ClientChatModel
 import com.example.scaffoldsmart.databinding.FragmentClientChatBinding
@@ -44,6 +46,10 @@ class ClientChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSearchView()
+
+        binding.settingBtn.setOnClickListener {
+            startActivity(Intent(context, ClientSettingActivity::class.java))
+        }
     }
 
     private fun setRcv() {

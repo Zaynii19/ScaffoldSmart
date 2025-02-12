@@ -22,10 +22,23 @@ class ClientScafoldRcvAdapter (val context: Context, private var infoList: Array
     }
 
     override fun onBindViewHolder(holder: MyInfoViewHolder, position: Int) {
-        holder.binding.itemName.text = infoList[position].itemName
-        holder.binding.itemQuantity.text = infoList[position].quantity
+        holder.binding.srNo.text = (position + 1).toString()
+        holder.binding.rent.text = infoList[position].rent
         holder.binding.duration.text = infoList[position].duration
+        holder.binding.status.setBackgroundResource(
+            when (infoList[position].rentStatus) {
+                "overdue" -> R.drawable.status_red
+                "returned" -> R.drawable.status_green
+                "ongoing" -> R.drawable.status_blue
+                else -> R.drawable.status_blue
+            }
+        )
 
+    }
+
+    fun updateList(newItems: ArrayList<ClientScafoldInfoModel>) {
+        infoList = newItems
+        notifyDataSetChanged()
     }
 
 }

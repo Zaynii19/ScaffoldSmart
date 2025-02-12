@@ -18,9 +18,14 @@ import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.databinding.FragmentRentalReqBinding
+import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
@@ -56,6 +61,9 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     private lateinit var dialog: AlertDialog
     private var datePickerDialog: DatePickerDialog? = null
     private var onSendReqListener: OnSendReqListener? = null
+    private lateinit var viewModel: InventoryViewModel
+    private var itemList = ArrayList<InventoryModel>()
+    private var totalPrice : Int = 0
 
     interface OnSendReqListener {
         fun onReqSendUpdated(
@@ -73,11 +81,16 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             pumps: String,
             motors: String,
             generators: String,
-            wheel: String)
+            wheel: String,
+            rent: Int
+        )
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel = ViewModelProvider(this)[InventoryViewModel::class.java]
+        viewModel.retrieveInventory()
     }
 
     override fun onCreateView(
@@ -85,6 +98,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View {
         setSpinner()
+        observeInventoryLiveData()
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -97,6 +111,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
 
         binding.sendBtn.setOnClickListener {
             getClientInfo()
+            jointsQuantity = binding.joints.text.toString()
 
             if (!isClientInfoValid()) {
                 Toast.makeText(context, "Please fill client info", Toast.LENGTH_SHORT).show()
@@ -113,14 +128,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
                 return@setOnClickListener
             }
 
-            // If all validations pass, proceed with the action
-            onSendReqListener?.onReqSendUpdated(
-                clientName, rentalAddress, clientEmail, clientPhone, clientCnic,
-                durationStart, durationEnd, pipeQuantity, pipeLength, jointsQuantity,
-                wenchQuantity, pumpsQuantity, motorsQuantity, generatorsQuantity, wheelQuantity
-
-            )
-            dismiss() // Dismiss only after saving data
+           showSendReqDialog()
         }
     }
 
@@ -168,10 +176,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             }
         })
 
-
-        jointsQuantity = binding.joints.text.toString()
         getSpinnerValues()
-
     }
 
     private fun getRentalDuration() {
@@ -399,9 +404,162 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     }
 
     private fun isRentalItemSelected(): Boolean {
-        return pipeQuantity.isNotEmpty() || wenchQuantity.isNotEmpty() ||
-                pumpsQuantity.isNotEmpty() || motorsQuantity.isNotEmpty() ||
-                generatorsQuantity.isNotEmpty() || wheelQuantity.isNotEmpty()
+        return pipeQuantity.isNotEmpty() || jointsQuantity.isNotEmpty() ||
+                wenchQuantity.isNotEmpty() || pumpsQuantity.isNotEmpty() ||
+                motorsQuantity.isNotEmpty() || generatorsQuantity.isNotEmpty() ||
+                wheelQuantity.isNotEmpty()
+    }
+
+    private fun observeInventoryLiveData() {
+        viewModel.observeInventoryLiveData().observe(viewLifecycleOwner) { items ->
+            itemList.clear()
+            items?.let {
+                itemList.addAll(it)
+                Log.d("RentReqDebug", "observeInventoryLiveData: ${it.size}")
+            }
+        }
+    }
+
+    private fun calculateTotalPrice(): Int {
+        totalPrice = 0 // Reset total price before calculation
+
+        // Calculate price for pipes
+        if (pipeQuantity.isNotEmpty()) {
+            Log.d("RentReqDebug", "Pipe Quantity: $pipeQuantity")
+            itemList.forEach {
+                if (it.itemName == "Pipes" || it.itemName == "Scaffolding Pipes") {
+                    totalPrice += it.price.toInt() * pipeQuantity.toInt() * diffInDays
+                    Log.d("RentReqDebug", "Pipes: ${it.price} * $pipeQuantity * $diffInDays = ${it.price.toInt() * pipeQuantity.toInt() * diffInDays}")
+                }
+            }
+        }
+
+        // Calculate price for joints
+        if (jointsQuantity.isNotEmpty()) {
+            Log.d("RentReqDebug", "Joints Quantity: $jointsQuantity")
+            itemList.forEach {
+                if (it.itemName == "Joints") {
+                    totalPrice += it.price.toInt() * jointsQuantity.toInt() * diffInDays
+                    Log.d("RentReqDebug", "Joints: ${it.price} * $jointsQuantity * $diffInDays = ${it.price.toInt() * jointsQuantity.toInt() * diffInDays}")
+                }
+            }
+        }
+
+        // Calculate price for wench
+        if (wenchQuantity.isNotEmpty()) {
+            Log.d("RentReqDebug", "Wench Quantity: $wenchQuantity")
+            itemList.forEach {
+                if (it.itemName == "Wench") {
+                    totalPrice += it.price.toInt() * wenchQuantity.toInt() * diffInDays
+                    Log.d("RentReqDebug", "Wench: ${it.price} * $wenchQuantity * $diffInDays = ${it.price.toInt() * wenchQuantity.toInt() * diffInDays}")
+                }
+            }
+        }
+
+        // Calculate price for pumps
+        if (pumpsQuantity.isNotEmpty()) {
+            Log.d("RentReqDebug", "Pumps Quantity: $pumpsQuantity")
+            itemList.forEach {
+                if (it.itemName == "Pumps" || it.itemName == "Slug Pumps") {
+                    totalPrice += it.price.toInt() * pumpsQuantity.toInt() * diffInDays
+                    Log.d("RentReqDebug", "Pumps: ${it.price} * $pumpsQuantity * $diffInDays = ${it.price.toInt() * pumpsQuantity.toInt() * diffInDays}");
+                }
+            }
+        }
+
+        // Calculate price for generators
+        if (generatorsQuantity.isNotEmpty()) {
+            Log.d("RentReqDebug", "Generators Quantity: $generatorsQuantity")
+            itemList.forEach {
+                if (it.itemName == "Generators") {
+                    totalPrice += it.price.toInt() * generatorsQuantity.toInt() * diffInDays
+                    Log.d("RentReqDebug", "Generators: ${it.price} * $generatorsQuantity * $diffInDays = ${it.price.toInt() * generatorsQuantity.toInt() * diffInDays}");
+                }
+            }
+        }
+
+        // Calculate price for motors
+        if (motorsQuantity.isNotEmpty()) {
+            Log.d("RentReqDebug", "Motors Quantity: $motorsQuantity")
+            itemList.forEach {
+                if (it.itemName == "Motors") {
+                    totalPrice += it.price.toInt() * motorsQuantity.toInt() * diffInDays
+                    Log.d("RentReqDebug", "Motors: ${it.price} * $motorsQuantity * $diffInDays = ${it.price.toInt() * motorsQuantity.toInt() * diffInDays}");
+                }
+            }
+        }
+
+        // Calculate price for wheels
+        if (wheelQuantity.isNotEmpty()) {
+            Log.d("RentReqDebug", "Wheels Quantity: $wheelQuantity")
+            itemList.forEach {
+                if (it.itemName == "Wheels" || it.itemName == "Wheel Borrows") {
+                    totalPrice += it.price.toInt() * wheelQuantity.toInt() * diffInDays
+                    Log.d("RentReqDebug", "Wheels: ${it.price} * $wheelQuantity * $diffInDays = ${it.price.toInt() * wheelQuantity.toInt() * diffInDays}");
+                }
+            }
+        }
+
+        Log.d("RentReqDebug", "Total Price Calculated: $totalPrice")
+        return totalPrice
+    }
+
+    private fun showSendReqDialog() {
+        val customDialog = LayoutInflater.from(requireActivity()).inflate(R.layout.rentals_details_dialog, null)
+        val binder = RentalsDetailsDialogBinding.bind(customDialog)
+
+        binder.clientName.text = clientName
+        binder.address.text = rentalAddress
+        binder.phoneNum.text = clientPhone
+        binder.email.text = clientEmail
+        binder.cnic.text = clientCnic
+        binder.estimatedRent.text = "${calculateTotalPrice()}"
+        binder.rentalDurationFrom.text = durationStart
+        binder.rentalDurationTo.text = durationEnd
+        setViewVisibilityAndText(binder.pipes, pipeQuantity, binder.entry8)
+        setViewVisibilityAndText(binder.pipesLength, pipeLength, binder.entry9)
+        setViewVisibilityAndText(binder.joints, jointsQuantity, binder.entry10)
+        setViewVisibilityAndText(binder.wench, wenchQuantity, binder.entry11)
+        setViewVisibilityAndText(binder.slugPumps, pumpsQuantity, binder.entry12)
+        setViewVisibilityAndText(binder.motors, motorsQuantity, binder.entry13)
+        setViewVisibilityAndText(binder.generators, generatorsQuantity, binder.entry14)
+        setViewVisibilityAndText(binder.wheel, wheelQuantity, binder.entry15)
+
+        dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Send Rental Request")
+            .setView(customDialog)
+            .setPositiveButton("Send") { _, _ ->
+                // If all validations pass, proceed with the action
+                onSendReqListener?.onReqSendUpdated(
+                    clientName, rentalAddress, clientEmail, clientPhone, clientCnic, durationStart,
+                    durationEnd, pipeQuantity, pipeLength, jointsQuantity, wenchQuantity, pumpsQuantity,
+                    motorsQuantity, generatorsQuantity, wheelQuantity, totalPrice
+                )
+                dismiss() // Dismiss ReqFrag only after saving data
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss() // Just dismiss the dialog
+            }
+            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.curved_msg_view_client))
+            .create()
+
+        dialog.apply {
+            show()
+            // Set title text color
+            val titleView = findViewById<TextView>(androidx.appcompat.R.id.alertTitle)
+            titleView?.setTextColor(Color.BLACK)
+            //Customize button colors after the dialog is shown
+            getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(Color.BLUE)
+            getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(Color.BLUE)
+        }
+    }
+
+    private fun setViewVisibilityAndText(view: TextView, text: String, entry: ConstraintLayout) {
+        if (text.isNotEmpty()) {
+            view.text = text
+        } else {
+            entry.visibility = View.GONE
+        }
     }
 
     companion object {

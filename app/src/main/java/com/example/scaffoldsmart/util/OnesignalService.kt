@@ -20,14 +20,14 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 
-class OnesignalService(context: Context) {
+class OnesignalService(val context: Context) {
 
     private val appId = "4c3f5def-07a5-46b9-9fbb-f8336f1dfa8a"
     private val apiKey = "os_v2_app_jq7v33yhuvdlth537azw6hp2rir3kktmejgui44gno5haipvnp2bjxn3nfjx4yrhzmcwsj5ajhphiqfwfs7zdltixzcfsuot5av5tki"
     private val reqPreferences = context.getSharedPreferences("RENTALREQ", Context.MODE_PRIVATE)
 
     // Initialize OneSignal
-    fun initializeOneSignal(context: Context) {
+    fun initializeOneSignal() {
         // Verbose Logging set to help debug issues, remove before releasing your app.
         OneSignal.Debug.logLevel = LogLevel.VERBOSE
 
@@ -179,8 +179,8 @@ class OnesignalService(context: Context) {
         pumps: String,
         motors: String,
         generators: String,
-        wheel: String
-    ) {
+        wheel: String,
+        rent: Int) {
         val message = "A new rental request has been submitted. Click to view rental details."
         val title = "Rental Request Alert"
 
@@ -202,6 +202,7 @@ class OnesignalService(context: Context) {
             put("motors", motors)
             put("generators", generators)
             put("wheel", wheel)
+            put("rent", rent)
         }
 
         // Create the notification JSON object for included_segments

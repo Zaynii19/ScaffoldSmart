@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.AdminDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentProfileBinding
@@ -49,6 +50,10 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.settingBtn.setOnClickListener {
+            startActivity(Intent(context, SettingActivity::class.java))
+        }
 
         binding.personalDetailBtn.setOnClickListener {
             adminDetailsDialog()

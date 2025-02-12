@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.admin
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
@@ -32,7 +33,6 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     private val binding by lazy {
         ActivityInventoryBinding.inflate(layoutInflater)
     }
-    //private var itemList = ArrayList<InventoryModel>()
     private lateinit var adapter: InventoryRcvAdapter
     private var isUpdate = false
     private lateinit var inventoryPreferences: SharedPreferences
@@ -77,6 +77,14 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
             // Dummy item
             val item = InventoryModel()
             showBottomSheet(item)
+        }
+
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+
+        binding.settingBtn.setOnClickListener {
+            startActivity(Intent(this@InventoryActivity, SettingActivity::class.java))
         }
     }
 
@@ -174,7 +182,6 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
             Toast.makeText(this@InventoryActivity, "Failed to generate item ID", Toast.LENGTH_SHORT).show()
         }
     }
-
 
     private fun updateInventoryItem(itemId: String, itemName: String, price: String, quantity: String, availability: String) {
         // Reference to the specific item in Firebase

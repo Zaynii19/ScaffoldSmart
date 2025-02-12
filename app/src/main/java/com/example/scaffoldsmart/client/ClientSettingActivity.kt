@@ -47,6 +47,10 @@ class ClientSettingActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[ClientViewModel::class.java]
         viewModel.retrieveClientData()
 
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+
         binding.accountSettingBtn.setOnClickListener {
             showBottomSheet()
         }

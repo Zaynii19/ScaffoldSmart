@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,6 +13,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_adapters.ChatRcvAdapter
 import com.example.scaffoldsmart.databinding.FragmentChatBinding
 import com.example.scaffoldsmart.admin.admin_models.ChatModel
@@ -43,6 +45,10 @@ class ChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setSearchView()
+
+        binding.settingBtn.setOnClickListener {
+            startActivity(Intent(context, SettingActivity::class.java))
+        }
     }
 
     private fun setRcv() {

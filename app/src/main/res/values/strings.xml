@@ -143,5 +143,8 @@
     <string name="_generators">Generators:</string>
     <string name="_wheel_borrows">Wheel Borrows:</string>
     <string name="rental_request">Rental Request</string>
+    <string name="rent">Rent</string>
+    <string name="sr">Sr</string>
+    <string name="estimated_rent">Rent:</string>
 
 </resources>

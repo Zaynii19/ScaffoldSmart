@@ -1,7 +1,10 @@
 package com.example.scaffoldsmart.admin
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
@@ -11,10 +14,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.RentalClientModel
 import com.example.scaffoldsmart.admin.admin_adapters.ClientRcvAdapter
+import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientBinding
 
 class ClientActivity : AppCompatActivity() {
@@ -23,6 +28,7 @@ class ClientActivity : AppCompatActivity() {
     }
     private var clientList = ArrayList<RentalClientModel>()
     private lateinit var adapter: ClientRcvAdapter
+    private lateinit var viewModel: RentalViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +41,19 @@ class ClientActivity : AppCompatActivity() {
         }
 
         setStatusBarColor()
-        initializeClientList()
         setRcv()
         setSearchView()
+        viewModel = ViewModelProvider(this)[RentalViewModel::class.java]
+        viewModel.retrieveRentalReq()
+        observeRentalLiveData()
+
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+
+        binding.settingBtn.setOnClickListener {
+            startActivity(Intent(this@ClientActivity, SettingActivity::class.java))
+        }
 
     }
 
@@ -51,13 +67,6 @@ class ClientActivity : AppCompatActivity() {
         adapter = ClientRcvAdapter(this, clientList)
         binding.rcv.adapter = adapter
         binding.rcv.setHasFixedSize(true)
-    }
-
-    private fun initializeClientList() {
-        clientList.add(RentalClientModel("Danish"))
-        clientList.add(RentalClientModel("Fatima"))
-        clientList.add(RentalClientModel("Noman"))
-        clientList.add(RentalClientModel("Amna"))
     }
 
     private fun setSearchView() {
@@ -82,4 +91,19 @@ class ClientActivity : AppCompatActivity() {
             }
         })
     }
+
+    private fun observeRentalLiveData() {
+        binding.loading.visibility = View.VISIBLE
+        viewModel.observeRentalReqLiveData().observe(this@ClientActivity) { rentals ->
+            binding.loading.visibility = View.GONE
+            val filteredRentals = rentals?.filter { it.status.isNotEmpty() } // Get only approved rentals
+            clientList.clear()
+            filteredRentals?.forEach {
+                clientList.add(RentalClientModel(it.rentalId ,it.clientName, it.clientEmail, it.clientCnic, it.rentalAddress, it.clientPhone))
+                adapter.updateList(clientList)
+                Log.d("AdminClientDebug", "observeRentalReqLiveData: ${clientList.size} ")
+            }
+        }
+    }
+
 }

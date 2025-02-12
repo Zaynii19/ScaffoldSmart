@@ -46,7 +46,6 @@ class HomeFragment : Fragment() {
         FragmentHomeBinding.inflate(layoutInflater)
     }
     private lateinit var onesignal: OnesignalService
-
     private var id: String = ""
     private var name: String = ""
     private var email: String = ""
@@ -58,6 +57,7 @@ class HomeFragment : Fragment() {
     private var infoList = ArrayList<ScafoldInfoModel>()
     private lateinit var adapter: ScafoldRcvAdapter
     private var reqList = ArrayList<RentalModel>()
+    private var filteredRentals = ArrayList<RentalModel>()
     private lateinit var viewModel: AdminViewModel
     private lateinit var reqViewModel: RentalViewModel
     private var durationInMonths: Long = 0L
@@ -104,6 +104,11 @@ class HomeFragment : Fragment() {
 
         binding.notiAlert.setOnClickListener {
             showBottomSheet()
+        }
+
+        binding.totalPaymentReceived.text = buildString {
+            append(totalPaymentReceived())
+            append(" .Rs")
         }
     }
 
@@ -177,7 +182,7 @@ class HomeFragment : Fragment() {
             binding.loading.visibility = View.GONE
             if (rentals != null) {
                 // Filter rentals where the status is not empty
-                val filteredRentals = rentals.filter { it.status.isNotEmpty() }
+                filteredRentals = rentals.filter { it.status.isNotEmpty() } as ArrayList<RentalModel>
                 populateInfoList(filteredRentals)
                 // Filter rentals where the status is empty
                 val filteredRequests = rentals.filter { it.status.isEmpty() }
@@ -360,5 +365,13 @@ class HomeFragment : Fragment() {
     private fun showBottomSheet() {
         bottomSheetDialog = AdminRentalReqFragment.newInstance(reqList)
         bottomSheetDialog?.show(requireActivity().supportFragmentManager, "Request")
+    }
+
+    private fun totalPaymentReceived(): Int {
+        var total = 0
+        for (rental in filteredRentals) {
+            total += rental.rent.toInt()
+        }
+        return total
     }
 }
