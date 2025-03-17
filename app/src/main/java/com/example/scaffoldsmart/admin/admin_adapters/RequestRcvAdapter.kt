@@ -74,7 +74,7 @@ class RequestRcvAdapter(
 
         builder.setView(customDialog)
             .setTitle("Rental Request Details")
-            .setBackground(ContextCompat.getDrawable(context, R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(context, R.drawable.msg_view_received))
             .setPositiveButton("Approve") { dialog, _ ->
                 approveRentalReq(currentReq)
                 dialog.dismiss()

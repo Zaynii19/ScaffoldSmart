@@ -1,6 +1,7 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -63,9 +65,12 @@ class HomeFragment : Fragment() {
     private var durationInMonths: Long = 0L
     private var status: String = ""
     private var bottomSheetDialog: BottomSheetDialogFragment? = null
+    private lateinit var chatPreferences: SharedPreferences
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        chatPreferences = requireActivity().getSharedPreferences("CHATADMIN", MODE_PRIVATE)
 
         onesignal = OnesignalService(requireActivity())
         viewModel = ViewModelProvider(this)[AdminViewModel::class.java]
@@ -172,6 +177,9 @@ class HomeFragment : Fragment() {
                 }
 
                 onesignal.oneSignalLogin(email, userType)
+
+                chatPreferences.edit().putString("SenderUid", id).apply()
+                chatPreferences.edit().putString("SenderName", name).apply()
             }
         }
     }
@@ -281,7 +289,7 @@ class HomeFragment : Fragment() {
 
         builder.setView(customDialog)
             .setTitle("Rental Request Details ${index + 1}")
-            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
             .setPositiveButton("Approve") { dialog, _ ->
                 approveRentalReq(currentReq)
                 dialog.dismiss()

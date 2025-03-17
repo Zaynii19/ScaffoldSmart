@@ -21,10 +21,12 @@ class AdminViewModel: ViewModel() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val admin = snapshot.getValue<AdminModel>()
                     adminLiveData.value = admin
+
+                    Log.d("AdminVMDebug", "Admin data retrieved successfully")
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("AdminHomeDebug", "Failed to retrieve admin data", error.toException())
+                    Log.e("AdminVMDebug", "Failed to retrieve admin data", error.toException())
                 }
             })
     }

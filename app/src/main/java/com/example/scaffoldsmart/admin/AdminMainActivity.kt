@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.admin
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +15,7 @@ import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.client.client_fragments.ClientInventoryFragment
 import com.example.scaffoldsmart.databinding.ActivityMainAdminBinding
+import com.example.scaffoldsmart.util.AdminMessageListenerService
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
@@ -28,6 +30,8 @@ class AdminMainActivity : AppCompatActivity() {
     private lateinit var onesignal: OnesignalService
     private var prevNotiCompletedAt = ""
     private lateinit var reqPreferences: SharedPreferences
+    private lateinit var chatPreferences: SharedPreferences
+    private var senderUid: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,8 +42,11 @@ class AdminMainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        chatPreferences = getSharedPreferences("CHATADMIN", MODE_PRIVATE)
         reqPreferences = getSharedPreferences("RENTALREQ", MODE_PRIVATE)
         prevNotiCompletedAt = reqPreferences.getString("CompletedAt", "")!!
+        senderUid = chatPreferences.getString("SenderUid", null)
 
         setStatusBarColor()
         setBottomNav()
@@ -49,6 +56,8 @@ class AdminMainActivity : AppCompatActivity() {
         // Get rental notification data first start
         val notificationId = ClientInventoryFragment.notificationId
         onesignal.getOneSignalNoti(notificationId, prevNotiCompletedAt)
+
+        getMessageNoti()
 
         // Get the FCM device token
         /*FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -79,6 +88,23 @@ class AdminMainActivity : AppCompatActivity() {
         // Get rental notification data on when noti clicks
         val notificationId = ClientInventoryFragment.notificationId
         onesignal.getOneSignalNoti(notificationId, prevNotiCompletedAt)
+
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Online"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).setValue(presenceMap)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Offline"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).setValue(presenceMap)
     }
 
     private fun setStatusBarColor() {
@@ -90,6 +116,12 @@ class AdminMainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.fragmentView)
         val bottomNav = findViewById<BottomNavigationView>(R.id.nav_bottom)
         bottomNav.setupWithNavController(navController)
+    }
+
+    private fun getMessageNoti() {
+        val intent = Intent(this, AdminMessageListenerService::class.java)
+        intent.putExtra("SenderUid", senderUid)
+        startService(intent)
     }
 
     companion object {

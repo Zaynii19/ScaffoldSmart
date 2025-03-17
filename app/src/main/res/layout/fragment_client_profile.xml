@@ -331,7 +331,7 @@ android:background="@color/app_bg">
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/rentalHistoryBtn"
+                android:id="@+id/adminChatBtn"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"
                 android:layout_marginTop="@dimen/_10sdp"
@@ -355,7 +355,7 @@ android:background="@color/app_bg">
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:padding="@dimen/_10sdp"
-                        android:src="@drawable/history"
+                        android:src="@drawable/chat"
                         app:tint="@color/item_color"/>
                 </androidx.cardview.widget.CardView>
 
@@ -363,7 +363,7 @@ android:background="@color/app_bg">
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/_10sdp"
-                    android:text="@string/view_rental_history"
+                    android:text="@string/chat_with_admin"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_14sdp"
                     app:layout_constraintBottom_toBottomOf="@+id/cardView5"
@@ -395,8 +395,7 @@ android:background="@color/app_bg">
                 app:cornerRadius="@dimen/_10sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rentalHistoryBtn" />
-
+                app:layout_constraintTop_toBottomOf="@+id/adminChatBtn" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

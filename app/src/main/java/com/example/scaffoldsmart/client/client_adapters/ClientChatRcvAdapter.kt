@@ -6,13 +6,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.databinding.ConversationRcvItemBinding
-import com.example.scaffoldsmart.admin.admin_models.ChatModel
+import com.example.scaffoldsmart.admin.admin_models.RecentChatModel
 import com.example.scaffoldsmart.client.ClientChatActivity
 import com.example.scaffoldsmart.client.client_models.ClientChatModel
 
 class ClientChatRcvAdapter(val context: Context, private var chatList: ArrayList<ClientChatModel>): RecyclerView.Adapter<ClientChatRcvAdapter.MyChatViewHolder>() {
     class MyChatViewHolder(val binding: ConversationRcvItemBinding):RecyclerView.ViewHolder(binding.root){
-        fun bind(chat: ChatModel) {
+        fun bind(chat: RecentChatModel) {
             // Bind your chat item to UI elements here.
             binding.userName.text = chat.userName
         }

@@ -13,8 +13,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.admin_adapters.ChatRcvAdapter
-import com.example.scaffoldsmart.admin.admin_models.ChatModel
 import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_adapters.ClientChatRcvAdapter
 import com.example.scaffoldsmart.client.client_models.ClientChatModel

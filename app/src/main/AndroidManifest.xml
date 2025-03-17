@@ -5,8 +5,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
+    <!--<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />-->
 
     <application
         android:allowBackup="true"
@@ -39,7 +40,8 @@
             android:exported="false" />
         <activity
             android:name=".admin.ChatActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".LoginActivity"
             android:exported="true" />
@@ -60,6 +62,14 @@
             android:exported="true"
             android:windowSoftInputMode="adjustPan"/>
         <!--android:windowSoftInputMode="adjustPan"   to fix bottom Nav -->
+        <service
+            android:name=".util.AdminMessageListenerService"
+            android:enabled="true"
+            android:exported="false"/>
+        <service
+            android:name=".util.ClientMessageListenerService"
+            android:enabled="true"
+            android:exported="false"/>
     </application>
 
 </manifest>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/_3sdp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/receiveMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:background="@drawable/msg_view_received"
+        android:padding="@dimen/_12sdp"
+        android:text="@string/hello"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:maxWidth="@dimen/_200sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/lastReceiveMessageTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/_09_32_am"
+        android:textColor="@color/dark_gray"
+        android:textSize="@dimen/_8ssp"
+        android:layout_marginStart="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="@id/receiveMessage"
+        app:layout_constraintStart_toEndOf="@+id/receiveMessage" />
+
+    <ImageView
+        android:id="@+id/receiveImage"
+        android:layout_width="@dimen/_120sdp"
+        android:layout_height="@dimen/_130sdp"
+        android:src="@drawable/image_placeholder"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        android:layout_marginStart="@dimen/_15sdp"
+        android:layout_marginTop="@dimen/_5sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/receiveMessage" />
+
+    <TextView
+        android:id="@+id/lastReceiveImgMessageTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/_09_32_am"
+        android:textColor="@color/dark_gray"
+        android:textSize="@dimen/_8ssp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/receiveImage"
+        app:layout_constraintStart_toEndOf="@+id/receiveImage" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

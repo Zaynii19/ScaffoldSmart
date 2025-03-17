@@ -68,7 +68,7 @@ class ClientInventoryRcvAdapter (val context: Context, private var itemList: Arr
 
         builder.setView(customDialog)
             .setTitle("Inventory Details")
-            .setBackground(ContextCompat.getDrawable(context, R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(context, R.drawable.msg_view_received))
             .setPositiveButton("Ok") { dialog, _ ->
                 dialog.dismiss()
             }.create().apply {

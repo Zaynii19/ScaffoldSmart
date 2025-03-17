@@ -20,8 +20,8 @@
         android:label="fragment_client_profile"
         tools:layout="@layout/fragment_client_profile" />
     <fragment
-        android:id="@+id/clientChatFragment"
-        android:name="com.example.scaffoldsmart.client.client_fragments.ClientChatFragment"
-        android:label="fragment_client_chat"
-        tools:layout="@layout/fragment_client_chat" />
+        android:id="@+id/clientRentFragment"
+        android:name="com.example.scaffoldsmart.client.client_fragments.ClientRentFragment"
+        android:label="fragment_client_rent"
+        tools:layout="@layout/fragment_client_rent" />
 </navigation>

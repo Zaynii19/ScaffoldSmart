@@ -14,9 +14,9 @@
         android:id="@+id/placeHolder"
         android:title="" />
     <item
-        android:title="@string/chat"
-        android:id="@+id/clientChatFragment"
-        android:icon="@drawable/chat"/>
+        android:title="@string/rental"
+        android:id="@+id/clientRentFragment"
+        android:icon="@drawable/contract"/>
     <item
         android:title="@string/profile"
         android:id="@+id/clientProfileFragment"

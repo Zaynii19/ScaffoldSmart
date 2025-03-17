@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.client
 
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -32,6 +33,8 @@ class ClientSettingActivity : AppCompatActivity() {
     private lateinit var viewModel: ClientViewModel
     private var currentDecryptedPassword: String = ""
     private var switch = false
+    private var senderUid: String? = null
+    private lateinit var chatPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +45,8 @@ class ClientSettingActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        chatPreferences = getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
 
         setStatusBarColor()
         viewModel = ViewModelProvider(this)[ClientViewModel::class.java]
@@ -188,7 +193,7 @@ class ClientSettingActivity : AppCompatActivity() {
     private fun showEmailVerificationDialog() {
         val builder = MaterialAlertDialogBuilder(this@ClientSettingActivity)
         builder.setTitle("Email Verification")
-            .setBackground(ContextCompat.getDrawable(this@ClientSettingActivity, R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(this@ClientSettingActivity, R.drawable.msg_view_received))
             .setMessage("We've sent a verification email to your new email address. Please verify it to complete the update. Once verified, relaunch the app to see changes.")
             .setPositiveButton("Ok") { dialog, _ -> dialog.dismiss() }
 
@@ -203,5 +208,25 @@ class ClientSettingActivity : AppCompatActivity() {
             // Set button color
             getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Online"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Offline"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
     }
 }

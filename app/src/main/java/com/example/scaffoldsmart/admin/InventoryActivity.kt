@@ -37,6 +37,8 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     private var isUpdate = false
     private lateinit var inventoryPreferences: SharedPreferences
     private lateinit var viewModel: InventoryViewModel
+    private lateinit var chatPreferences: SharedPreferences
+    private var senderUid: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +51,8 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         }
 
         inventoryPreferences = getSharedPreferences("INVENTORY", MODE_PRIVATE)
+        chatPreferences = getSharedPreferences("CHATADMIN", MODE_PRIVATE)
+
         setStatusBarColor()
         setRcv()
         setSearchView()
@@ -213,6 +217,26 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         editor.putBoolean("Update", isUpdate)
         editor.apply()
         showBottomSheet(item)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Online"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Offline"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
     }
 
     companion object {

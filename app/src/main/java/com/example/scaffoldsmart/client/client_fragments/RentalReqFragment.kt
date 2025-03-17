@@ -297,7 +297,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss() // Just dismiss the dialog
             }
-            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
             .create()
 
         dialog.apply {
@@ -540,7 +540,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             .setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss() // Just dismiss the dialog
             }
-            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
             .create()
 
         dialog.apply {

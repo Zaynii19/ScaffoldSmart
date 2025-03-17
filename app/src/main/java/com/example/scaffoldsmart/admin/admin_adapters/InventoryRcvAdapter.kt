@@ -93,7 +93,7 @@ class InventoryRcvAdapter(
 
         builder.setView(customDialog)
             .setTitle("Inventory Details")
-            .setBackground(ContextCompat.getDrawable(context, R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(context, R.drawable.msg_view_received))
             .setPositiveButton("Ok") { dialog, _ ->
                 dialog.dismiss()
             }.create().apply {
@@ -110,7 +110,7 @@ class InventoryRcvAdapter(
         val itemToDelete = itemList[position]
         val builder = MaterialAlertDialogBuilder(context)
         builder.setTitle("Delete ${itemToDelete.itemName}")
-            .setBackground(ContextCompat.getDrawable(context, R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(context, R.drawable.msg_view_received))
             .setMessage("Do you want to delete the item?")
             .setPositiveButton("Yes") { dialog, _ ->
                 // Remove item from database

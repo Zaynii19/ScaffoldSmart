@@ -100,7 +100,7 @@ class ProfileFragment : Fragment() {
         val builder = MaterialAlertDialogBuilder(requireActivity())
         builder.setView(customDialog)
             .setTitle("Admin Details")
-            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
             .setPositiveButton("Ok"){ dialog, _ ->
                 dialog.dismiss()
             }.create().apply {
@@ -126,7 +126,7 @@ class ProfileFragment : Fragment() {
         val builder = MaterialAlertDialogBuilder(requireActivity())
         builder.setView(customDialog)
             .setTitle("Other Platforms")
-            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
             .setPositiveButton("Ok"){ dialog, _ ->
                 dialog.dismiss()
             }.create().apply {

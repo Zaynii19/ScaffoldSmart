@@ -67,25 +67,66 @@
             android:layout_margin="@dimen/_10sdp"
             android:background="@drawable/curved_searchview"
             android:focusable="false"
+            android:inputType="textCapSentences"
             android:textColor="@color/black"
             app:iconifiedByDefault="false"
             app:layout_constraintEnd_toEndOf="@+id/toolBar"
             app:layout_constraintStart_toStartOf="@+id/toolBar"
             app:layout_constraintTop_toBottomOf="@+id/toolBar"
             app:queryHint="@string/search_messages"
-            app:searchIcon="@drawable/search"
-            android:inputType="textCapSentences"/>
+            app:searchIcon="@drawable/search" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/chatRCV"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/userRcvCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            app:cardCornerRadius="@dimen/_15sdp"
+            app:cardElevation="@dimen/_6sdp"
+            android:layout_margin="@dimen/_10sdp"
+            app:layout_constraintTop_toBottomOf="@+id/search"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/usersRcv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:orientation="horizontal"
+                tools:listitem="@layout/chat_user_item"/>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/chatRcvCard"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            tools:listitem="@layout/conversation_rcv_item"
+            android:backgroundTint="@color/white"
+            app:cardCornerRadius="@dimen/_15sdp"
+            app:cardElevation="@dimen/_6sdp"
             android:layout_margin="@dimen/_10sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search" />
+            app:layout_constraintTop_toBottomOf="@+id/userRcvCard" >
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chatRCV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/conversation_rcv_item"
+                android:layout_margin="@dimen/_10sdp"
+                android:paddingBottom="@dimen/_10sdp"/>
+        </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="@dimen/_50sdp"
+        android:layout_height="@dimen/_50sdp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/item_color" />
 
 </FrameLayout>

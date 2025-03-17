@@ -1,25 +1,18 @@
 package com.example.scaffoldsmart.admin.admin_adapters
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.ClientRcvItemBinding
 import com.example.scaffoldsmart.admin.admin_models.RentalClientModel
 import com.example.scaffoldsmart.databinding.ClientDetailsDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import com.google.firebase.database.database
 
 class ClientRcvAdapter (val context: Context, private var clientList: ArrayList<RentalClientModel>): RecyclerView.Adapter<ClientRcvAdapter.MyClientViewHolder>() {
     class MyClientViewHolder(val binding: ClientRcvItemBinding): RecyclerView.ViewHolder(binding.root) {
@@ -65,7 +58,7 @@ class ClientRcvAdapter (val context: Context, private var clientList: ArrayList<
 
         builder.setView(customDialog)
             .setTitle("Client Details")
-            .setBackground(ContextCompat.getDrawable(context, R.drawable.curved_msg_view_client))
+            .setBackground(ContextCompat.getDrawable(context, R.drawable.msg_view_received))
             .setPositiveButton("Ok"){ dialog, _ ->
                 dialog.dismiss()
             }.create().apply {

@@ -1,6 +1,7 @@
 package com.example.scaffoldsmart.admin
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,8 @@ import com.example.scaffoldsmart.admin.admin_models.RentalClientModel
 import com.example.scaffoldsmart.admin.admin_adapters.ClientRcvAdapter
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientBinding
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 
 class ClientActivity : AppCompatActivity() {
     private val binding by lazy {
@@ -29,6 +32,8 @@ class ClientActivity : AppCompatActivity() {
     private var clientList = ArrayList<RentalClientModel>()
     private lateinit var adapter: ClientRcvAdapter
     private lateinit var viewModel: RentalViewModel
+    private lateinit var chatPreferences: SharedPreferences
+    private var senderUid: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +44,8 @@ class ClientActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        chatPreferences = getSharedPreferences("CHATADMIN", MODE_PRIVATE)
 
         setStatusBarColor()
         setRcv()
@@ -104,6 +111,26 @@ class ClientActivity : AppCompatActivity() {
                 Log.d("AdminClientDebug", "observeRentalReqLiveData: ${clientList.size} ")
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Online"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Offline"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
     }
 
 }
