@@ -166,10 +166,10 @@ class SettingActivity : AppCompatActivity() {
                             ).show()
                         }
                 }
-                .addOnFailureListener { reauthException ->
+                .addOnFailureListener { reAuthException ->
                     Toast.makeText(
                         this@SettingActivity,
-                        "Re-Authentication failed: ${reauthException.localizedMessage}",
+                        "Re-Authentication failed: ${reAuthException.localizedMessage}",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

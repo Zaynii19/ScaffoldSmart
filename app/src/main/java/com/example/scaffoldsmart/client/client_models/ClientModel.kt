@@ -1,6 +1,8 @@
 package com.example.scaffoldsmart.client.client_models
 
-class ClientModel {
+import java.io.Serializable
+
+class ClientModel: Serializable {
     var userType = ""
     var id = ""
     var name = ""

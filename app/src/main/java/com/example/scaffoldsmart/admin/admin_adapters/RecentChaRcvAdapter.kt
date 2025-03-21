@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.admin.ChatActivity
 import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
 import com.example.scaffoldsmart.databinding.ConversationRcvItemBinding
-import com.example.scaffoldsmart.admin.admin_models.RecentChatModel
 import com.example.scaffoldsmart.util.DateFormater
 
 class RecentChaRcvAdapter(

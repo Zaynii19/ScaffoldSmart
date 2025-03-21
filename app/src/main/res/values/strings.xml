@@ -152,8 +152,13 @@
     <string name="cancel">Cancel</string>
     <string name="tap_to_chat">Tap to chat</string>
     <string name="no_client_found">No Client Found!</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="chat_with_admin">Chat with Admin</string>
+    <string name="view_rental_detail">View rental details</string>
+    <string name="rental_address">Rental Address</string>
+    <string name="verify">Verify</string>
+    <string name="verify_account">Verify Account</string>
+    <string name="compare_item_cost">Compare Item Cost</string>
+    <string name="calculate_rent">Calculate Rent</string>
+    <string name="total_rent_0_rs">Total Rent: 0 .Rs</string>
 
 </resources>

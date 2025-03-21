@@ -66,7 +66,7 @@
         android:layout_height="@dimen/_50sdp"
         android:layout_marginTop="@dimen/_10sdp"
         android:layout_marginStart="@dimen/_10sdp"
-        android:backgroundTint="@color/white"
+        android:backgroundTint="@color/item_color"
         app:cardCornerRadius="@dimen/_12sdp"
         app:cardElevation="@dimen/_10sdp"
         app:layout_constraintStart_toStartOf="parent"
@@ -85,14 +85,14 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/item_color" />
+                app:tint="@color/white" />
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/price"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11ssp"
                 app:layout_constraintEnd_toEndOf="@+id/imageView2"
                 app:layout_constraintStart_toStartOf="@+id/imageView2"
@@ -108,7 +108,7 @@
         app:cardElevation="@dimen/_10sdp"
         android:layout_marginStart="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_10sdp"
-        android:backgroundTint="@color/white"
+        android:backgroundTint="@color/item_color"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView">
 
@@ -123,7 +123,7 @@
                 android:layout_height="@dimen/_22sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:src="@drawable/quantity"
-                app:tint="@color/item_color"
+                app:tint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -134,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:text="@string/quantity"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11ssp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -149,7 +149,7 @@
         android:layout_height="@dimen/_50sdp"
         android:layout_marginStart="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_10sdp"
-        android:backgroundTint="@color/white"
+        android:backgroundTint="@color/item_color"
         app:cardCornerRadius="@dimen/_12sdp"
         app:cardElevation="@dimen/_10sdp"
         android:visibility="gone"
@@ -169,14 +169,14 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/item_color" />
+                app:tint="@color/white" />
 
             <TextView
                 android:id="@+id/textView5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/weight"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11ssp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -192,7 +192,7 @@
         app:cardElevation="@dimen/_10sdp"
         android:layout_marginStart="@dimen/_10sdp"
         android:layout_marginVertical="@dimen/_10sdp"
-        android:backgroundTint="@color/white"
+        android:backgroundTint="@color/item_color"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView3"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -207,7 +207,7 @@
                 android:layout_height="@dimen/_22sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:src="@drawable/stock"
-                app:tint="@color/item_color"
+                app:tint="@color/white"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -217,7 +217,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/status"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="@dimen/_11ssp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

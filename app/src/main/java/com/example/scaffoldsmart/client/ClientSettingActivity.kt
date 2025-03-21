@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.client
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
@@ -31,7 +32,7 @@ class ClientSettingActivity : AppCompatActivity() {
         ActivityClientSettingBinding.inflate(layoutInflater)
     }
     private lateinit var viewModel: ClientViewModel
-    private var currentDecryptedPassword: String = ""
+    //private var currentDecryptedPassword: String = ""
     private var switch = false
     private var senderUid: String? = null
     private lateinit var chatPreferences: SharedPreferences
@@ -89,20 +90,29 @@ class ClientSettingActivity : AppCompatActivity() {
     private fun showBottomSheet() {
         val bottomSheetDialog: BottomSheetDialogFragment = ClientUpdateFragment.newInstance(object : ClientUpdateFragment.OnClientUpdatedListener {
             override fun onClientUpdated(name: String, email: String, pass: String, cnic: String, phone: String, address: String) {
-                updateClientData(name, email, pass, cnic, address, phone)
+                viewModel.observeClientLiveData().observe(this@ClientSettingActivity) { client ->
+                    if (client != null) {
+                        val currentDecryptedPassword = EncryptionUtil.decrypt(client.pass)
+                        updateClientData(name, email, pass, cnic, address, phone, currentDecryptedPassword)
+                    }
+                }
             }
-        })
+
+            override fun onClientVerified(cnic: String, phone: String, address: String) {}
+        }, false)
         bottomSheetDialog.show(this.supportFragmentManager, "Client")
     }
 
-    private fun updateClientData(name: String, email: String, pass: String, cnic: String, address: String, phone: String) {
+    private fun updateClientData(
+        name: String,
+        email: String,
+        pass: String,
+        cnic: String,
+        address: String,
+        phone: String,
+        currentDecryptedPassword: String
+    ) {
         val currentUser = Firebase.auth.currentUser
-
-        viewModel.observeClientLiveData().observe(this) { client ->
-            if (client != null) {
-                currentDecryptedPassword = EncryptionUtil.decrypt(client.pass)
-            }
-        }
 
         if (currentUser != null) {
             // Step 1: Re-authenticate the user
@@ -178,10 +188,10 @@ class ClientSettingActivity : AppCompatActivity() {
                             ).show()
                         }
                 }
-                .addOnFailureListener { reauthException ->
+                .addOnFailureListener { reAuthException ->
                     Toast.makeText(
                         this@ClientSettingActivity,
-                        "Re-Authentication failed: ${reauthException.localizedMessage}",
+                        "Re-Authentication failed: ${reAuthException.localizedMessage}",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -228,5 +238,60 @@ class ClientSettingActivity : AppCompatActivity() {
         presenceMap["status"] = "Offline"
         presenceMap["lastSeen"] = currentTime
         Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+    }
+
+    companion object {
+
+        fun verifyClient(
+            cnic: String,
+            address: String,
+            phone: String,
+            currentDecryptedPassword: String,
+            context: Context
+        ) {
+            val currentUser = Firebase.auth.currentUser
+
+            if (currentUser != null) {
+                // Step 1: Re-authenticate the user
+                val credential = EmailAuthProvider.getCredential(currentUser.email!!, currentDecryptedPassword)
+                currentUser.reauthenticate(credential)
+                    .addOnSuccessListener {
+                        // Step 2: Update client data in Firebase Database
+                        val databaseRef = Firebase.database.reference.child("Client")
+                            .child(currentUser.uid)
+
+                        val updates = hashMapOf<String, Any>(
+                            "cnic" to cnic,
+                            "address" to address,
+                            "phone" to phone
+                        )
+
+                        databaseRef.updateChildren(updates)
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    context,
+                                    "Client verified successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            .addOnFailureListener { dbException ->
+                                Toast.makeText(
+                                    context,
+                                    "Failed to verify client data: ${dbException.localizedMessage}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                    }
+                    .addOnFailureListener { reAuthException ->
+                        Toast.makeText(
+                            context,
+                            "Re-Authentication failed: ${reAuthException.localizedMessage}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            } else {
+                Toast.makeText(context, "User not logged in", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

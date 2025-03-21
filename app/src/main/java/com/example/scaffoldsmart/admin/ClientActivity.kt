@@ -18,20 +18,26 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.admin_models.RentalClientModel
+import com.example.scaffoldsmart.admin.InventoryActivity.Companion.itemList
 import com.example.scaffoldsmart.admin.admin_adapters.ClientRcvAdapter
+import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
+import com.example.scaffoldsmart.client.client_models.ClientModel
+import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientBinding
 import com.google.firebase.Firebase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 
 class ClientActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityClientBinding.inflate(layoutInflater)
     }
-    private var clientList = ArrayList<RentalClientModel>()
+    private var clientList = ArrayList<ClientModel>()
     private lateinit var adapter: ClientRcvAdapter
-    private lateinit var viewModel: RentalViewModel
     private lateinit var chatPreferences: SharedPreferences
     private var senderUid: String? = null
 
@@ -50,9 +56,8 @@ class ClientActivity : AppCompatActivity() {
         setStatusBarColor()
         setRcv()
         setSearchView()
-        viewModel = ViewModelProvider(this)[RentalViewModel::class.java]
-        viewModel.retrieveRentalReq()
-        observeRentalLiveData()
+
+        fetchingClientsData()
 
         binding.backBtn.setOnClickListener {
             finish()
@@ -93,24 +98,38 @@ class ClientActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                adapter.filter(newText ?: "") // Call filter method on text change
+
+                // Filter the itemList based on the search text (case-insensitive)
+                val filteredList = clientList.filter { client ->
+                    client.name.lowercase().contains(newText!!.lowercase())
+                }
+
+                // Update the adapter with the filtered list
+                adapter.updateList(filteredList as ArrayList<ClientModel>)
                 return true
             }
         })
     }
 
-    private fun observeRentalLiveData() {
-        binding.loading.visibility = View.VISIBLE
-        viewModel.observeRentalReqLiveData().observe(this@ClientActivity) { rentals ->
-            binding.loading.visibility = View.GONE
-            val filteredRentals = rentals?.filter { it.status.isNotEmpty() } // Get only approved rentals
-            clientList.clear()
-            filteredRentals?.forEach {
-                clientList.add(RentalClientModel(it.rentalId ,it.clientName, it.clientEmail, it.clientCnic, it.rentalAddress, it.clientPhone))
+
+    private fun fetchingClientsData() {
+        Firebase.database.reference.child("Client").addValueEventListener(object :
+            ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                clientList.clear()
+                for (child in snapshot.children) {
+                    val user = child.getValue(ClientModel::class.java)
+                    if (user != null) {
+                        clientList.add(user)
+                    }
+                }
                 adapter.updateList(clientList)
-                Log.d("AdminClientDebug", "observeRentalReqLiveData: ${clientList.size} ")
             }
-        }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("ClientFragDebug", "Failed to retrieve others user data", error.toException())
+            }
+        })
     }
 
     override fun onResume() {
@@ -132,5 +151,4 @@ class ClientActivity : AppCompatActivity() {
         presenceMap["lastSeen"] = currentTime
         Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
     }
-
 }

@@ -10,19 +10,12 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ClientRcvItemBinding
-import com.example.scaffoldsmart.admin.admin_models.RentalClientModel
+import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.databinding.ClientDetailsDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class ClientRcvAdapter (val context: Context, private var clientList: ArrayList<RentalClientModel>): RecyclerView.Adapter<ClientRcvAdapter.MyClientViewHolder>() {
-    class MyClientViewHolder(val binding: ClientRcvItemBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(client: RentalClientModel) {
-            // Bind your chat item to UI elements here.
-            binding.clientName.text = client.clientName
-        }
-    }
-
-    private var originalClientList = ArrayList(clientList) // Store the original list
+class ClientRcvAdapter (val context: Context, private var clientList: ArrayList<ClientModel>): RecyclerView.Adapter<ClientRcvAdapter.MyClientViewHolder>() {
+    class MyClientViewHolder(val binding: ClientRcvItemBinding): RecyclerView.ViewHolder(binding.root) {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyClientViewHolder {
         return MyClientViewHolder(ClientRcvItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -34,7 +27,7 @@ class ClientRcvAdapter (val context: Context, private var clientList: ArrayList<
 
     override fun onBindViewHolder(holder: MyClientViewHolder, position: Int) {
         val currentItem = clientList[position]
-        holder.binding.clientName.text = currentItem.clientName
+        holder.binding.clientName.text = currentItem.name
         holder.binding.root.setOnClickListener {
             clientDetailsDialog(currentItem)
         }
@@ -45,12 +38,12 @@ class ClientRcvAdapter (val context: Context, private var clientList: ArrayList<
 
     }
 
-    private fun clientDetailsDialog(currentItem: RentalClientModel) {
+    private fun clientDetailsDialog(currentItem: ClientModel) {
         val customDialog = LayoutInflater.from(context).inflate(R.layout.client_details_dialog, null)
         val builder = MaterialAlertDialogBuilder(context)
         val binder = ClientDetailsDialogBinding.bind(customDialog)
 
-        binder.clientName.text = currentItem.clientName
+        binder.clientName.text = currentItem.name
         binder.email.text = currentItem.email
         binder.cnic.text = currentItem.cnic
         binder.address.text = currentItem.address
@@ -128,22 +121,8 @@ class ClientRcvAdapter (val context: Context, private var clientList: ArrayList<
         snackbar.setBackgroundTint(Color.WHITE)
     }*/
 
-    // Method to filter client list based on the search query
-    fun filter(query: String) {
-        clientList.clear()
-        if (query.isEmpty()) {
-            clientList.addAll(originalClientList) // Reset to original if query is empty
-        } else {
-            val filteredList = originalClientList.filter {
-                it.clientName.contains(query, ignoreCase = true) // Case insensitive matching
-            }
-            clientList.addAll(filteredList) // Add the filtered results
-        }
-        notifyDataSetChanged() // Notify the adapter
-    }
-
-    fun updateList(newItems: ArrayList<RentalClientModel>) {
-        clientList = newItems
+    fun updateList(newClients: ArrayList<ClientModel>) {
+        clientList = newClients
         notifyDataSetChanged()
     }
 }

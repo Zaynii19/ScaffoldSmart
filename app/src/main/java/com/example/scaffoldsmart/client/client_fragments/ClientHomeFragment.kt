@@ -11,18 +11,26 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.scaffoldsmart.admin.admin_models.AdminModel
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.ChatViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
+import com.example.scaffoldsmart.client.ClientChatActivity
 import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_adapters.ClientScafoldRcvAdapter
+import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.client.client_models.ClientScafoldInfoModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
 import com.example.scaffoldsmart.util.OnesignalService
+import com.google.firebase.Firebase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.database
+import com.google.firebase.database.getValue
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class ClientHomeFragment : Fragment() {
@@ -41,6 +49,7 @@ class ClientHomeFragment : Fragment() {
     private lateinit var onesignal: OnesignalService
     private lateinit var rentViewModel: RentalViewModel
     private lateinit var chatPreferences: SharedPreferences
+    private lateinit var viewModelC: ChatViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +62,10 @@ class ClientHomeFragment : Fragment() {
 
         rentViewModel = ViewModelProvider(this)[RentalViewModel::class.java]
         rentViewModel.retrieveRentalReq()
+
+
+        viewModelC = ViewModelProvider(this)[ChatViewModel::class.java]
+        viewModelC.retrieveChatData()
     }
 
     override fun onCreateView(

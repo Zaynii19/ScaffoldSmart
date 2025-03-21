@@ -11,10 +11,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ActivityClientMainBinding
-import com.example.scaffoldsmart.util.ClientMessageListenerService
+import com.example.scaffoldsmart.client.client_service.ClientMessageListenerService
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase

@@ -21,12 +21,15 @@ import com.example.scaffoldsmart.admin.ChatActivity
 import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.client.ClientChatActivity
+import com.example.scaffoldsmart.client.ClientCostComparisonActivity
 import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ClientDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentClientProfileBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
+import com.example.scaffoldsmart.util.OnesignalService
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -80,6 +83,10 @@ class ClientProfileFragment : Fragment() {
 
         binding.otherPlatformBtn.setOnClickListener {
             adminPlatformDialog()
+        }
+
+        binding.costComparisonBtn.setOnClickListener {
+            startActivity(Intent(context, ClientCostComparisonActivity::class.java))
         }
 
         binding.logoutBtn.setOnClickListener {

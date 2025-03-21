@@ -3,11 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
-    <!--<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />-->
 
     <application
         android:allowBackup="true"
@@ -20,6 +18,9 @@
         android:theme="@style/Theme.ScaffoldSmart"
         tools:targetApi="31">
         <activity
+            android:name=".client.ClientCostComparisonActivity"
+            android:exported="false" />
+        <activity
             android:name=".client.ClientChatActivity"
             android:exported="false" />
         <activity
@@ -28,7 +29,7 @@
         <activity
             android:name=".client.ClientMainActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".admin.SettingActivity"
             android:exported="false" />
@@ -60,16 +61,15 @@
         <activity
             android:name=".admin.AdminMainActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustPan"/>
-        <!--android:windowSoftInputMode="adjustPan"   to fix bottom Nav -->
+            android:windowSoftInputMode="adjustPan" /> <!-- android:windowSoftInputMode="adjustPan"   to fix bottom Nav -->
         <service
-            android:name=".util.AdminMessageListenerService"
+            android:name=".admin.admin_service.AdminMessageListenerService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
         <service
-            android:name=".util.ClientMessageListenerService"
+            android:name=".client.client_service.ClientMessageListenerService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
     </application>
 
 </manifest>

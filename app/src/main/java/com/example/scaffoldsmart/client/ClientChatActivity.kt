@@ -13,6 +13,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -21,6 +22,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.AdminMainActivity
 import com.example.scaffoldsmart.admin.admin_adapters.MessageRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.DateHeader
 import com.example.scaffoldsmart.admin.admin_models.MessageModel
@@ -60,6 +62,13 @@ class ClientChatActivity : AppCompatActivity() {
     private lateinit var viewModelA: AdminViewModel
     private lateinit var viewModel: MessageViewModel
     private lateinit var chatPreferences: SharedPreferences
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            // Handle back button press here
+            startActivity(Intent(this@ClientChatActivity, ClientMainActivity::class.java))
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +105,8 @@ class ClientChatActivity : AppCompatActivity() {
         setupSendButton()
         setupAttachmentButton()
         setupTypingStatus()
+
+        onBackPressedDispatcher.addCallback(this@ClientChatActivity, onBackPressedCallback)
     }
 
     private fun setStatusBarColor() {
@@ -186,7 +197,6 @@ class ClientChatActivity : AppCompatActivity() {
             } else {
                 sendMessage(messageText)
             }
-            sendMessage(messageText)
         }
     }
 

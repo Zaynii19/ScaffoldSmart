@@ -15,7 +15,7 @@ import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.client.client_fragments.ClientInventoryFragment
 import com.example.scaffoldsmart.databinding.ActivityMainAdminBinding
-import com.example.scaffoldsmart.util.AdminMessageListenerService
+import com.example.scaffoldsmart.admin.admin_service.AdminMessageListenerService
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
@@ -28,7 +28,8 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private lateinit var onesignal: OnesignalService
-    private var prevNotiCompletedAt = ""
+    private var prevNotiCompletedAt: String = ""
+    private var prevNotificationId: String = ""
     private lateinit var reqPreferences: SharedPreferences
     private lateinit var chatPreferences: SharedPreferences
     private var senderUid: String? = null
@@ -46,6 +47,7 @@ class AdminMainActivity : AppCompatActivity() {
         chatPreferences = getSharedPreferences("CHATADMIN", MODE_PRIVATE)
         reqPreferences = getSharedPreferences("RENTALREQ", MODE_PRIVATE)
         prevNotiCompletedAt = reqPreferences.getString("CompletedAt", "")!!
+        prevNotificationId = reqPreferences.getString("NotificationId", "")!!
         senderUid = chatPreferences.getString("SenderUid", null)
 
         setStatusBarColor()
@@ -54,8 +56,7 @@ class AdminMainActivity : AppCompatActivity() {
         onesignal.initializeOneSignal()
 
         // Get rental notification data first start
-        val notificationId = ClientInventoryFragment.notificationId
-        onesignal.getOneSignalNoti(notificationId, prevNotiCompletedAt)
+        onesignal.getOneSignalNoti(prevNotiCompletedAt, prevNotificationId)
 
         getMessageNoti()
 
@@ -86,8 +87,7 @@ class AdminMainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Get rental notification data on when noti clicks
-        val notificationId = ClientInventoryFragment.notificationId
-        onesignal.getOneSignalNoti(notificationId, prevNotiCompletedAt)
+        //onesignal.getOneSignalNoti(prevNotiCompletedAt)
 
         senderUid = chatPreferences.getString("SenderUid", null)
         val currentTime = System.currentTimeMillis()
@@ -146,7 +146,6 @@ class AdminMainActivity : AppCompatActivity() {
                 val totalRent = data.optString("rent", "N/A")
 
                 storeRentalReq(clientID, clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel, totalRent)
-
             }
         }
 

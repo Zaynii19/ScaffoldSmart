@@ -48,7 +48,6 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
         if (isUpdate) {
             setValuesForUpdate()
         }
-
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -105,7 +104,7 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
     }
 
     private fun setValuesForUpdate() {
-        val item: InventoryModel = arguments?.getSerializable(ARG_LIST) as InventoryModel
+        val item: InventoryModel = arguments?.getSerializable(ARG_ITEM) as InventoryModel
         binding.title.text = getString(R.string.update_inventory)
         itemId = item.itemId
         binding.itemName.setText(item.itemName)
@@ -116,14 +115,14 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
-        private const val ARG_LIST = "arg_list"
+        private const val ARG_ITEM = "arg_item"
         fun newInstance(listener: OnInventoryUpdatedListener, item: InventoryModel): AddInventoryFragment {
             val fragment = AddInventoryFragment()
 
             fragment.onInventoryUpdatedListener = listener
 
             val args = Bundle()
-            args.putSerializable(ARG_LIST, item)  // Pass the list as Serializable
+            args.putSerializable(ARG_ITEM, item)  // Pass the item as Serializable
             fragment.arguments = args
 
             return fragment

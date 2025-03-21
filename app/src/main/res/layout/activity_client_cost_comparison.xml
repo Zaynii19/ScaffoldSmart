@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".client.ClientCostComparisonActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toolBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:background="@color/toolbar_color"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/backBtn"
+            android:layout_width="@dimen/_40sdp"
+            android:layout_height="@dimen/_40sdp"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:scaleType="fitCenter"
+            android:src="@drawable/back"
+            app:tint="@color/white"
+            android:layout_marginStart="@dimen/_10sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/compare_items_cost"
+            android:textSize="@dimen/_20ssp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/settingBtn"
+            app:layout_constraintStart_toEndOf="@+id/backBtn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/settingBtn"
+            android:layout_width="@dimen/_35sdp"
+            android:layout_height="@dimen/_35sdp"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:scaleType="fitCenter"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:src="@drawable/setting"
+            app:tint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/rent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/total_rent_0_rs"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_14ssp"
+        android:layout_marginTop="@dimen/_30sdp"
+        app:layout_constraintEnd_toEndOf="@+id/toolBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolBar" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="@dimen/_140sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:hint="@string/duration_start"
+        android:textColorHint="@color/dark_gray"
+        app:boxBackgroundColor="@color/app_bg"
+        app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
+        app:boxCornerRadiusBottomStart="@dimen/_15sdp"
+        app:boxCornerRadiusTopEnd="@dimen/_15sdp"
+        app:boxCornerRadiusTopStart="@dimen/_15sdp"
+        app:boxStrokeColor="@color/app_bg"
+        app:cursorColor="@color/dark_gray"
+        app:hintTextColor="@color/light_gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/rentalDurationFrom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:inputType="none"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout2"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="@dimen/_140sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:hint="@string/duration_end"
+        android:textColorHint="@color/dark_gray"
+        app:boxBackgroundColor="@color/app_bg"
+        app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
+        app:boxCornerRadiusBottomStart="@dimen/_15sdp"
+        app:boxCornerRadiusTopEnd="@dimen/_15sdp"
+        app:boxCornerRadiusTopStart="@dimen/_15sdp"
+        app:boxStrokeColor="@color/app_bg"
+        app:cursorColor="@color/dark_gray"
+        app:hintTextColor="@color/light_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/rentalDurationTo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:inputType="none"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout3"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:hint="@string/pipes_quantity"
+        android:textColorHint="@color/dark_gray"
+        app:boxBackgroundColor="@color/app_bg"
+        app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
+        app:boxCornerRadiusBottomStart="@dimen/_15sdp"
+        app:boxCornerRadiusTopEnd="@dimen/_15sdp"
+        app:boxCornerRadiusTopStart="@dimen/_15sdp"
+        app:boxStrokeColor="@color/app_bg"
+        app:cursorColor="@color/dark_gray"
+        app:hintTextColor="@color/light_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/pipes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout4"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:hint="@string/pipes_length"
+        android:textColorHint="@color/dark_gray"
+        app:boxBackgroundColor="@color/app_bg"
+        app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
+        app:boxCornerRadiusBottomStart="@dimen/_15sdp"
+        app:boxCornerRadiusTopEnd="@dimen/_15sdp"
+        app:boxCornerRadiusTopStart="@dimen/_15sdp"
+        app:boxStrokeColor="@color/app_bg"
+        app:cursorColor="@color/dark_gray"
+        app:hintTextColor="@color/light_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/pipesLength"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:inputType="none"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout5"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:hint="@string/joints_quantity"
+        android:textColorHint="@color/dark_gray"
+        app:boxBackgroundColor="@color/app_bg"
+        app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
+        app:boxCornerRadiusBottomStart="@dimen/_15sdp"
+        app:boxCornerRadiusTopEnd="@dimen/_15sdp"
+        app:boxCornerRadiusTopStart="@dimen/_15sdp"
+        app:boxStrokeColor="@color/app_bg"
+        app:cursorColor="@color/dark_gray"
+        app:hintTextColor="@color/light_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/joints"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginStart="@dimen/_20sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout5">
+
+        <TextView
+            android:id="@+id/wench"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wench"
+            android:textColor="@color/dark_gray"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/wenchQuantitySpinner"
+            android:layout_width="@dimen/_65sdp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/black"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/wench"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/wench"
+            app:layout_constraintTop_toTopOf="@+id/wench" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_20sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout5">
+
+        <TextView
+            android:id="@+id/slugPumps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/slug_pumps"
+            android:textColor="@color/dark_gray"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/slugPumpsQuantitySpinner"
+            android:layout_width="@dimen/_65sdp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/black"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/slugPumps"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/slugPumps"
+            app:layout_constraintTop_toTopOf="@+id/slugPumps" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_20sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item4">
+
+        <TextView
+            android:id="@+id/generators"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/generators"
+            android:textColor="@color/dark_gray"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/generatorsQuantitySpinner"
+            android:layout_width="@dimen/_65sdp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/black"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/generators"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/generators"
+            app:layout_constraintTop_toTopOf="@+id/generators" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item5">
+
+        <TextView
+            android:id="@+id/wheel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wheel_borrows"
+            android:textColor="@color/dark_gray"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/wheelQuantitySpinner"
+            android:layout_width="@dimen/_140sdp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/black"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/wheel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/wheel"
+            app:layout_constraintTop_toTopOf="@+id/wheel" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/item7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginStart="@dimen/_20sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item3">
+
+        <TextView
+            android:id="@+id/motors"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/motors"
+            android:textColor="@color/dark_gray"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/motorsQuantitySpinner"
+            android:layout_width="@dimen/_65sdp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/black"
+            android:minHeight="48dp"
+            app:layout_constraintBottom_toBottomOf="@+id/motors"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/motors"
+            app:layout_constraintTop_toTopOf="@+id/motors" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

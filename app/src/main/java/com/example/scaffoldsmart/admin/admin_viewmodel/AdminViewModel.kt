@@ -20,8 +20,9 @@ class AdminViewModel: ViewModel() {
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val admin = snapshot.getValue<AdminModel>()
-                    adminLiveData.value = admin
-
+                    if (admin != null) {
+                        adminLiveData.value = admin
+                    }
                     Log.d("AdminVMDebug", "Admin data retrieved successfully")
                 }
 

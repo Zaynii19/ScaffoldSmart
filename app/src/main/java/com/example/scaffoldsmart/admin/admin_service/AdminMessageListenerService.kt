@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.util
+package com.example.scaffoldsmart.admin.admin_service
 
 import android.app.Service
 import android.content.Intent
@@ -6,6 +6,7 @@ import android.os.IBinder
 import android.util.Log
 import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
 import com.example.scaffoldsmart.admin.admin_models.MessageModel
+import com.example.scaffoldsmart.util.AdminMsgNotification
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError

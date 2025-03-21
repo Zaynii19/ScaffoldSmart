@@ -252,9 +252,10 @@ class OnesignalService(val context: Context) {
         })
     }
 
-    fun getOneSignalNoti(notificationId: String, prevNotiCompletedAt: String) {
+    fun getOneSignalNoti(prevNotiCompletedAt: String, prevNotificationId: String) {
         // Construct the URL for fetching the notification details
-        val url = "https://api.onesignal.com/notifications/$notificationId?app_id=$appId"
+        val notiId = ""
+        val url = "https://api.onesignal.com/notifications/$notiId?app_id=$appId"
 
         // Build the request
         val request = Request.Builder()
@@ -280,21 +281,24 @@ class OnesignalService(val context: Context) {
                             val notifications = jsonResponse.optJSONArray("notifications")
                             notifications?.let {
                                 if (it.length() > 0) {
-                                    val notification = it.getJSONObject(0)
-                                    Log.d("OneSignalDebug", "Current Notification: $notification")
+                                    val currentNotification = it.getJSONObject(0)
+                                    Log.d("OneSignalDebug", "Current Notification: $currentNotification")
 
                                     // Safely extract 'data' from the notification
-                                    val reqData = notification.optJSONObject("data")
+                                    val reqData = currentNotification.optJSONObject("data")
                                     if (reqData != null) {
-                                        val currentNotiCompletedAt = notification.optString("completed_at")
-                                        reqPreferences.edit().putString("CompletedAt", currentNotiCompletedAt).apply()
 
-                                        if (currentNotiCompletedAt != prevNotiCompletedAt) {
-                                            Log.d("OneSignalDebug", "New rental request found!")
+                                        val currentNotiCompletedAt = currentNotification.optString("completed_at")
+                                        val currentNotificationId = currentNotification.optString("id")
+                                        reqPreferences.edit().putString("CompletedAt", currentNotiCompletedAt).apply()
+                                        reqPreferences.edit().putString("NotificationId", currentNotificationId).apply()
+
+                                        if (currentNotiCompletedAt != prevNotiCompletedAt && currentNotificationId != prevNotificationId) {
                                             AdminMainActivity.handleReqData(reqData)
                                         } else {
                                             Log.d("OneSignalDebug", "Request data already found!")
                                         }
+
                                     } else {
                                         Log.e("OneSignalDebug", "No data found in the notification")
                                     }

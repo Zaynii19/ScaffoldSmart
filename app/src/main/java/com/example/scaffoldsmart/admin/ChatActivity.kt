@@ -13,6 +13,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -60,6 +61,13 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var viewModelA: AdminViewModel
     private lateinit var viewModel: MessageViewModel
     private lateinit var chatPreferences: SharedPreferences
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            // Handle back button press here
+            startActivity(Intent(this@ChatActivity, AdminMainActivity::class.java))
+            finish()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,6 +111,8 @@ class ChatActivity : AppCompatActivity() {
         setupSendButton()
         setupAttachmentButton()
         setupTypingStatus()
+
+        onBackPressedDispatcher.addCallback(this@ChatActivity, onBackPressedCallback)
     }
 
     private fun setStatusBarColor() {
@@ -300,7 +310,6 @@ class ChatActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun sendMessageWithImage(uri: Uri) {
         binding.typedMessage.setText("")

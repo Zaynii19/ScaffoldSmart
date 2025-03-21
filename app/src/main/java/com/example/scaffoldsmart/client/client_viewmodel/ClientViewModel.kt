@@ -20,7 +20,9 @@ class ClientViewModel : ViewModel() {
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val client = snapshot.getValue<ClientModel>()
-                    clientLiveData.value = client
+                    if (client != null) {
+                        clientLiveData.value = client
+                    }
                 }
 
                 override fun onCancelled(error: DatabaseError) {

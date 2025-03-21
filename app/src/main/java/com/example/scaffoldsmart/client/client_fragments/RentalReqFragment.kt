@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
+import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.databinding.FragmentRentalReqBinding
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -67,11 +68,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
 
     interface OnSendReqListener {
         fun onReqSendUpdated(
-            clientName: String,
             rentalAddress: String,
-            clientEmail: String,
-            clientPhone: String,
-            clientCnic: String,
             startDuration: String,
             endDuration: String,
             pipes: String,
@@ -111,12 +108,8 @@ class RentalReqFragment : BottomSheetDialogFragment() {
 
         binding.sendBtn.setOnClickListener {
             getClientInfo()
+            rentalAddress = binding.rentalAddress.text.toString()
             jointsQuantity = binding.joints.text.toString()
-
-            if (!isClientInfoValid()) {
-                Toast.makeText(context, "Please fill client info", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
 
             if (!isDurationValid()) {
                 Toast.makeText(context, "Please add start and end duration", Toast.LENGTH_SHORT).show()
@@ -133,11 +126,11 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     }
 
     private fun getClientInfo() {
-        clientName = binding.name.text.toString()
-        rentalAddress = binding.address.text.toString()
-        clientEmail = binding.email.text.toString()
-        clientPhone = binding.phone.text.toString()
-        clientCnic = binding.cnic.text.toString()
+        val client: ClientModel = arguments?.getSerializable(ARG_CLIENT) as ClientModel
+        clientName = client.name
+        clientEmail = client.email
+        clientPhone = client.phone
+        clientCnic = client.cnic
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -393,12 +386,6 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         }
     }
 
-    // Validation functions
-    private fun isClientInfoValid(): Boolean {
-        return clientName.isNotEmpty() && rentalAddress.isNotEmpty() &&
-                clientPhone.isNotEmpty() && clientEmail.isNotEmpty() && clientCnic.isNotEmpty()
-    }
-
     private fun isDurationValid(): Boolean {
         return durationStart.isNotEmpty() && durationEnd.isNotEmpty()
     }
@@ -513,7 +500,10 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         binder.phoneNum.text = clientPhone
         binder.email.text = clientEmail
         binder.cnic.text = clientCnic
-        binder.estimatedRent.text = "${calculateTotalPrice()}"
+        binder.estimatedRent.text = buildString {
+            append(calculateTotalPrice())
+            append(" .Rs")
+        }
         binder.rentalDurationFrom.text = durationStart
         binder.rentalDurationTo.text = durationEnd
         setViewVisibilityAndText(binder.pipes, pipeQuantity, binder.entry8)
@@ -531,8 +521,8 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             .setPositiveButton("Send") { _, _ ->
                 // If all validations pass, proceed with the action
                 onSendReqListener?.onReqSendUpdated(
-                    clientName, rentalAddress, clientEmail, clientPhone, clientCnic, durationStart,
-                    durationEnd, pipeQuantity, pipeLength, jointsQuantity, wenchQuantity, pumpsQuantity,
+                    rentalAddress, durationStart, durationEnd, pipeQuantity,
+                    pipeLength, jointsQuantity, wenchQuantity, pumpsQuantity,
                     motorsQuantity, generatorsQuantity, wheelQuantity, totalPrice
                 )
                 dismiss() // Dismiss ReqFrag only after saving data
@@ -563,9 +553,15 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
-        fun newInstance(listener: OnSendReqListener): RentalReqFragment {
+        private const val ARG_CLIENT = "arg_client"
+        fun newInstance(listener: OnSendReqListener, client: ClientModel): RentalReqFragment {
             val fragment = RentalReqFragment()
             fragment.onSendReqListener = listener
+
+            val args = Bundle()
+            args.putSerializable(ARG_CLIENT, client)  // Pass the client as Serializable
+            fragment.arguments = args
+
             return fragment
         }
     }
