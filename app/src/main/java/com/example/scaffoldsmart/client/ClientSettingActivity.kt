@@ -19,7 +19,7 @@ import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.client.client_fragments.ClientUpdateFragment
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientSettingBinding
-import com.example.scaffoldsmart.util.EncryptionUtil
+import com.example.scaffoldsmart.util.Encryption
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
@@ -92,7 +92,7 @@ class ClientSettingActivity : AppCompatActivity() {
             override fun onClientUpdated(name: String, email: String, pass: String, cnic: String, phone: String, address: String) {
                 viewModel.observeClientLiveData().observe(this@ClientSettingActivity) { client ->
                     if (client != null) {
-                        val currentDecryptedPassword = EncryptionUtil.decrypt(client.pass)
+                        val currentDecryptedPassword = Encryption.decrypt(client.pass)
                         updateClientData(name, email, pass, cnic, address, phone, currentDecryptedPassword)
                     }
                 }
@@ -132,7 +132,7 @@ class ClientSettingActivity : AppCompatActivity() {
                                     val databaseRef = Firebase.database.reference.child("Client")
                                         .child(currentUser.uid)
 
-                                    val encryptedPassword = EncryptionUtil.encrypt(pass)
+                                    val encryptedPassword = Encryption.encrypt(pass)
 
                                     val updates = hashMapOf<String, Any>(
                                         "name" to name,

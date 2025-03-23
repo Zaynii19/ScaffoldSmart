@@ -57,7 +57,6 @@ class ChatActivity : AppCompatActivity() {
     private var receiverName: String? = null
     private var senderName: String? = null
     private var isActivityVisible: Boolean? = null
-    private var dateFormatter : DateFormater? = null
     private lateinit var viewModelA: AdminViewModel
     private lateinit var viewModel: MessageViewModel
     private lateinit var chatPreferences: SharedPreferences
@@ -88,7 +87,6 @@ class ChatActivity : AppCompatActivity() {
         storage = FirebaseStorage.getInstance()
         dialog = ProgressDialog(this@ChatActivity)
         messages = ArrayList()
-        dateFormatter = DateFormater()
         chatPreferences = getSharedPreferences("CHATADMIN", MODE_PRIVATE)
         senderUid = chatPreferences.getString("SenderUid", null)
 
@@ -123,7 +121,7 @@ class ChatActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         val layoutManager = LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
         binding.rcv.layoutManager = layoutManager
-        adapter = MessageRcvAdapter(this, messages!!, senderRoom!!, receiverRoom!!, dateFormatter, senderUid!!)
+        adapter = MessageRcvAdapter(this, messages!!, senderRoom!!, receiverRoom!!, senderUid!!)
         binding.rcv.adapter = adapter
         layoutManager.stackFromEnd = true
         binding.rcv.setHasFixedSize(true)
@@ -151,7 +149,7 @@ class ChatActivity : AppCompatActivity() {
             messages!!.clear()
             var previousDate: String? = null
             for (msg in msgs!!) {
-                val currentDate = dateFormatter!!.formatDateHeader(msg.timestamp)
+                val currentDate = DateFormater.formatDateHeader(msg.timestamp)
                 if (currentDate != previousDate) {
                     messages!!.add(DateHeader(currentDate))
                     previousDate = currentDate
@@ -177,7 +175,7 @@ class ChatActivity : AppCompatActivity() {
                         if (!status.isNullOrEmpty() && lastSeen != null) {
                             if (status == "Offline") {
                                 binding.status.visibility = View.VISIBLE
-                                binding.status.text = dateFormatter!!.formatTimestampForLastSeen(lastSeen)
+                                binding.status.text = DateFormater.formatTimestampForLastSeen(lastSeen)
                             } else {
                                 binding.status.text = status.toString()
                                 binding.status.visibility = View.VISIBLE

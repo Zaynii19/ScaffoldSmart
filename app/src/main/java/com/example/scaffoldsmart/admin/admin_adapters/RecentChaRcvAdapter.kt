@@ -15,7 +15,6 @@ import com.example.scaffoldsmart.util.DateFormater
 class RecentChaRcvAdapter(
     val context: Context,
     private var chatList: ArrayList<ChatUserModel>,
-    private val dateFormatter: DateFormater?
 ): RecyclerView.Adapter<RecentChaRcvAdapter.MyChatViewHolder>() {
     class MyChatViewHolder(val binding: ConversationRcvItemBinding):RecyclerView.ViewHolder(binding.root)
 
@@ -31,7 +30,7 @@ class RecentChaRcvAdapter(
         val chatItem = chatList[position]
         holder.binding.userName.text = chatItem.userName
         holder.binding.message.text = chatItem.lastMsg
-        holder.binding.lastMessageTime.text = dateFormatter!!.formatTimestampForMsg(chatItem.lastMsgTime)
+        holder.binding.lastMessageTime.text = DateFormater.formatTimestampForMsg(chatItem.lastMsgTime)
         if (chatItem.clientNewMsgCount == 0) {
             holder.binding.newMessageCount.visibility = View.GONE
         } else {

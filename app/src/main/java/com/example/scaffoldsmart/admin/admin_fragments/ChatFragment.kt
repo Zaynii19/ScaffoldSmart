@@ -47,7 +47,6 @@ class ChatFragment : Fragment() {
     private var auth: FirebaseAuth? = null
     private var senderUid: String? = null
     private var senderName: String? = null
-    private var dateFormatter : DateFormater? = null
     private lateinit var chatPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +61,6 @@ class ChatFragment : Fragment() {
         profilesList = ArrayList()
         recentChatList = ArrayList()
         chatClientList = ArrayList()
-        dateFormatter = DateFormater()
 
         viewModelA = ViewModelProvider(this)[AdminViewModel::class.java]
         viewModelA.retrieveAdminData()
@@ -105,7 +103,7 @@ class ChatFragment : Fragment() {
     private fun setRecentChatRcv() {
         val layoutManagerC = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         binding.chatRCV.layoutManager = layoutManagerC
-        adapterC = RecentChaRcvAdapter(requireActivity(), recentChatList, dateFormatter)
+        adapterC = RecentChaRcvAdapter(requireActivity(), recentChatList)
         binding.chatRCV.adapter = adapterC
         binding.chatRCV.setHasFixedSize(true)
     }

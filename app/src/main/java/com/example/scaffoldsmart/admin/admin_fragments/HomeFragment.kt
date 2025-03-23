@@ -18,7 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.util.EncryptionUtil
+import com.example.scaffoldsmart.util.Encryption
 import com.example.scaffoldsmart.admin.ClientActivity
 import com.example.scaffoldsmart.admin.InventoryActivity
 import com.example.scaffoldsmart.admin.SettingActivity
@@ -125,7 +125,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun storeAdminData() {
-        val encryptedPassword = EncryptionUtil.encrypt(pass)
+        val encryptedPassword = Encryption.encrypt(pass)
         userType = "Admin"
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {

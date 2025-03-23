@@ -27,6 +27,7 @@ import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientCostComparisonBinding
+import com.example.scaffoldsmart.util.DateFormater
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -213,7 +214,7 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                         set(selectedYear, selectedMonth, selectedDay)
                     }
 
-                    durationStart = formatCalendarDate(fromDate!!)
+                    durationStart = DateFormater.formatRentDuration(fromDate!!)
 
                     binding.rentalDurationFrom.setText(buildString {
                         append(selectedDay.toString())
@@ -249,7 +250,7 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                         set(selectedYear, selectedMonth, selectedDay)
                     }
 
-                    durationEnd = formatCalendarDate(toDate!!)
+                    durationEnd = DateFormater.formatRentDuration(toDate!!)
 
                     binding.rentalDurationTo.setText(buildString {
                         append(selectedDay.toString())
@@ -284,13 +285,6 @@ class ClientCostComparisonActivity : AppCompatActivity() {
             Toast.makeText(this@ClientCostComparisonActivity, "Difference: $diffInDays days", Toast.LENGTH_SHORT).show()
             updateTotalRent() // Update rent when dates change
         }
-    }
-
-    private fun formatCalendarDate(calendar: Calendar): String {
-        // Create a SimpleDateFormat instance with the desired format
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-        // Format the date and return the string
-        return dateFormat.format(calendar.time)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -417,12 +411,11 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         if (isRentalItemSelected() && isDurationValid()) {
             val totalPrice = calculateTotalPrice()
             binding.rent.text = buildString {
-                append("Total Rent: ")
                 append(totalPrice)
                 append(" .Rs")
             }
         } else {
-            binding.rent.text = getString(R.string.total_rent_0_rs) // Reset rent if inputs are invalid
+            binding.rent.text = getString(R.string._0_rs) // Reset rent if inputs are invalid
         }
     }
 

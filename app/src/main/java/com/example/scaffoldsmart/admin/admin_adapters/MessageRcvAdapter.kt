@@ -27,7 +27,6 @@ class MessageRcvAdapter(
     private val messages: ArrayList<Any>, // Hold both Message and DateHeader
     private val senderRoom: String,
     private val receiverRoom: String,
-    private val dateFormatter: DateFormater?,
     private val senderUid: String
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder?>() {
 
@@ -100,7 +99,7 @@ class MessageRcvAdapter(
             holder.bindingS.sendMessage.text = currentMessageModel.message
         }
         holder.bindingS.sendMessageSeen.visibility = if (currentMessageModel.seen!! && currentMessageModel.message != "photo") View.VISIBLE else View.GONE
-        holder.bindingS.lastSendMessageTime.text = dateFormatter!!.formatTimestampForMsg(currentMessageModel.timestamp)
+        holder.bindingS.lastSendMessageTime.text = DateFormater.formatTimestampForMsg(currentMessageModel.timestamp)
         holder.bindingS.root.setOnLongClickListener { showDeleteDialog(currentMessageModel, true) }
     }
 
@@ -123,7 +122,7 @@ class MessageRcvAdapter(
         } else {
             holder.bindingR.receiveMessage.text = currentMessageModel.message
         }
-        holder.bindingR.lastReceiveMessageTime.text = dateFormatter!!.formatTimestampForMsg(currentMessageModel.timestamp)
+        holder.bindingR.lastReceiveMessageTime.text = DateFormater.formatTimestampForMsg(currentMessageModel.timestamp)
         holder.bindingR.root.setOnLongClickListener { showDeleteDialog(currentMessageModel, false) }
     }
 
@@ -149,7 +148,7 @@ class MessageRcvAdapter(
         messageSeen.visibility = View.GONE
         messageTime.visibility = View.GONE
         Glide.with(context).load(imageUrl).placeholder(R.drawable.image_placeholder).into(imageView)
-        imgMessageTime.text = dateFormatter!!.formatTimestampForMsg(timestamp)
+        imgMessageTime.text = DateFormater.formatTimestampForMsg(timestamp)
     }
 
     private fun showImageReceiveMessage(
@@ -165,7 +164,7 @@ class MessageRcvAdapter(
         textMessage.visibility = View.GONE
         messageTime.visibility = View.GONE
         Glide.with(context).load(imageUrl).placeholder(R.drawable.image_placeholder).into(imageView)
-        imgMessageTime.text = dateFormatter!!.formatTimestampForMsg(timestamp)
+        imgMessageTime.text = DateFormater.formatTimestampForMsg(timestamp)
     }
 
     private fun showDeleteDialog(messageModel: MessageModel, isSender: Boolean): Boolean {

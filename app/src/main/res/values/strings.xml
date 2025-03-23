@@ -159,6 +159,7 @@
     <string name="verify_account">Verify Account</string>
     <string name="compare_item_cost">Compare Item Cost</string>
     <string name="calculate_rent">Calculate Rent</string>
-    <string name="total_rent_0_rs">Total Rent: 0 .Rs</string>
+    <string name="total_rent">Total Rent: </string>
+    <string name="_0_rs">0. Rs</string>
 
 </resources>

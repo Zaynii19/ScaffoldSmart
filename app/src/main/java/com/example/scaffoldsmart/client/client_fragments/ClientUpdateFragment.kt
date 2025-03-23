@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientUpdateBinding
-import com.example.scaffoldsmart.util.EncryptionUtil
+import com.example.scaffoldsmart.util.Encryption
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class ClientUpdateFragment : BottomSheetDialogFragment() {
@@ -91,7 +91,7 @@ class ClientUpdateFragment : BottomSheetDialogFragment() {
             if (client != null) {
                 binding.clientName.setText(client.name)
                 binding.email.setText(client.email)
-                val decryptedPassword = EncryptionUtil.decrypt(client.pass)
+                val decryptedPassword = Encryption.decrypt(client.pass)
                 binding.password.setText(decryptedPassword)
                 binding.cnic.setText(client.cnic)
                 binding.phoneNum.setText(client.phone)

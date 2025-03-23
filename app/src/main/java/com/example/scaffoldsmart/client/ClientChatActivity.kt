@@ -22,7 +22,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.AdminMainActivity
 import com.example.scaffoldsmart.admin.admin_adapters.MessageRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.DateHeader
 import com.example.scaffoldsmart.admin.admin_models.MessageModel
@@ -58,7 +57,6 @@ class ClientChatActivity : AppCompatActivity() {
     private var receiverName: String? = null
     private var senderName: String? = null
     private var isActivityVisible: Boolean? = null
-    private var dateFormatter : DateFormater? = null
     private lateinit var viewModelA: AdminViewModel
     private lateinit var viewModel: MessageViewModel
     private lateinit var chatPreferences: SharedPreferences
@@ -89,7 +87,6 @@ class ClientChatActivity : AppCompatActivity() {
         storage = FirebaseStorage.getInstance()
         dialog = ProgressDialog(this@ClientChatActivity)
         messages = ArrayList()
-        dateFormatter = DateFormater()
         chatPreferences = getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
 
         dialog?.setMessage("Uploading image...")
@@ -117,7 +114,7 @@ class ClientChatActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         val layoutManager = LinearLayoutManager(this@ClientChatActivity, LinearLayoutManager.VERTICAL, false)
         binding.rcv.layoutManager = layoutManager
-        adapter = MessageRcvAdapter(this, messages!!, senderRoom!!, receiverRoom!!, dateFormatter, senderUid!!)
+        adapter = MessageRcvAdapter(this, messages!!, senderRoom!!, receiverRoom!!, senderUid!!)
         binding.rcv.adapter = adapter
         layoutManager.stackFromEnd = true
         binding.rcv.setHasFixedSize(true)
@@ -146,7 +143,7 @@ class ClientChatActivity : AppCompatActivity() {
             messages!!.clear()
             var previousDate: String? = null
             for (msg in msgs!!) {
-                val currentDate = dateFormatter!!.formatDateHeader(msg.timestamp)
+                val currentDate = DateFormater.formatDateHeader(msg.timestamp)
                 if (currentDate != previousDate) {
                     messages!!.add(DateHeader(currentDate))
                     previousDate = currentDate
@@ -172,7 +169,7 @@ class ClientChatActivity : AppCompatActivity() {
                         if (!status.isNullOrEmpty() && lastSeen != null) {
                             if (status == "Offline") {
                                 binding.status.visibility = View.VISIBLE
-                                binding.status.text = dateFormatter!!.formatTimestampForLastSeen(lastSeen)
+                                binding.status.text = DateFormater.formatTimestampForLastSeen(lastSeen)
                             } else {
                                 binding.status.text = status.toString()
                                 binding.status.visibility = View.VISIBLE

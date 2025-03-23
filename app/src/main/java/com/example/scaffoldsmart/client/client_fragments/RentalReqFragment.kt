@@ -27,6 +27,7 @@ import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.databinding.FragmentRentalReqBinding
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
+import com.example.scaffoldsmart.util.DateFormater
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.text.SimpleDateFormat
@@ -186,7 +187,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
                         set(selectedYear, selectedMonth, selectedDay)
                     }
 
-                    durationStart = formatCalendarDate(fromDate!!)
+                    durationStart = DateFormater.formatRentDuration(fromDate!!)
 
                     binding.rentalDurationFrom.setText(buildString {
                         append(selectedDay.toString())
@@ -222,7 +223,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
                         set(selectedYear, selectedMonth, selectedDay)
                     }
 
-                    durationEnd = formatCalendarDate(toDate!!)
+                    durationEnd = DateFormater.formatRentDuration(toDate!!)
 
                     binding.rentalDurationTo.setText(buildString {
                         append(selectedDay.toString())
@@ -256,13 +257,6 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             // Display the difference
             Toast.makeText(requireActivity(), "Difference: $diffInDays days", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun formatCalendarDate(calendar: Calendar): String {
-        // Create a SimpleDateFormat instance with the desired format
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-        // Format the date and return the string
-        return dateFormat.format(calendar.time)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

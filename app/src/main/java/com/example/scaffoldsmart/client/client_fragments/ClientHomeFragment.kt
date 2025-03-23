@@ -2,33 +2,41 @@ package com.example.scaffoldsmart.client.client_fragments
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Typeface
+import android.graphics.pdf.PdfDocument
 import android.os.Bundle
+import android.os.Environment
+import android.text.Layout
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.StaticLayout
+import android.text.TextPaint
+import android.text.style.StyleSpan
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.scaffoldsmart.admin.admin_models.AdminModel
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.ChatViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
-import com.example.scaffoldsmart.client.ClientChatActivity
 import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_adapters.ClientScafoldRcvAdapter
-import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.client.client_models.ClientScafoldInfoModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
 import com.example.scaffoldsmart.util.OnesignalService
-import com.google.firebase.Firebase
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
-import com.google.firebase.database.getValue
+import com.example.scaffoldsmart.util.SmartContract
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -89,6 +97,10 @@ class ClientHomeFragment : Fragment() {
         binding.totalPaymentDue.text = buildString {
             append(totalDueRent())
             append(" .Rs")
+        }
+
+        binding.imageView2.setOnClickListener {
+            SmartContract.createScaffoldingContractPdf()
         }
     }
 

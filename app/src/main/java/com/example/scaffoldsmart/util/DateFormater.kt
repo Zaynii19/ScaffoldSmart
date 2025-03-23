@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class DateFormater {
+object DateFormater {
     /*fun formatRelativeTimestamp(timestamp: Long?): String {
         if (timestamp == null) return "Unknown"
 
@@ -18,6 +18,13 @@ class DateFormater {
             else -> SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(timestamp))
         }
     }*/
+
+    fun formatRentDuration(calendar: Calendar): String {
+        // Create a SimpleDateFormat instance with the desired format
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        // Format the date and return the string
+        return dateFormat.format(calendar.time)
+    }
 
     fun formatTimestampForMsg(timestamp: Long?): String {
         if (timestamp == null) return "Unknown"

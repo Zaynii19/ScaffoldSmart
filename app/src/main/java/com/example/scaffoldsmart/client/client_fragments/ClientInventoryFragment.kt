@@ -21,7 +21,7 @@ import com.example.scaffoldsmart.client.client_adapters.ClientInventoryRcvAdapte
 import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientInventoryBinding
-import com.example.scaffoldsmart.util.EncryptionUtil
+import com.example.scaffoldsmart.util.Encryption
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -121,7 +121,7 @@ class ClientInventoryFragment : Fragment() {
                 clientPhone = client.phone
                 clientCnic = client.cnic
 
-                currentDecryptedPassword = EncryptionUtil.decrypt(client.pass)
+                currentDecryptedPassword = Encryption.decrypt(client.pass)
 
                 clientObj = client //Passing whole client to the obj
             }

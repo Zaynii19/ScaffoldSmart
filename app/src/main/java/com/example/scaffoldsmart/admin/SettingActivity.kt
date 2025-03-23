@@ -14,7 +14,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import com.example.scaffoldsmart.util.EncryptionUtil
+import com.example.scaffoldsmart.util.Encryption
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ActivitySettingBinding
 import com.example.scaffoldsmart.admin.admin_fragments.AdminUpdateFragment
@@ -88,7 +88,7 @@ class SettingActivity : AppCompatActivity() {
 
         viewModel.observeAdminLiveData().observe(this) { admin ->
             if (admin != null) {
-                currentDecryptedPassword = EncryptionUtil.decrypt(admin.pass)
+                currentDecryptedPassword = Encryption.decrypt(admin.pass)
             }
         }
 
@@ -110,7 +110,7 @@ class SettingActivity : AppCompatActivity() {
                                     val databaseRef = Firebase.database.reference.child("Admin")
                                         .child(currentUser.uid)
 
-                                    val encryptedPassword = EncryptionUtil.encrypt(pass)
+                                    val encryptedPassword = Encryption.encrypt(pass)
 
                                     val updates = hashMapOf<String, Any>(
                                         "name" to name,
