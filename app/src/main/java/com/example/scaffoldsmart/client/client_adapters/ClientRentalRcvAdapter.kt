@@ -88,7 +88,7 @@ class ClientRentalRcvAdapter (val context: Context, private var rentalList: Arra
         binder.textView6.visibility = View.GONE
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
-        binder.estimatedRent.text = currentReq.rent
+        binder.rent.text = currentReq.rent
         setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
         setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
         setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)

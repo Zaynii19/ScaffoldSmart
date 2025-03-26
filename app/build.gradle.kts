@@ -58,6 +58,14 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    // for email feature
+    packaging {
+        resources {
+            excludes.add("META-INF/NOTICE.md")
+            excludes.add("META-INF/LICENSE.md")
+        }
+    }
 }
 
 dependencies {
@@ -96,4 +104,9 @@ dependencies {
     implementation (libs.circleimageview)
     implementation (libs.imagepicker)
     implementation (libs.glide)
+
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.android.mail)
+    implementation(libs.android.activation)
+
 }

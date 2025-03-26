@@ -18,8 +18,11 @@ import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_adapters.RentalRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.FragmentRentBinding
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
+import com.example.scaffoldsmart.util.DateFormater
+import com.example.scaffoldsmart.util.SmartContract
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import java.text.ParseException
@@ -28,7 +31,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class RentFragment : Fragment() {
+class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
     private val binding by lazy {
         FragmentRentBinding.inflate(layoutInflater)
     }
@@ -36,13 +39,25 @@ class RentFragment : Fragment() {
     private var rentalList = ArrayList<RentalModel>()
     private lateinit var adapter: RentalRcvAdapter
     private lateinit var viewModel: RentalViewModel
+    private lateinit var viewModelA: AdminViewModel
     private var rentStatus: String = ""
+    private var smartContract: SmartContract? = null
+    private var name: String = ""
+    private var email: String = ""
+    private var company: String = ""
+    private var address: String = ""
+    private var phone: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        smartContract = SmartContract()
+
         viewModel = ViewModelProvider(this)[RentalViewModel::class.java]
         viewModel.retrieveRentalReq()
+
+        viewModelA = ViewModelProvider(this)[AdminViewModel::class.java]
+        viewModelA.retrieveAdminData()
     }
 
     override fun onCreateView(
@@ -52,6 +67,7 @@ class RentFragment : Fragment() {
         setRcv()
         setSearchView()
         observeRentalLiveData()
+        observeAdminLiveData()
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -66,7 +82,7 @@ class RentFragment : Fragment() {
 
     private fun setRcv() {
         binding.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        adapter = RentalRcvAdapter(requireActivity(), rentalList)
+        adapter = RentalRcvAdapter(requireActivity(), rentalList, this@RentFragment)
         binding.rcv.adapter = adapter
         binding.rcv.setHasFixedSize(true)
     }
@@ -83,6 +99,20 @@ class RentFragment : Fragment() {
             }
             adapter.updateList(rentalList)
             calculateRentalStatus(rentalList)
+        }
+    }
+
+    private fun observeAdminLiveData() {
+        binding.loading.visibility = View.VISIBLE
+        viewModelA.observeAdminLiveData().observe(viewLifecycleOwner) { admin ->
+            binding.loading.visibility = View.GONE
+            if (admin != null) {
+                name = admin.name
+                email = admin.email
+                company = admin.company
+                phone = admin.phone
+                address = admin.address
+            }
         }
     }
 
@@ -116,34 +146,18 @@ class RentFragment : Fragment() {
     }
 
     private fun calculateRentalStatus(rentalList: ArrayList<RentalModel>) {
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-
         for (rental in rentalList) {
-            try {
-                // Convert start and end duration strings to Date type
-                val startDate = dateFormat.parse(rental.startDuration)
-                val endDate = dateFormat.parse(rental.endDuration)
 
-                if (startDate != null && endDate != null) {
-                    // Get current date and format it
-                    val currentDate = LocalDate.now() // Get current date
-                    val currentDateFormatted = currentDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-                    val currentDateParsed = dateFormat.parse(currentDateFormatted)
-
-                    // Determine the status
-                    rentStatus = if (currentDateParsed?.after(endDate) == true) {
-                        "overdue"
-                    } else {
-                        "ongoing"
-                    }
-
-                    // Call method to update the database with the new status
-                    updateRentalStatus(rental.rentalId, rentStatus)
-
-                }
-            } catch (e: ParseException) {
-                Log.e("RentFragDebug", "Date parsing error for rental: ${rental.clientName} - ${e.message}")
+            // Determine the status
+            val isOverdue = DateFormater.compareDateWithCurrentDate(rental.endDuration)
+            rentStatus = if (isOverdue) {
+                "overdue"
+            } else {
+                "ongoing"
             }
+
+            // Call method to update the database with the new status
+            updateRentalStatus(rental.rentalId, rentStatus)
         }
     }
 
@@ -166,4 +180,12 @@ class RentFragment : Fragment() {
             }
     }
 
+    override fun onDownloadButtonClick(rental: RentalModel) {
+        smartContract!!.createScaffoldingContractPdf(
+            requireActivity(), false, name, company, email, phone, address, rental.clientName, rental.clientPhone,
+            rental.clientEmail, rental.clientCnic, rental.clientAddress, rental.rentalAddress, rental.startDuration,
+            rental.endDuration, rental.pipes, rental.pipesLength, rental.joints, rental.wench, rental.motors,
+            rental.pumps, rental.generators, rental.wheel
+        )
+    }
 }

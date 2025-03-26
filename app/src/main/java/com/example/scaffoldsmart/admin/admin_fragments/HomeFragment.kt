@@ -30,7 +30,9 @@ import com.example.scaffoldsmart.admin.admin_models.ScafoldInfoModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
+import com.example.scaffoldsmart.util.DateFormater
 import com.example.scaffoldsmart.util.OnesignalService
+import com.example.scaffoldsmart.util.SmartContract
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
@@ -62,17 +64,21 @@ class HomeFragment : Fragment() {
     private var filteredRentals = ArrayList<RentalModel>()
     private lateinit var viewModel: AdminViewModel
     private lateinit var reqViewModel: RentalViewModel
-    private var durationInMonths: Long = 0L
+    private var durationInMonths: String = ""
     private var status: String = ""
+    private var isApproved: Boolean = false
     private var bottomSheetDialog: BottomSheetDialogFragment? = null
     private lateinit var chatPreferences: SharedPreferences
+    private var smartContract: SmartContract? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        onesignal = OnesignalService(requireActivity())
+        smartContract = SmartContract()
+
         chatPreferences = requireActivity().getSharedPreferences("CHATADMIN", MODE_PRIVATE)
 
-        onesignal = OnesignalService(requireActivity())
         viewModel = ViewModelProvider(this)[AdminViewModel::class.java]
         viewModel.retrieveAdminData()
         storeAdminData()
@@ -201,40 +207,22 @@ class HomeFragment : Fragment() {
 
     private fun populateInfoList(rentals: List<RentalModel>) {
         infoList.clear()
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-
         for (rental in rentals) {
-            try {
-                // Convert start and end duration strings to Date type
-                val startDate = dateFormat.parse(rental.startDuration)
-                val endDate = dateFormat.parse(rental.endDuration)
 
-                if (startDate != null && endDate != null) {
-                    // Calculate difference in milliseconds
-                    val diffInMillis = endDate.time - startDate.time
-                    // Calculate difference in days
-                    val diffInDays = diffInMillis / (1000 * 60 * 60 * 24)
-                    // Convert to months (approximately)
-                    durationInMonths = diffInDays / 30  // Assuming 30 days in a month
-
-                    // Get current date and format it
-                    val currentDate = LocalDate.now() // Get current date
-                    val currentDateFormatted = currentDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
-                    val currentDateParsed = dateFormat.parse(currentDateFormatted)
-
-                    // Determine the status
-                    status = if (currentDateParsed?.after(endDate) == true) {
-                        "overdue"
-                    } else {
-                        "ongoing"
-                    }
-                    // Create a ScafoldInfoModel instance and add to infoList
-                    infoList.add(ScafoldInfoModel(rental.clientName, "$durationInMonths months", status))
-                    adapter.updateList(infoList)
-                }
-            } catch (e: ParseException) {
-                Log.e("HomeFragDebug", "Date parsing error for rental: ${rental.clientName} - ${e.message}")
+            // Determine the status
+            val isOverdue = DateFormater.compareDateWithCurrentDate(rental.endDuration)
+            status = if (isOverdue) {
+                "overdue"
+            } else {
+                "ongoing"
             }
+
+            // Calculate the duration in months
+            durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
+
+            // Create a ScafoldInfoModel instance and add to infoList
+            infoList.add(ScafoldInfoModel(rental.clientName, durationInMonths, status))
+            adapter.updateList(infoList)
         }
     }
 
@@ -278,6 +266,7 @@ class HomeFragment : Fragment() {
         binder.cnic.text = currentReq.clientCnic
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
+        binder.rent.text = currentReq.rent
         setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
         setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
         setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)
@@ -291,11 +280,21 @@ class HomeFragment : Fragment() {
             .setTitle("Rental Request Details ${index + 1}")
             .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
             .setPositiveButton("Approve") { dialog, _ ->
+                isApproved = true
                 approveRentalReq(currentReq)
+                notifyClient(currentReq, isApproved)
+                smartContract!!.createScaffoldingContractPdf(
+                    requireActivity(), isApproved, name, company, email, phone, address, currentReq.clientName, currentReq.clientPhone,
+                    currentReq.clientEmail, currentReq.clientCnic, currentReq.clientAddress, currentReq.rentalAddress, currentReq.startDuration,
+                    currentReq.endDuration, currentReq.pipes, currentReq.pipesLength, currentReq.joints, currentReq.wench,
+                    currentReq.motors, currentReq.pumps, currentReq.generators, currentReq.wheel
+                )
                 dialog.dismiss()
             }
             .setNegativeButton("Reject") { dialog, _ ->
+                isApproved = false
                 delRentalReq(currentReq)
+                notifyClient(currentReq, isApproved)
                 dialog.dismiss()
             }
             .setNeutralButton(if (index == reqList.size - 1) "Previous" else "Next") { dialog, _ ->
@@ -349,6 +348,7 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireActivity(), "Request Approved", Toast.LENGTH_SHORT).show()
                 // Remove the item from the list
                 reqList.remove(currentReq)
+                adapter.notifyDataSetChanged()
             }
             .addOnFailureListener {
                 Toast.makeText(requireActivity(), "Failed to approve request", Toast.LENGTH_SHORT).show()
@@ -364,10 +364,25 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireActivity(), "Request rejected from ${currentReq.clientName}", Toast.LENGTH_SHORT).show()
                 // Remove the item from the list
                 reqList.remove(currentReq)
+                adapter.notifyDataSetChanged()
             }
             .addOnFailureListener {
                 Toast.makeText(requireActivity(), "Failed to reject request", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun notifyClient(currentReq: RentalModel, isApproved: Boolean) {
+        if (isApproved) {
+            val title = "Rental Request Alert"
+            val message = "Your Rental Request Has Been Approved. Click to view rental details."
+            val externalId = listOf(currentReq.clientEmail)
+            onesignal.sendNotiByOneSignalToExternalId(title, message, externalId)
+        } else {
+            val title = "Rental Request Alert"
+            val message = "Your Rental Request Has Been Rejected."
+            val externalId = listOf(currentReq.clientEmail)
+            onesignal.sendNotiByOneSignalToExternalId(title, message, externalId)
+        }
     }
 
     private fun showBottomSheet() {

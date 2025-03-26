@@ -41,6 +41,7 @@ class ClientInventoryFragment : Fragment() {
     private var clientEmail: String = ""
     private var clientPhone: String = ""
     private var clientCnic: String = ""
+    private var clientAddress: String = ""
     private var currentDecryptedPassword: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -120,6 +121,7 @@ class ClientInventoryFragment : Fragment() {
                 clientEmail = client.email
                 clientPhone = client.phone
                 clientCnic = client.cnic
+                clientAddress = client.address
 
                 currentDecryptedPassword = Encryption.decrypt(client.pass)
 
@@ -145,7 +147,7 @@ class ClientInventoryFragment : Fragment() {
                 rent: Int
             ) {
                 val onesignal = OnesignalService(requireActivity())
-                onesignal.sendReqNotiByOneSignalToSegment(clientID, clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel, rent)
+                onesignal.sendReqNotiByOneSignalToSegment(clientID, clientName, clientAddress, clientEmail, clientPhone, clientCnic, rentalAddress ,startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel, rent)
             }
         }, clientObj)
         bottomSheetDialog.show(requireActivity().supportFragmentManager, "RentalReq")

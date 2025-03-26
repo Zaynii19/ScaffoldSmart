@@ -166,10 +166,11 @@ class OnesignalService(val context: Context) {
     fun sendReqNotiByOneSignalToSegment(
         clientID: String,
         clientName: String,
-        rentalAddress: String,
+        clientAddress: String,
         clientEmail: String,
         clientPhone: String,
         clientCnic: String,
+        rentalAddress: String,
         startDuration: String,
         endDuration: String,
         pipes: String,
@@ -188,10 +189,11 @@ class OnesignalService(val context: Context) {
         val customData = JSONObject().apply {
             put("clientID", clientID)
             put("clientName", clientName)
-            put("rentalAddress", rentalAddress)
+            put("clientAddress", clientAddress)
             put("clientEmail", clientEmail)
             put("clientPhone", clientPhone)
             put("clientCnic", clientCnic)
+            put("rentalAddress", rentalAddress)
             put("startDuration", startDuration)
             put("endDuration", endDuration)
             put("pipes", pipes)

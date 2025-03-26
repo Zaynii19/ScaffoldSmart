@@ -32,6 +32,7 @@ import com.example.scaffoldsmart.client.client_adapters.ClientScafoldRcvAdapter
 import com.example.scaffoldsmart.client.client_models.ClientScafoldInfoModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
+import com.example.scaffoldsmart.util.DateFormater
 import com.example.scaffoldsmart.util.OnesignalService
 import com.example.scaffoldsmart.util.SmartContract
 import java.io.File
@@ -49,7 +50,6 @@ class ClientHomeFragment : Fragment() {
     private var email: String = ""
     private var role: String = ""
     private var clientID: String = ""
-    private var diffInDays: Long = 0
     private var infoList = ArrayList<ClientScafoldInfoModel>()
     private var dueRequests = ArrayList<RentalModel>()
     private lateinit var adapter: ClientScafoldRcvAdapter
@@ -97,10 +97,6 @@ class ClientHomeFragment : Fragment() {
         binding.totalPaymentDue.text = buildString {
             append(totalDueRent())
             append(" .Rs")
-        }
-
-        binding.imageView2.setOnClickListener {
-            SmartContract.createScaffoldingContractPdf()
         }
     }
 
@@ -153,29 +149,14 @@ class ClientHomeFragment : Fragment() {
 
     private fun populateInfoList(rentals: List<RentalModel>) {
         infoList.clear()
-        val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-
         for (rental in rentals) {
-            try {
-                // Convert start and end duration strings to Date type
-                val startDate = dateFormat.parse(rental.startDuration)
-                val endDate = dateFormat.parse(rental.endDuration)
 
-                if (startDate != null && endDate != null) {
-                    // Calculate difference in milliseconds
-                    val diffInMillis = endDate.time - startDate.time
-                    // Calculate difference in days
-                    diffInDays = diffInMillis / (1000 * 60 * 60 * 24)
-                    // Convert to months (approximately)
-                    val durationInMonths = diffInDays / 30  // Assuming 30 days in a month
+            // Calculate the duration in months
+            val durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
 
-                    // Create a ScafoldInfoModel instance and add to infoList
-                    infoList.add(ClientScafoldInfoModel(rental.rent, "$durationInMonths months", rental.rentStatus))
-                    adapter.updateList(infoList)
-                }
-            } catch (e: ParseException) {
-                Log.e("ClientHomeFragDebug", "Date parsing error for rental: ${rental.rentalId} - ${e.message}")
-            }
+            // Create a ScafoldInfoModel instance and add to infoList
+            infoList.add(ClientScafoldInfoModel(rental.rent, durationInMonths, rental.rentStatus))
+            adapter.updateList(infoList)
         }
     }
 

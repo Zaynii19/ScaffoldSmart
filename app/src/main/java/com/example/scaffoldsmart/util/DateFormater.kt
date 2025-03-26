@@ -1,6 +1,8 @@
 package com.example.scaffoldsmart.util
 
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 
@@ -98,5 +100,80 @@ object DateFormater {
                 SimpleDateFormat("MMMM d, yyyy", Locale.getDefault()).format(calendar.time) // Format like "March 2, 2025"
             }
         }
+    }
+
+    fun formatCurrentDate(): String {
+        // Get the current date
+        val currentDate = Calendar.getInstance()
+
+        // Create a SimpleDateFormat instance for the desired output format
+        val outputFormat = SimpleDateFormat("d'th' MMMM, yyyy", Locale.getDefault())
+
+        // Get the day of the month
+        val day = SimpleDateFormat("d", Locale.getDefault()).format(currentDate.time)
+
+        // Determine the suffix for the day
+        val suffix = when {
+            day.endsWith("1") && day != "11" -> "st"
+            day.endsWith("2") && day != "12" -> "nd"
+            day.endsWith("3") && day != "13" -> "rd"
+            else -> "th"
+        }
+
+        // Format the current date into the desired output format and replace "th"
+        val formattedDate = outputFormat.format(currentDate.time).replace("th", suffix)
+
+        return formattedDate
+    }
+
+    fun formatDateString(dateString: String): String {
+        // Create a SimpleDateFormat instance to parse the input date string
+        val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        // Create a SimpleDateFormat instance for the desired output format
+        val outputFormat = SimpleDateFormat("d MMMM, yyyy", Locale.getDefault())
+
+        // Parse the date string
+        val date = inputFormat.parse(dateString)
+
+        // Format the date into the desired output format
+        val formattedDate = outputFormat.format(date!!)
+
+        return formattedDate
+    }
+
+    fun calculateDurationInMonths(startDateString: String, endDateString: String): String {
+        val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+
+        val startDate = inputFormat.parse(startDateString)
+        val endDate = inputFormat.parse(endDateString)
+
+        // Create Calendar instances for both dates
+        val startCalendar = Calendar.getInstance()
+        val endCalendar = Calendar.getInstance()
+
+        startCalendar.time = startDate!!
+        endCalendar.time = endDate!!
+
+        // Calculate the difference in months
+        val yearsDifference = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR)
+        val monthsDifference = endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH)
+
+        val totalMonthDifference = yearsDifference * 12 + monthsDifference
+
+        return totalMonthDifference.toString() + " month" + (if (totalMonthDifference != 1) "s" else "")
+    }
+
+    fun compareDateWithCurrentDate(endDuration: String): Boolean {
+        val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+
+        // Convert end duration strings to Date type
+        val endDate = inputFormat.parse(endDuration)
+
+        // Get current date and format it
+        val currentDate = LocalDate.now() // Get current date
+        val currentDateFormatted = currentDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+        val currentDateParsed = inputFormat.parse(currentDateFormatted)
+
+        return currentDateParsed!!.after(endDate)
     }
 }

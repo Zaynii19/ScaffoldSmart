@@ -23,14 +23,13 @@ import com.google.firebase.database.database
 class RequestRcvAdapter(
     val context: Context,
     private var reqList: ArrayList<RentalModel>,
-    private val viewModel: RentalViewModel,
     private val listener: OnItemActionListener
 ): RecyclerView.Adapter<RequestRcvAdapter.MyRequestViewHolder>() {
 
     class MyRequestViewHolder(val binding: ReqRcvItemBinding): RecyclerView.ViewHolder(binding.root)
 
     interface OnItemActionListener {
-        fun onDialogDismissed()
+        fun onReqUpdateListener(currentReq: RentalModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRequestViewHolder {
@@ -47,100 +46,13 @@ class RequestRcvAdapter(
         holder.binding.clientName.text = currentReq.clientName
 
         holder.binding.root.setOnClickListener {
-            showReqDetailsDialog(currentReq)
+            listener.onReqUpdateListener(currentReq)
         }
     }
 
-    private fun showReqDetailsDialog(currentReq: RentalModel) {
-        val customDialog = LayoutInflater.from(context).inflate(R.layout.rentals_details_dialog, null)
-        val builder = MaterialAlertDialogBuilder(context)
-        val binder = RentalsDetailsDialogBinding.bind(customDialog)
-
-        binder.clientName.text = currentReq.clientName
-        binder.address.text = currentReq.rentalAddress
-        binder.phoneNum.text = currentReq.clientPhone
-        binder.email.text = currentReq.clientEmail
-        binder.cnic.text = currentReq.clientCnic
-        binder.rentalDurationFrom.text = currentReq.startDuration
-        binder.rentalDurationTo.text = currentReq.endDuration
-        setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
-        setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
-        setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)
-        setViewVisibilityAndText(binder.wench, currentReq.wench, binder.entry11)
-        setViewVisibilityAndText(binder.slugPumps, currentReq.pumps, binder.entry12)
-        setViewVisibilityAndText(binder.motors, currentReq.motors, binder.entry13)
-        setViewVisibilityAndText(binder.generators, currentReq.generators, binder.entry14)
-        setViewVisibilityAndText(binder.wheel, currentReq.wheel, binder.entry15)
-
-        builder.setView(customDialog)
-            .setTitle("Rental Request Details")
-            .setBackground(ContextCompat.getDrawable(context, R.drawable.msg_view_received))
-            .setPositiveButton("Approve") { dialog, _ ->
-                approveRentalReq(currentReq)
-                dialog.dismiss()
-            }.setNegativeButton("Reject"){ dialog, _ ->
-                delRentalReq(currentReq)
-                dialog.dismiss()
-            }.setOnDismissListener {
-                // Notify the fragment about the dismissal
-                listener.onDialogDismissed()
-            }.create().apply {
-                show()
-                // Set title text color
-                val titleView = findViewById<TextView>(androidx.appcompat.R.id.alertTitle)
-                titleView?.setTextColor(Color.BLACK)
-                // Set button color
-                getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.GREEN)
-                getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED)
-            }
-    }
-
-    private fun setViewVisibilityAndText(view: TextView, text: String, entry: ConstraintLayout) {
-        if (text.isNotEmpty()) {
-            view.text = text
-        } else {
-            entry.visibility = View.GONE
-        }
-    }
-
-    private fun approveRentalReq(currentReq: RentalModel) {
-        // Reference to the specific req in Firebase
-        val databaseRef = Firebase.database.reference.child("Rentals")
-            .child(currentReq.rentalId) // Reference to the specific req using reqId
-
-        val newStatus = "approved"
-        // Create a map of the fields you want to update
-        val updates = hashMapOf<String, Any>(
-            "status" to newStatus
-        )
-
-        // Update the item with the new values
-        databaseRef.updateChildren(updates)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Request Approved", Toast.LENGTH_SHORT).show()
-                reqList.remove(currentReq)
-                viewModel.retrieveRentalReq() // Refresh to reflect changes
-                notifyDataSetChanged()
-            }
-            .addOnFailureListener {
-                Toast.makeText(context, "Failed to approve request", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun delRentalReq(currentReq: RentalModel) {
-        // Reference to the specific req in Firebase
-        val databaseRef = Firebase.database.reference.child("Rentals")
-            .child(currentReq.rentalId) // Reference to the specific req using reqId
-        databaseRef.removeValue()
-            .addOnSuccessListener {
-                Toast.makeText(context, "Request rejected from ${currentReq.clientName}", Toast.LENGTH_SHORT).show()
-                // Remove the item from the list
-                reqList.remove(currentReq)
-                notifyDataSetChanged()
-            }
-            .addOnFailureListener {
-                Toast.makeText(context, "Failed to reject request", Toast.LENGTH_SHORT).show()
-            }
+    fun updateList(newReqList: ArrayList<RentalModel>) {
+        reqList = newReqList
+        notifyDataSetChanged()
     }
 }
 

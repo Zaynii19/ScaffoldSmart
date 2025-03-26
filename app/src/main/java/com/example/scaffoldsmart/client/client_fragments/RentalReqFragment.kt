@@ -494,7 +494,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         binder.phoneNum.text = clientPhone
         binder.email.text = clientEmail
         binder.cnic.text = clientCnic
-        binder.estimatedRent.text = buildString {
+        binder.rent.text = buildString {
             append(calculateTotalPrice())
             append(" .Rs")
         }

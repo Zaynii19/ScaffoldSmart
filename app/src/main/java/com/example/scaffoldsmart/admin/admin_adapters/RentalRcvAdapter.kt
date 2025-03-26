@@ -11,17 +11,28 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.admin_adapters.InventoryRcvAdapter.OnItemActionListener
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.RentalRcvItemBinding
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
+import com.example.scaffoldsmart.util.SmartContract
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class RentalRcvAdapter (val context: Context, private var rentalList: ArrayList<RentalModel>): RecyclerView.Adapter<RentalRcvAdapter.MyRentalViewHolder>() {
+class RentalRcvAdapter(
+    val context: Context,
+    private var rentalList: ArrayList<RentalModel>,
+    private val listener: OnItemActionListener
+): RecyclerView.Adapter<RentalRcvAdapter.MyRentalViewHolder>() {
     class MyRentalViewHolder(val binding: RentalRcvItemBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(rental: RentalModel) {
             // Bind your chat item to UI elements here.
             binding.rentalItems.text = rental.clientName
         }
+    }
+
+    interface OnItemActionListener {
+        fun onDownloadButtonClick(rental: RentalModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRentalViewHolder {
@@ -62,6 +73,10 @@ class RentalRcvAdapter (val context: Context, private var rentalList: ArrayList<
             }
         )
 
+        holder.binding.downloadContract.setOnClickListener {
+            listener.onDownloadButtonClick(currentItem)
+        }
+
         holder.binding.root.setOnClickListener {
             showRentDetailsDialog(currentItem)
         }
@@ -79,7 +94,7 @@ class RentalRcvAdapter (val context: Context, private var rentalList: ArrayList<
         binder.cnic.text = currentReq.clientCnic
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
-        binder.estimatedRent.text = currentReq.rent
+        binder.rent.text = currentReq.rent
         setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
         setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
         setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)

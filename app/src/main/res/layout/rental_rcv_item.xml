@@ -86,6 +86,18 @@
             app:layout_constraintStart_toStartOf="@+id/status"
             app:layout_constraintTop_toBottomOf="@+id/status"
             app:srcCompat="@drawable/done"
+            app:tint="@color/item_color" />
+
+        <ImageButton
+            android:id="@+id/downloadContract"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_50sdp"
+            android:scaleType="fitCenter"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_constraintEnd_toStartOf="@+id/delItem"
+            app:layout_constraintTop_toTopOf="@+id/delItem"
+            app:srcCompat="@drawable/download_contract"
             app:tint="@drawable/menu_item_selector" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,9 +7,10 @@ class RentalModel : Serializable {
     var rentalId = ""
     var clientName = ""
     var clientEmail = ""
-    var rentalAddress = ""
     var clientCnic = ""
     var clientPhone = ""
+    var clientAddress = ""
+    var rentalAddress = ""
     var startDuration = ""
     var endDuration = ""
     var pipes = ""
@@ -31,9 +32,10 @@ class RentalModel : Serializable {
         rentalId: String,
         clientName: String,
         clientEmail: String,
-        rentalAddress: String,
         clientCnic: String,
         clientPhone: String,
+        clientAddress: String,
+        rentalAddress: String,
         startDuration: String,
         endDuration: String,
         pipes: String,
@@ -52,9 +54,10 @@ class RentalModel : Serializable {
         this.rentalId = rentalId
         this.clientName = clientName
         this.clientEmail = clientEmail
-        this.rentalAddress = rentalAddress
         this.clientCnic = clientCnic
         this.clientPhone = clientPhone
+        this.clientAddress = clientAddress
+        this.rentalAddress = rentalAddress
         this.startDuration = startDuration
         this.endDuration = endDuration
         this.pipes = pipes

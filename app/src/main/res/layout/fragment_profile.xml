@@ -225,7 +225,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/reminderGenerateBtn"
+            android:id="@+id/sendReminderBtn"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_50sdp"
             android:layout_marginTop="@dimen/_10sdp"
@@ -282,7 +282,7 @@
             android:layout_marginTop="@dimen/_10sdp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/reminderGenerateBtn">
+            app:layout_constraintTop_toBottomOf="@+id/sendReminderBtn">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardView4"

@@ -19,6 +19,8 @@ import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.AdminDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentProfileBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
+import com.example.scaffoldsmart.util.OnesignalService
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 
@@ -31,10 +33,15 @@ class ProfileFragment : Fragment() {
     private var company: String = ""
     private var address: String = ""
     private var phone: String = ""
+    private var bottomSheetDialog: BottomSheetDialogFragment? = null
+    private lateinit var onesignal: OnesignalService
 
     private lateinit var viewModel: AdminViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        onesignal = OnesignalService(requireActivity())
+
         viewModel = ViewModelProvider(this)[AdminViewModel::class.java]
         viewModel.retrieveAdminData()
     }
@@ -68,6 +75,10 @@ class ProfileFragment : Fragment() {
             auth.signOut()
             Toast.makeText(requireActivity(), "Logout Successful", Toast.LENGTH_SHORT).show()
             startActivity(Intent(requireActivity(), LoginActivity::class.java))
+        }
+
+        binding.sendReminderBtn.setOnClickListener {
+            showBottomSheet()
         }
 
     }
@@ -137,5 +148,10 @@ class ProfileFragment : Fragment() {
                 // Set button color
                 getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
             }
+    }
+
+    private fun showBottomSheet() {
+        bottomSheetDialog = ReminderSendFragment()
+        bottomSheetDialog?.show(requireActivity().supportFragmentManager, "Reminder")
     }
 }

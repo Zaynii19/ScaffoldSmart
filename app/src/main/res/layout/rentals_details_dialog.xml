@@ -225,7 +225,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/estimatedRent"
+                    android:id="@+id/rent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/_10sdp"

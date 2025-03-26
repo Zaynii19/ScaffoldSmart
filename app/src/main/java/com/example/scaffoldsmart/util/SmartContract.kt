@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.util
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
@@ -12,40 +13,122 @@ import android.text.SpannableString
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.style.StyleSpan
+import android.util.Log
 import android.widget.Toast
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 
-object SmartContract {
-    fun createScaffoldingContractPdf() {
+class SmartContract {
+
+    private val emailToClient = EmailToClient()
+
+    fun createScaffoldingContractPdf(
+        context: Context,
+        isApproved: Boolean,
+        ownerName: String,
+        company: String,
+        ownerEmail: String,
+        ownerPhone: String,
+        companyAddress: String,
+        clientName: String,
+        clientPhone: String,
+        clientEmail: String,
+        clientCnic: String,
+        clientAddress: String,
+        rentalAddress: String,
+        startDuration: String,
+        endDuration: String,
+        pipes: String,
+        pipesLength: String,
+        joints: String,
+        wench: String,
+        motors: String,
+        pumps: String,
+        generators: String,
+        wheel: String
+    ) {
         // Create a new PdfDocument
         val document = PdfDocument()
 
         // Define page dimensions (A4 size in points: 595 x 842)
         val pageWidth = 595
         val pageHeight = 842
-        val fileName = "Scaffolding_Rental_Contract.pdf"
 
         // Create Page 1
         val pageInfo1 = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
         val page1 = document.startPage(pageInfo1)
-        drawPage1Content(page1.canvas)
+        drawPage1Content(
+            page1.canvas, ownerName, company, ownerEmail, ownerPhone,
+            companyAddress, clientName, clientPhone, clientEmail, clientCnic, clientAddress,
+            rentalAddress, startDuration, endDuration, pipes, pipesLength, joints,
+            wench, motors, pumps, generators, wheel
+        )
         document.finishPage(page1)
 
-        // Write the document content to a file
-        val filePath = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).toString(), fileName) // save file in external Documents folder
         try {
-            document.writeTo(FileOutputStream(filePath))
+            if (isApproved) {
+                // Create PDF in memory and send directly
+                val outputStream = ByteArrayOutputStream()
+                document.writeTo(outputStream)
+                val pdfBytes = outputStream.toByteArray()
+
+                // Create a temporary file in cache
+                val tempFile = File.createTempFile("contract", ".pdf", context.cacheDir).apply {
+                    deleteOnExit() // Ensure it gets deleted eventually
+                }
+                FileOutputStream(tempFile).use { fos ->
+                    fos.write(pdfBytes)
+                }
+
+                // Send email with the temporary PDF
+                emailToClient.sendEmailWithPdfWithCoroutine(tempFile, clientEmail)
+            } else {
+                // Save to storage only if not approved
+                val documentsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+                val filePath = File(documentsDirectory, "Scaffolding_Rental_Contract.pdf")
+                document.writeTo(FileOutputStream(filePath))
+                Toast.makeText(context, "Smart Contract Downloaded", Toast.LENGTH_SHORT).show()
+                Log.d("SmartContract", "PDF saved successfully to storage")
+            }
         } catch (e: IOException) {
             e.printStackTrace()
+            Log.e("SmartContract", "Error handling PDF", e)
+        } finally {
+            // Close the document in all cases
+            document.close()
         }
-
-        // Close the document
-        document.close()
     }
 
-    private fun drawPage1Content(canvas: Canvas) {
+    private fun drawPage1Content(
+        canvas: Canvas,
+        ownerName: String,
+        company: String,
+        ownerEmail: String,
+        ownerPhone: String,
+        companyAddress: String,
+        clientName: String,
+        clientPhone: String,
+        clientEmail: String,
+        clientCnic: String,
+        clientAddress: String,
+        rentalAddress: String,
+        startDuration: String,
+        endDuration: String,
+        pipes: String,
+        pipesLength: String,
+        joints: String,
+        wench: String,
+        motors: String,
+        pumps: String,
+        generators: String,
+        wheel: String
+    ) {
+        val formatedStartDate = DateFormater.formatDateString(startDuration)
+        val formatedEndDate = DateFormater.formatDateString(endDuration)
+        val durationInMonths = DateFormater.calculateDurationInMonths(startDuration, endDuration)
+
         val titlePaint = TextPaint().apply {
             color = Color.BLACK
             textSize = 24f
@@ -73,76 +156,106 @@ object SmartContract {
         // Draw the title
         canvas.drawText("Scaffolding Equipment Rental Contractual Agreement", 60f, 50f, titlePaint)
 
-        // Draw the agreement details as a paragraph
-        val agreementText = "This Rental Agreement (the \"Agreement\") is made and entered into as of the 22th September, 2025. " +
-                "The rental period for the Equipment shall commence on 15 September, 2024 and shall end on 22 September, 2025, " +
+        // Create the agreement text with all variables
+        val agreementText = "This Rental Agreement (the \"Agreement\") is made and entered into as of the $formatedStartDate. " +
+                "The rental period for the Equipment shall commence on $formatedStartDate and shall end on $formatedEndDate, " +
                 "unless terminated earlier in accordance with this Agreement."
 
-        // Create a SpannableString to apply bold style to specific parts
+        // Create a SpannableString to apply bold style
         val spannableString = SpannableString(agreementText)
-        spannableString.setSpan(StyleSpan(Typeface.BOLD), agreementText.indexOf("\"Agreement\""), agreementText.indexOf("\"Agreement\"") + "\"Agreement\"".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        spannableString.setSpan(StyleSpan(Typeface.BOLD), agreementText.indexOf("22th September, 2025"), agreementText.indexOf("22th September, 2025") + "22th September, 2025".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        spannableString.setSpan(StyleSpan(Typeface.BOLD), agreementText.indexOf("15 September, 2024"), agreementText.indexOf("15 September, 2024") + "15 September, 2024".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-        spannableString.setSpan(StyleSpan(Typeface.BOLD), agreementText.indexOf("22 September, 2025"), agreementText.indexOf("22 September, 2025") + "22 September, 2025".length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        // Use StaticLayout.Builder to create the layout
-        val textWidth = canvas.width - 100 // Adjust width as needed
+        // Bold all occurrences of the start date
+        var index = agreementText.indexOf(formatedStartDate)
+        while (index >= 0) {
+            spannableString.setSpan(
+                StyleSpan(Typeface.BOLD),
+                index,
+                index + formatedStartDate.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            index = agreementText.indexOf(formatedStartDate, index + formatedStartDate.length)
+        }
+
+        // Bold the end date
+        index = agreementText.indexOf(formatedEndDate)
+        if (index >= 0) {
+            spannableString.setSpan(
+                StyleSpan(Typeface.BOLD),
+                index,
+                index + formatedEndDate.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // Bold "Agreement"
+        index = agreementText.indexOf("\"Agreement\"")
+        if (index >= 0) {
+            spannableString.setSpan(
+                StyleSpan(Typeface.BOLD),
+                index,
+                index + "\"Agreement\"".length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // Use StaticLayout for the paragraph
+        val textWidth = canvas.width - 100
         val staticLayout = StaticLayout.Builder.obtain(spannableString, 0, spannableString.length, textPaint, textWidth)
             .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-            .setLineSpacing(0.0f, 1.0f) // Default line spacing
+            .setLineSpacing(0.0f, 1.0f)
             .setIncludePad(false)
             .build()
 
         // Draw the StaticLayout
         canvas.save()
-        canvas.translate(50f, 80f) // Set the starting position
+        canvas.translate(50f, 80f)
         staticLayout.draw(canvas)
         canvas.restore()
 
         // Draw OWNER section
         canvas.drawText("OWNER:", 50f, 120f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "Sallar Ahmed Mirza", 90f, 120f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "Salar Private LTD", 50f, 140f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "Rawalpindi", 50f, 160f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "02743847435", 50f, 180f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "sdndei@nasd", 50f, 200f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, ownerName, 90f, 120f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, company, 50f, 140f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, companyAddress, 50f, 160f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, ownerPhone, 50f, 180f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, ownerEmail, 50f, 200f + staticLayout.height, textPaint)
 
         // Draw RENTER section
         canvas.drawText("RENTER: ", 50f, 240f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "Ali Zain", 93f, 240f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientName, 93f, 240f + staticLayout.height, textPaint)
         canvas.drawText("Address: ", 50f, 260f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "Lahore", 90f, 260f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientAddress, 90f, 260f + staticLayout.height, textPaint)
         canvas.drawText("CNIC: ", 50f, 280f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "378246823764", 75f, 280f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientCnic, 75f, 280f + staticLayout.height, textPaint)
         canvas.drawText("Phone: ", 50f, 300f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "0932307434", 85f, 300f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientPhone, 85f, 300f + staticLayout.height, textPaint)
         canvas.drawText("Email: ", 50f, 320f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "zauihsnwdo", 82f, 320f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientEmail, 82f, 320f + staticLayout.height, textPaint)
 
         // Draw Place of Use & Rental Period
         canvas.drawText("Place of Use: ", 50f, 360f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "Islamabad", 110f, 360f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, rentalAddress, 110f, 360f + staticLayout.height, textPaint)
         canvas.drawText("Rental Period: ", 50f, 380f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "5 Weeks", 118f, 380f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, durationInMonths, 118f, 380f + staticLayout.height, textPaint)
 
         // Draw Equipment Rented table
         canvas.drawText("Equipment Rented", 230f, 420f + staticLayout.height, titlePaint)
         canvas.drawText("Item                           Quantity                            Length ", 160f, 460f + staticLayout.height, textPaint)
         canvas.drawText("1.Scaffolding Pipes", 140f, 480f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "1500", 275f, 480f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "10 feet", 390f, 480f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, pipes, 275f, 480f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, pipesLength, 390f, 480f + staticLayout.height, textPaint)
         canvas.drawText("2.Joints", 140f, 500f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "1500", 275f, 500f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, joints, 275f, 500f + staticLayout.height, textPaint)
         canvas.drawText("3.Electric Motors", 140f, 520f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "1500", 275f, 520f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, motors, 275f, 520f + staticLayout.height, textPaint)
         canvas.drawText("4.Generators", 140f, 540f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "1500", 275f, 540f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, generators, 275f, 540f + staticLayout.height, textPaint)
         canvas.drawText("5.Slug Pumps", 140f, 560f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "1500", 275f, 560f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, pumps, 275f, 560f + staticLayout.height, textPaint)
         canvas.drawText("6.Wench", 140f, 580f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "1500", 275f, 580f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, wench, 275f, 580f + staticLayout.height, textPaint)
         canvas.drawText("7.Wheel Barrows", 140f, 600f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "1500", 275f, 600f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, wheel, 275f, 600f + staticLayout.height, textPaint)
 
         // Draw Terms & Conditions
         canvas.drawText("TERMS & CONDITIONS", 50f, 640f + staticLayout.height, conditionTitlePaint)
@@ -152,9 +265,9 @@ object SmartContract {
 
         // Draw signature lines
         canvas.drawText("Owner Signature", 50f, 740f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "Sallar Ahmed Mirza", 50f, 770f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, ownerName, 50f, 770f + staticLayout.height, textPaint)
         canvas.drawText("Renter Signature", 400f, 740f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, "Ali Zain", 400f, 770f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientName, 400f, 770f + staticLayout.height, textPaint)
     }
 
     private fun drawUnderlinedText(canvas: Canvas, text: String, x: Float, y: Float, paint: Paint) {

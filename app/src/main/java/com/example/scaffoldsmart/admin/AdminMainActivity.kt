@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -129,10 +130,11 @@ class AdminMainActivity : AppCompatActivity() {
             reqData.let { data ->
                 val clientID = data.optString("clientID", "N/A")
                 val clientName = data.optString("clientName", "N/A")
-                val rentalAddress = data.optString("rentalAddress", "N/A")
+                val clientAddress = data.optString("clientAddress", "N/A")
                 val clientEmail = data.optString("clientEmail", "N/A")
                 val clientPhone = data.optString("clientPhone", "N/A")
                 val clientCnic = data.optString("clientCnic", "N/A")
+                val rentalAddress = data.optString("rentalAddress", "N/A")
                 val startDuration = data.optString("startDuration", "N/A")
                 val endDuration = data.optString("endDuration", "N/A")
                 val pipes = data.optString("pipes", "N/A")
@@ -145,17 +147,18 @@ class AdminMainActivity : AppCompatActivity() {
                 val wheel = data.optString("wheel", "N/A")
                 val totalRent = data.optString("rent", "N/A")
 
-                storeRentalReq(clientID, clientName, rentalAddress, clientEmail, clientPhone, clientCnic, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel, totalRent)
+                storeRentalReq(clientID, clientName, clientAddress, clientEmail, clientPhone, clientCnic, rentalAddress, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel, totalRent)
             }
         }
 
         private fun storeRentalReq(
             clientID: String,
             clientName: String,
-            rentalAddress: String,
+            clientAddress: String,
             clientEmail: String,
             clientPhone: String,
             clientCnic: String,
+            rentalAddress: String,
             startDuration: String,
             endDuration: String,
             pipes: String,
@@ -175,7 +178,7 @@ class AdminMainActivity : AppCompatActivity() {
 
             if (rentalId != null) {
                 // Create new rental request model
-                val newReq = RentalModel(clientID, rentalId, clientName, clientEmail, rentalAddress, clientCnic, clientPhone,
+                val newReq = RentalModel(clientID, rentalId, clientName, clientEmail, clientCnic, clientPhone, clientAddress, rentalAddress,
                     startDuration, endDuration, pipes, pipesLength, joints, wench, motors, pumps, generators, wheel,"",totalRent,"")
 
                 // Store the new request in Firebase
