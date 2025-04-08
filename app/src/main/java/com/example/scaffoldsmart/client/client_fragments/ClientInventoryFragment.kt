@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -35,13 +36,7 @@ class ClientInventoryFragment : Fragment() {
     private lateinit var adapter: ClientInventoryRcvAdapter
     private lateinit var viewModel: InventoryViewModel
     private lateinit var viewModel2: ClientViewModel
-    private lateinit var clientObj: ClientModel
-    private var clientID: String = ""
-    private var clientName: String = ""
-    private var clientEmail: String = ""
-    private var clientPhone: String = ""
-    private var clientCnic: String = ""
-    private var clientAddress: String = ""
+    private var clientObj: ClientModel? = null
     private var currentDecryptedPassword: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,8 +46,6 @@ class ClientInventoryFragment : Fragment() {
 
         viewModel2 = ViewModelProvider(this)[ClientViewModel::class.java]
         viewModel2.retrieveClientData()
-
-        //clientObj = ClientModel()
     }
 
     override fun onCreateView(
@@ -74,11 +67,21 @@ class ClientInventoryFragment : Fragment() {
             startActivity(Intent(context, ClientSettingActivity::class.java))
         }
 
+        clientObj.let { client ->
+            if (client == null) {
+                // Disable the button if clientObj is null
+                binding.rentalRequestBtn.isEnabled = false
+                binding.rentalRequestBtn.backgroundTintList = ContextCompat.getColorStateList(requireActivity(), R.color.dark_gray)
+            }
+        }
+
         binding.rentalRequestBtn.setOnClickListener {
-            if (clientCnic.isNullOrEmpty() && clientPhone.isNullOrEmpty()) {
-                showVerificationDialog()
-            } else {
-                showReqBottomSheet()
+            clientObj?.let { client ->
+                if (client.cnic.isEmpty() && client.phone.isEmpty() && client.address.isEmpty()) {
+                    showVerificationDialog()
+                } else {
+                    showReqBottomSheet()
+                }
             }
         }
 
@@ -116,16 +119,12 @@ class ClientInventoryFragment : Fragment() {
         viewModel2.observeClientLiveData().observe(viewLifecycleOwner) { client ->
             binding.loading.visibility = View.GONE
             if (client != null) {
-                clientID = client.id
-                clientName = client.name
-                clientEmail = client.email
-                clientPhone = client.phone
-                clientCnic = client.cnic
-                clientAddress = client.address
-
                 currentDecryptedPassword = Encryption.decrypt(client.pass)
-
                 clientObj = client //Passing whole client to the obj
+
+                // Enable the button if clientObj is not null
+                binding.rentalRequestBtn.isEnabled = true
+                binding.rentalRequestBtn.backgroundTintList = ContextCompat.getColorStateList(requireActivity(), R.color.buttons_color)
             }
         }
     }
@@ -147,9 +146,14 @@ class ClientInventoryFragment : Fragment() {
                 rent: Int
             ) {
                 val onesignal = OnesignalService(requireActivity())
-                onesignal.sendReqNotiByOneSignalToSegment(clientID, clientName, clientAddress, clientEmail, clientPhone, clientCnic, rentalAddress ,startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel, rent)
+                onesignal.sendReqNotiByOneSignalToSegment(
+                    clientObj!!.id, clientObj!!.name, clientObj!!.address,
+                    clientObj!!.email, clientObj!!.phone, clientObj!!.cnic,
+                    rentalAddress ,startDuration, endDuration, pipes, pipesLength,
+                    joints, wench, pumps, motors, generators, wheel, rent
+                )
             }
-        }, clientObj)
+        }, clientObj!!)
         bottomSheetDialog.show(requireActivity().supportFragmentManager, "RentalReq")
     }
 

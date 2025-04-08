@@ -91,21 +91,27 @@ class AdminMainActivity : AppCompatActivity() {
         //onesignal.getOneSignalNoti(prevNotiCompletedAt)
 
         senderUid = chatPreferences.getString("SenderUid", null)
-        val currentTime = System.currentTimeMillis()
-        val presenceMap = HashMap<String, Any>()
-        presenceMap["status"] = "Online"
-        presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).setValue(presenceMap)
+        if (senderUid == null) {
+            Log.e("AdminMainDebug", "senderUid is null - Redirecting to login")
+        } else {
+            val currentTime = System.currentTimeMillis()
+            val presenceMap = HashMap<String, Any>()
+            presenceMap["status"] = "Online"
+            presenceMap["lastSeen"] = currentTime
+            Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        }
     }
 
     override fun onPause() {
         super.onPause()
         senderUid = chatPreferences.getString("SenderUid", null)
-        val currentTime = System.currentTimeMillis()
-        val presenceMap = HashMap<String, Any>()
-        presenceMap["status"] = "Offline"
-        presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).setValue(presenceMap)
+        if (senderUid != null) {
+            val currentTime = System.currentTimeMillis()
+            val presenceMap = HashMap<String, Any>()
+            presenceMap["status"] = "Offline"
+            presenceMap["lastSeen"] = currentTime
+            Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        }
     }
 
     private fun setStatusBarColor() {

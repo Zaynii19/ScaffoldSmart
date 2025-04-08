@@ -81,25 +81,38 @@ object DateFormater {
     }
 
     fun formatDateHeader(timestamp: Long?): String {
-        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp!! }
+        if (timestamp == null) return ""
+
+        val calendar = Calendar.getInstance().apply { timeInMillis = timestamp }
         val now = Calendar.getInstance()
 
         return when {
-            calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
-                    calendar.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR) -> {
-                "Today"  // Check if it's today
-            }
-            calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
-                    calendar.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR) - 1 -> {
-                "Yesterday" // Check if it's yesterday
-            }
-            calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR) -> {
-                SimpleDateFormat("EEEE", Locale.getDefault()).format(calendar.time) // Same week day name
-            }
-            else -> {
-                SimpleDateFormat("MMMM d, yyyy", Locale.getDefault()).format(calendar.time) // Format like "March 2, 2025"
-            }
+            isSameDay(calendar, now) -> "Today"
+            isYesterday(calendar, now) -> "Yesterday"
+            isWithinLast7Days(calendar, now) -> SimpleDateFormat("EEEE", Locale.getDefault()).format(calendar.time)
+            else -> SimpleDateFormat("MMMM d, yyyy", Locale.getDefault()).format(calendar.time)
         }
+    }
+
+    private fun isSameDay(cal1: Calendar, cal2: Calendar): Boolean {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+    }
+
+    private fun isYesterday(cal1: Calendar, cal2: Calendar): Boolean {
+        val yesterday = Calendar.getInstance().apply {
+            timeInMillis = cal2.timeInMillis
+            add(Calendar.DAY_OF_YEAR, -1)
+        }
+        return isSameDay(cal1, yesterday)
+    }
+
+    private fun isWithinLast7Days(cal1: Calendar, cal2: Calendar): Boolean {
+        val sevenDaysAgo = Calendar.getInstance().apply {
+            timeInMillis = cal2.timeInMillis
+            add(Calendar.DAY_OF_YEAR, -7)
+        }
+        return cal1.after(sevenDaysAgo) && !isSameDay(cal1, cal2) && !isYesterday(cal1, cal2)
     }
 
     fun formatCurrentDate(): String {

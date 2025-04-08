@@ -1,6 +1,7 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.LoginActivity
@@ -19,10 +21,13 @@ import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.AdminDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentProfileBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
+import com.example.scaffoldsmart.util.CheckNetConnectvity
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.database
 
 class ProfileFragment : Fragment() {
     private val binding by lazy {
@@ -35,10 +40,14 @@ class ProfileFragment : Fragment() {
     private var phone: String = ""
     private var bottomSheetDialog: BottomSheetDialogFragment? = null
     private lateinit var onesignal: OnesignalService
+    private lateinit var chatPreferences: SharedPreferences
+    private var senderUid: String? = null
 
     private lateinit var viewModel: AdminViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        chatPreferences = requireActivity().getSharedPreferences("CHATADMIN", MODE_PRIVATE)
 
         onesignal = OnesignalService(requireActivity())
 
@@ -71,10 +80,22 @@ class ProfileFragment : Fragment() {
         }
 
         binding.logoutBtn.setOnClickListener {
-            val auth = FirebaseAuth.getInstance()
-            auth.signOut()
-            Toast.makeText(requireActivity(), "Logout Successful", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(requireActivity(), LoginActivity::class.java))
+            if (CheckNetConnectvity.hasInternetConnection(requireActivity())) {
+                val auth = FirebaseAuth.getInstance()
+                auth.signOut()
+                senderUid = chatPreferences.getString("SenderUid", null)
+                if (senderUid != null) {
+                    val currentTime = System.currentTimeMillis()
+                    val presenceMap = HashMap<String, Any>()
+                    presenceMap["status"] = "Offline"
+                    presenceMap["lastSeen"] = currentTime
+                    Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+                }
+                Toast.makeText(requireActivity(), "Logout Successful", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(requireActivity(), LoginActivity::class.java))
+            } else {
+                Toast.makeText(requireActivity(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.sendReminderBtn.setOnClickListener {

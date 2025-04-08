@@ -1,8 +1,11 @@
 package com.example.scaffoldsmart.client.client_fragments
 
 import android.app.DatePickerDialog
+import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -27,6 +30,7 @@ import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.databinding.FragmentRentalReqBinding
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
+import com.example.scaffoldsmart.util.CheckNetConnectvity
 import com.example.scaffoldsmart.util.DateFormater
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -108,21 +112,27 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         getRentalInfo()
 
         binding.sendBtn.setOnClickListener {
-            getClientInfo()
-            rentalAddress = binding.rentalAddress.text.toString()
-            jointsQuantity = binding.joints.text.toString()
+            if (CheckNetConnectvity.hasInternetConnection(requireActivity())) {
 
-            if (!isDurationValid()) {
-                Toast.makeText(context, "Please add start and end duration", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                getClientInfo()
+                rentalAddress = binding.rentalAddress.text.toString()
+                jointsQuantity = binding.joints.text.toString()
+
+                if (!isDurationValid()) {
+                    Toast.makeText(context, "Please add start and end duration", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                if (!isRentalItemSelected()) {
+                    Toast.makeText(context, "Please add at least one rental item", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+               showSendReqDialog()
+
+            } else {
+                Toast.makeText(requireActivity(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show()
             }
-
-            if (!isRentalItemSelected()) {
-                Toast.makeText(context, "Please add at least one rental item", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-           showSendReqDialog()
         }
     }
 
@@ -519,6 +529,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
                     pipeLength, jointsQuantity, wenchQuantity, pumpsQuantity,
                     motorsQuantity, generatorsQuantity, wheelQuantity, totalPrice
                 )
+                Toast.makeText(requireActivity(), "Your rental request sent to Admin", Toast.LENGTH_SHORT).show()
                 dismiss() // Dismiss ReqFrag only after saving data
             }
             .setNegativeButton("Cancel") { dialog, _ ->

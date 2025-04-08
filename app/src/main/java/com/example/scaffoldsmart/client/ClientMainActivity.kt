@@ -39,7 +39,6 @@ class ClientMainActivity : AppCompatActivity() {
 
         chatPreferences = getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
         senderUid = chatPreferences.getString("SenderUid", null)
-        Log.d("ClientMainDebug", "onCreate: senderUid = $senderUid")
 
         setStatusBarColor()
         setBottomNav()
@@ -59,7 +58,7 @@ class ClientMainActivity : AppCompatActivity() {
             val presenceMap = HashMap<String, Any>()
             presenceMap["status"] = "Online"
             presenceMap["lastSeen"] = currentTime
-            Firebase.database.reference.child("ChatUser").child(senderUid!!).setValue(presenceMap)
+            Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
         }
     }
 
@@ -71,7 +70,7 @@ class ClientMainActivity : AppCompatActivity() {
             val presenceMap = HashMap<String, Any>()
             presenceMap["status"] = "Offline"
             presenceMap["lastSeen"] = currentTime
-            Firebase.database.reference.child("ChatUser").child(senderUid!!).setValue(presenceMap)
+            Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
         }
     }
 

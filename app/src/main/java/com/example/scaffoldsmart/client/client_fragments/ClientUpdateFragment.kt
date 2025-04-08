@@ -36,9 +36,9 @@ class ClientUpdateFragment : BottomSheetDialogFragment() {
         if (isVerify) {
             binding.title.text = getString(R.string.verify_account)
             binding.saveBtn.text = getString(R.string.verify)
-            binding.clientName.visibility = View.GONE
-            binding.email.visibility = View.GONE
-            binding.password.visibility = View.GONE
+            binding.textInputLayout.visibility = View.GONE
+            binding.textInputLayout2.visibility = View.GONE
+            binding.textInputLayout3.visibility = View.GONE
         } else {
             binding.title.text = getString(R.string.update_account_info)
             binding.saveBtn.text = getString(R.string.save)

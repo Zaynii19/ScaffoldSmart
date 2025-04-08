@@ -2,6 +2,7 @@ package com.example.scaffoldsmart.client
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -29,6 +30,8 @@ import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientCostComparisonBinding
 import com.example.scaffoldsmart.util.DateFormater
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -59,6 +62,8 @@ class ClientCostComparisonActivity : AppCompatActivity() {
     private lateinit var viewModel: InventoryViewModel
     private var itemList = ArrayList<InventoryModel>()
     private var totalPrice: Int = 0
+    private var senderUid: String? = null
+    private lateinit var chatPreferences: SharedPreferences
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,6 +75,8 @@ class ClientCostComparisonActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        chatPreferences = getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
 
         viewModel = ViewModelProvider(this)[InventoryViewModel::class.java]
         viewModel.retrieveInventory()
@@ -440,5 +447,25 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                 updateTotalRent() // Update rent when any input changes
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Online"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Offline"
+        presenceMap["lastSeen"] = currentTime
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
     }
 }

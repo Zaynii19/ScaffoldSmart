@@ -25,7 +25,6 @@ import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.ChatViewModel
 import com.example.scaffoldsmart.client.client_models.ClientModel
-import com.example.scaffoldsmart.util.DateFormater
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -168,7 +167,6 @@ class ChatFragment : Fragment() {
                         profilesList.add(ChatUserModel(user.id, user.name))
                         storeChatUser(profilesList)
                     }
-                    //getMessageNoti(user)
                 }
                 getChatsData(profilesList)
             }
@@ -179,7 +177,7 @@ class ChatFragment : Fragment() {
         })
     }
 
-    private fun storeChatUser(users: ArrayList<ChatUserModel>) {
+    /*private fun storeChatUser(users: ArrayList<ChatUserModel>) {
         // store client data
         for (user in users) {
             Firebase.database.reference.child("ChatUser").child(user.uid!!).setValue(user)
@@ -194,6 +192,37 @@ class ChatFragment : Fragment() {
         // store Admin data
         val user = ChatUserModel(senderUid, senderName)
         Firebase.database.reference.child("ChatUser").child(senderUid!!).setValue(user)
+            .addOnSuccessListener {
+                Log.d("ChatFragDebug", "User data added to Firebase successfully!")
+            }
+            .addOnFailureListener { error ->
+                Log.e("ChatFragDebug", "Failed to add user data to Firebase: ${error.message}")
+            }
+    }*/
+
+    private fun storeChatUser(users: ArrayList<ChatUserModel>) {
+        // store client data
+        for (user in users) {
+            val updates = mapOf(
+                "uid" to user.uid,
+                "userName" to user.userName,
+            )
+
+            Firebase.database.reference.child("ChatUser").child(user.uid!!).updateChildren(updates)
+                .addOnSuccessListener {
+                    Log.d("ChatFragDebug", "User data added to Firebase successfully!")
+                }
+                .addOnFailureListener { error ->
+                    Log.e("ChatFragDebug", "Failed to add user data to Firebase: ${error.message}")
+                }
+        }
+
+        // store Admin data
+        val updates = mapOf(
+            "uid" to senderUid,
+            "userName" to senderName,
+        )
+        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(updates)
             .addOnSuccessListener {
                 Log.d("ChatFragDebug", "User data added to Firebase successfully!")
             }

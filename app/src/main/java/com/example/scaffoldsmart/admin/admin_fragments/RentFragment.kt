@@ -98,7 +98,6 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
                 Log.d("RentFragDebug", "observeRentalReqLiveData: ${rentalList.size} ")
             }
             adapter.updateList(rentalList)
-            calculateRentalStatus(rentalList)
         }
     }
 
@@ -143,41 +142,6 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
                 return true
             }
         })
-    }
-
-    private fun calculateRentalStatus(rentalList: ArrayList<RentalModel>) {
-        for (rental in rentalList) {
-
-            // Determine the status
-            val isOverdue = DateFormater.compareDateWithCurrentDate(rental.endDuration)
-            rentStatus = if (isOverdue) {
-                "overdue"
-            } else {
-                "ongoing"
-            }
-
-            // Call method to update the database with the new status
-            updateRentalStatus(rental.rentalId, rentStatus)
-        }
-    }
-
-    private fun updateRentalStatus(rentalId: String, newStatus: String) {
-        // Reference to the specific rental in Firebase
-        val databaseRef = Firebase.database.reference.child("Rentals").child(rentalId)
-
-        // Create a map of the fields you want to update
-        val updates = hashMapOf<String, Any>(
-            "rentStatus" to newStatus
-        )
-
-        // Update the item with the new values
-        databaseRef.updateChildren(updates)
-            .addOnSuccessListener {
-                Log.i("RentFragDebug", "Successfully updated status for rental ID: $rentalId to $newStatus")
-            }
-            .addOnFailureListener {
-                Log.e("RentFragDebug", "Failed to update status for rental ID: $rentalId")
-            }
     }
 
     override fun onDownloadButtonClick(rental: RentalModel) {

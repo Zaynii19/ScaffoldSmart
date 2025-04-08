@@ -220,7 +220,7 @@ class HomeFragment : Fragment() {
             // Calculate the duration in months
             durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
 
-            // Create a ScafoldInfoModel instance and add to infoList
+            // Create a ScaffoldInfoModel instance and add to infoList
             infoList.add(ScafoldInfoModel(rental.clientName, durationInMonths, status))
             adapter.updateList(infoList)
         }
@@ -336,10 +336,20 @@ class HomeFragment : Fragment() {
         val databaseRef = Firebase.database.reference.child("Rentals")
             .child(currentReq.rentalId) // Reference to the specific req using reqId
 
+        // Update the status
         val newStatus = "approved"
-        // Create a map of the fields you want to update
+
+        // Determine the rent status
+        val isOverdue = DateFormater.compareDateWithCurrentDate(currentReq.endDuration)
+        val newRentStatus = if (isOverdue) {
+            "overdue"
+        } else {
+            "ongoing"
+        }
+
         val updates = hashMapOf<String, Any>(
-            "status" to newStatus
+            "status" to newStatus,
+            "rentStatus" to newRentStatus
         )
 
         // Update the item with the new values

@@ -28,6 +28,7 @@ import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ClientDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentClientProfileBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
+import com.example.scaffoldsmart.util.CheckNetConnectvity
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -49,6 +50,7 @@ class ClientProfileFragment : Fragment() {
     private var phone: String = ""
     private lateinit var viewModel: ClientViewModel
     private lateinit var chatPreferences: SharedPreferences
+    private var senderUid: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,10 +92,22 @@ class ClientProfileFragment : Fragment() {
         }
 
         binding.logoutBtn.setOnClickListener {
-            val auth = FirebaseAuth.getInstance()
-            auth.signOut()
-            Toast.makeText(requireActivity(), "Logout Successful", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(requireActivity(), LoginActivity::class.java))
+            if (CheckNetConnectvity.hasInternetConnection(requireActivity())) {
+                val auth = FirebaseAuth.getInstance()
+                auth.signOut()
+                senderUid = chatPreferences.getString("SenderUid", null)
+                if (senderUid != null) {
+                    val currentTime = System.currentTimeMillis()
+                    val presenceMap = HashMap<String, Any>()
+                    presenceMap["status"] = "Offline"
+                    presenceMap["lastSeen"] = currentTime
+                    Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+                }
+                Toast.makeText(requireActivity(), "Logout Successful", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(requireActivity(), LoginActivity::class.java))
+            } else {
+                Toast.makeText(requireActivity(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.adminChatBtn.setOnClickListener {

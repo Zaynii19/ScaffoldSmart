@@ -148,7 +148,7 @@ class ClientSettingActivity : AppCompatActivity() {
                                             Toast.makeText(
                                                 this@ClientSettingActivity,
                                                 "User data updated successfully",
-                                                Toast.LENGTH_SHORT
+                                                Toast.LENGTH_LONG
                                             ).show()
 
                                             // Step 5: Reload user to reflect changes
@@ -160,7 +160,7 @@ class ClientSettingActivity : AppCompatActivity() {
                                                     Toast.makeText(
                                                         this@ClientSettingActivity,
                                                         "Failed to reload user data: ${reloadException.localizedMessage}",
-                                                        Toast.LENGTH_SHORT
+                                                        Toast.LENGTH_LONG
                                                     ).show()
                                                 }
                                         }
@@ -168,7 +168,7 @@ class ClientSettingActivity : AppCompatActivity() {
                                             Toast.makeText(
                                                 this@ClientSettingActivity,
                                                 "Failed to update your data in database: ${dbException.localizedMessage}",
-                                                Toast.LENGTH_SHORT
+                                                Toast.LENGTH_LONG
                                             ).show()
                                         }
                                 }
@@ -176,7 +176,7 @@ class ClientSettingActivity : AppCompatActivity() {
                                     Toast.makeText(
                                         this@ClientSettingActivity,
                                         "Failed to update password: ${passwordException.localizedMessage}",
-                                        Toast.LENGTH_SHORT
+                                        Toast.LENGTH_LONG
                                     ).show()
                                 }
                         }
@@ -184,7 +184,7 @@ class ClientSettingActivity : AppCompatActivity() {
                             Toast.makeText(
                                 this@ClientSettingActivity,
                                 "Failed to send verification email: ${verificationException.localizedMessage}",
-                                Toast.LENGTH_SHORT
+                                Toast.LENGTH_LONG
                             ).show()
                         }
                 }
@@ -192,7 +192,7 @@ class ClientSettingActivity : AppCompatActivity() {
                     Toast.makeText(
                         this@ClientSettingActivity,
                         "Re-Authentication failed: ${reAuthException.localizedMessage}",
-                        Toast.LENGTH_SHORT
+                        Toast.LENGTH_LONG
                     ).show()
                 }
         } else {

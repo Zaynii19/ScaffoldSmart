@@ -63,7 +63,6 @@ class ClientChatActivity : AppCompatActivity() {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             // Handle back button press here
-            startActivity(Intent(this@ClientChatActivity, ClientMainActivity::class.java))
             finish()
         }
     }

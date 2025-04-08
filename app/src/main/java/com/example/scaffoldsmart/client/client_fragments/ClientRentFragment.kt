@@ -1,6 +1,7 @@
 package com.example.scaffoldsmart.client.client_fragments
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -30,9 +32,14 @@ class ClientRentFragment : Fragment() {
     private var rentalList = ArrayList<RentalModel>()
     private lateinit var adapter: ClientRentalRcvAdapter
     private lateinit var viewModel: RentalViewModel
+    private var clientUid: String? = null
+    private lateinit var chatPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        chatPreferences = requireActivity().getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
+        clientUid = chatPreferences.getString("SenderUid", null)
 
         viewModel = ViewModelProvider(this)[RentalViewModel::class.java]
         viewModel.retrieveRentalReq()
@@ -68,7 +75,7 @@ class ClientRentFragment : Fragment() {
         binding.loading.visibility = View.VISIBLE
         viewModel.observeRentalReqLiveData().observe(viewLifecycleOwner) { rentals ->
             binding.loading.visibility = View.GONE
-            val filteredRentals = rentals?.filter { it.status.isNotEmpty() } // Get only approved rentals
+            val filteredRentals = rentals?.filter { it.status.isNotEmpty() && it.clientID == clientUid } // Get only approved rentals
             rentalList.clear()
             filteredRentals?.let {
                 rentalList.addAll(it)
@@ -106,5 +113,4 @@ class ClientRentFragment : Fragment() {
             }
         })
     }
-
 }

@@ -1,14 +1,12 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_adapters.ReminderRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
@@ -16,7 +14,7 @@ import com.example.scaffoldsmart.databinding.FragmentReminderSendBinding
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class ReminderSendFragment : BottomSheetDialogFragment(), ReminderRcvAdapter.OnItemActionListener {
+class ReminderSendFragment : BottomSheetDialogFragment() {
     private val binding by lazy {
         FragmentReminderSendBinding.inflate(layoutInflater)
     }
@@ -47,7 +45,7 @@ class ReminderSendFragment : BottomSheetDialogFragment(), ReminderRcvAdapter.OnI
 
     private fun setRcv() {
         binding.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        adapter = ReminderRcvAdapter(requireActivity(), rentalList, oneSignal, this)
+        adapter = ReminderRcvAdapter(requireActivity(), rentalList, oneSignal)
         binding.rcv.adapter = adapter
         binding.rcv.setHasFixedSize(true)
     }
@@ -65,9 +63,5 @@ class ReminderSendFragment : BottomSheetDialogFragment(), ReminderRcvAdapter.OnI
                 }
             }
         }
-    }
-
-    override fun onDialogDismissed() {
-        dismiss()
     }
 }

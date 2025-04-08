@@ -20,6 +20,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavOptions
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_adapters.MessageRcvAdapter
@@ -63,7 +66,6 @@ class ChatActivity : AppCompatActivity() {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             // Handle back button press here
-            startActivity(Intent(this@ChatActivity, AdminMainActivity::class.java))
             finish()
         }
     }
@@ -149,6 +151,7 @@ class ChatActivity : AppCompatActivity() {
             messages!!.clear()
             var previousDate: String? = null
             for (msg in msgs!!) {
+                // Add a date header to the messages list if the date changes from the previous message.
                 val currentDate = DateFormater.formatDateHeader(msg.timestamp)
                 if (currentDate != previousDate) {
                     messages!!.add(DateHeader(currentDate))
