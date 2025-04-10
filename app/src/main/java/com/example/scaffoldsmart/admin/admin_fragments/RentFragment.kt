@@ -40,7 +40,6 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
     private lateinit var adapter: RentalRcvAdapter
     private lateinit var viewModel: RentalViewModel
     private lateinit var viewModelA: AdminViewModel
-    private var rentStatus: String = ""
     private var smartContract: SmartContract? = null
     private var name: String = ""
     private var email: String = ""

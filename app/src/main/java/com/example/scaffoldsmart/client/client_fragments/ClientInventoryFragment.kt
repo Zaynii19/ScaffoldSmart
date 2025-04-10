@@ -153,7 +153,7 @@ class ClientInventoryFragment : Fragment() {
                     joints, wench, pumps, motors, generators, wheel, rent
                 )
             }
-        }, clientObj!!)
+        }, clientObj!!, itemList)
         bottomSheetDialog.show(requireActivity().supportFragmentManager, "RentalReq")
     }
 

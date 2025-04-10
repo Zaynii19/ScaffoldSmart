@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
@@ -15,16 +14,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.InventoryActivity.Companion.itemList
 import com.example.scaffoldsmart.admin.admin_adapters.ClientRcvAdapter
-import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
-import com.example.scaffoldsmart.admin.admin_models.InventoryModel
-import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.client.client_models.ClientModel
-import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientBinding
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot

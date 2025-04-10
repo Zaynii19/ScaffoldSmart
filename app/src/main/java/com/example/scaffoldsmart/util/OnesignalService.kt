@@ -296,7 +296,7 @@ class OnesignalService(val context: Context) {
                                         reqPreferences.edit().putString("NotificationId", currentNotificationId).apply()
 
                                         if (currentNotiCompletedAt != prevNotiCompletedAt && currentNotificationId != prevNotificationId) {
-                                            AdminMainActivity.handleReqData(reqData)
+                                            AdminMainActivity.handleReqData(reqData, currentNotificationId)
                                         } else {
                                             Log.d("OneSignalDebug", "Request data already found!")
                                         }

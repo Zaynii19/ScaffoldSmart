@@ -22,6 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.R
@@ -32,9 +33,7 @@ import com.example.scaffoldsmart.util.DateFormater
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 class ClientCostComparisonActivity : AppCompatActivity() {
     private val binding by lazy {
@@ -76,13 +75,14 @@ class ClientCostComparisonActivity : AppCompatActivity() {
             insets
         }
 
+        setStatusBarColor()
+
         chatPreferences = getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
 
         viewModel = ViewModelProvider(this)[InventoryViewModel::class.java]
         viewModel.retrieveInventory()
         observeInventoryLiveData()
 
-        setSpinner()
         getRentalInfo()
 
         binding.backBtn.setOnClickListener {
@@ -100,47 +100,120 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         updateTotalRent()
     }
 
+    private fun setStatusBarColor() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
+    }
+
     private fun observeInventoryLiveData() {
         viewModel.observeInventoryLiveData().observe(this@ClientCostComparisonActivity) { items ->
             itemList.clear()
             items?.let {
                 itemList.addAll(it)
+                setEditTest(itemList)
+                setSpinner(itemList)
                 Log.d("CostComparisonDebug", "observeInventoryLiveData: ${it.size}")
             }
         }
     }
 
-    private fun setSpinner() {
-        // Define the options for the Spinner
-        val pumpsOptions = listOf("", "1", "2", "3")
-        val generatorsOptions = listOf("", "1", "2")
-        val wenchOptions = listOf("", "0", "1")
-        val wheelOptions = listOf("", "1", "2", "3", "4", "5")
-        val motorOptions = listOf("", "1", "2", "3")
+    private fun setEditTest(itemList: ArrayList<InventoryModel>) {
+        itemList.forEach { item ->
+            val lowerName = item.itemName.lowercase()
+            when {
+                lowerName.contains("pipe") -> {
+                    binding.pipes.hint = "${item.itemName} Quantity"
+                }
+            }
+        }
 
-        // Create an ArrayAdapter using the string array and a default Spinner layout
-        val pumpsAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, pumpsOptions)
-        val generatorsAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, generatorsOptions)
-        val wenchAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, wenchOptions)
-        val wheelAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, wheelOptions)
-        val motorAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, motorOptions)
+        itemList.forEach { item ->
+            val lowerName = item.itemName.lowercase()
+            when {
+                lowerName.contains("joint") -> {
+                    binding.joints.hint = "${item.itemName} Quantity"
+                }
+            }
+        }
+    }
 
-        // Specify the layout to use when the list of choices appears
-        pumpsAdapter.setDropDownViewResource(R.layout.spinner_item)
-        generatorsAdapter.setDropDownViewResource(R.layout.spinner_item)
-        wenchAdapter.setDropDownViewResource(R.layout.spinner_item)
-        wheelAdapter.setDropDownViewResource(R.layout.spinner_item)
-        motorAdapter.setDropDownViewResource(R.layout.spinner_item)
+    private fun setSpinner(itemList: ArrayList<InventoryModel>) {
+        if (itemList.isNotEmpty()) {
 
-        // Apply the adapter to the Spinner
-        binding.slugPumpsQuantitySpinner.adapter = pumpsAdapter
-        binding.generatorsQuantitySpinner.adapter = generatorsAdapter
-        binding.wenchQuantitySpinner.adapter = wenchAdapter
-        binding.wheelQuantitySpinner.adapter = wheelAdapter
-        binding.motorsQuantitySpinner.adapter = motorAdapter
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("wench") -> {
+                        binding.wench.text = item.itemName
+                        val wenchOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val wenchAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, wenchOptions)
+                        wenchAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.wenchQuantitySpinner.adapter = wenchAdapter
+                    }
+                }
+            }
+
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("pump") -> {
+                        binding.slugPumps.text = item.itemName
+                        val pumpsOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val pumpsAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, pumpsOptions)
+                        pumpsAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.slugPumpsQuantitySpinner.adapter = pumpsAdapter
+                    }
+                }
+            }
+
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("motor") -> {
+                        binding.motors.text = item.itemName
+                        val motorOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val motorAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, motorOptions)
+                        motorAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.motorsQuantitySpinner.adapter = motorAdapter
+                    }
+                }
+            }
+
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("generator") -> {
+                        binding.generators.text = item.itemName
+                        val generatorsOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val generatorsAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, generatorsOptions)
+                        generatorsAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.generatorsQuantitySpinner.adapter = generatorsAdapter
+                    }
+                }
+            }
+
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("wheel") -> {
+                        binding.wheel.text = item.itemName
+                        val wheelOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val wheelAdapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, wheelOptions)
+                        wheelAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.wheelQuantitySpinner.adapter = wheelAdapter
+                    }
+                }
+            }
+        } else {
+            Log.d("RentReqDebug", "itemList is empty")
+        }
 
         // Set spinner listeners
         setSpinnerListeners()
+    }
+
+    private fun generateSpinnerOptions(quantity: Int): List<String> {
+        return listOf("") + (1..quantity).map { it.toString() }
     }
 
     private fun setSpinnerListeners() {
@@ -173,10 +246,10 @@ class ClientCostComparisonActivity : AppCompatActivity() {
             }
         }
 
-        binding.pipes.addTextChangedListener(object : TextWatcher {
+        binding.pipesQuantity.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                pipeQuantity = binding.pipes.text.toString()
+                pipeQuantity = binding.pipesQuantity.text.toString()
                 pipeLength = binding.pipesLength.text.toString()
 
                 if (pipeQuantity.isNotEmpty()) {
@@ -196,10 +269,10 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         })
 
         // Add listener for joints quantity
-        binding.joints.addTextChangedListener(object : TextWatcher {
+        binding.jointsQuantity.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                jointsQuantity = binding.joints.text.toString()
+                jointsQuantity = binding.jointsQuantity.text.toString()
             }
             override fun afterTextChanged(s: Editable?) {
                 updateTotalRent() // Update rent when joints quantity changes
@@ -351,8 +424,12 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         // Calculate price for pipes
         if (pipeQuantity.isNotEmpty()) {
             itemList.forEach {
-                if (it.itemName == "Pipes" || it.itemName == "Scaffolding Pipes") {
-                    totalPrice += it.price.toInt() * pipeQuantity.toInt() * diffInDays
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("pipe") -> {
+                        totalPrice += it.price.toInt() * pipeQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Pipes: ${it.price} * $pipeQuantity * $diffInDays = ${it.price.toInt() * pipeQuantity.toInt() * diffInDays}")
+                    }
                 }
             }
         }
@@ -360,8 +437,12 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         // Calculate price for joints
         if (jointsQuantity.isNotEmpty()) {
             itemList.forEach {
-                if (it.itemName == "Joints") {
-                    totalPrice += it.price.toInt() * jointsQuantity.toInt() * diffInDays
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("joint") -> {
+                        totalPrice += it.price.toInt() * jointsQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Joints: ${it.price} * $jointsQuantity * $diffInDays = ${it.price.toInt() * jointsQuantity.toInt() * diffInDays}")
+                    }
                 }
             }
         }
@@ -369,8 +450,12 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         // Calculate price for wench
         if (wenchQuantity.isNotEmpty()) {
             itemList.forEach {
-                if (it.itemName == "Wench") {
-                    totalPrice += it.price.toInt() * wenchQuantity.toInt() * diffInDays
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("wench") -> {
+                        totalPrice += it.price.toInt() * wenchQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Wench: ${it.price} * $wenchQuantity * $diffInDays = ${it.price.toInt() * wenchQuantity.toInt() * diffInDays}")
+                    }
                 }
             }
         }
@@ -378,8 +463,12 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         // Calculate price for pumps
         if (pumpsQuantity.isNotEmpty()) {
             itemList.forEach {
-                if (it.itemName == "Pumps" || it.itemName == "Slug Pumps") {
-                    totalPrice += it.price.toInt() * pumpsQuantity.toInt() * diffInDays
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("pump") -> {
+                        totalPrice += it.price.toInt() * pumpsQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Pumps: ${it.price} * $pumpsQuantity * $diffInDays = ${it.price.toInt() * pumpsQuantity.toInt() * diffInDays}");
+                    }
                 }
             }
         }
@@ -387,8 +476,12 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         // Calculate price for generators
         if (generatorsQuantity.isNotEmpty()) {
             itemList.forEach {
-                if (it.itemName == "Generators") {
-                    totalPrice += it.price.toInt() * generatorsQuantity.toInt() * diffInDays
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("generator") -> {
+                        totalPrice += it.price.toInt() * generatorsQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Generators: ${it.price} * $generatorsQuantity * $diffInDays = ${it.price.toInt() * generatorsQuantity.toInt() * diffInDays}");
+                    }
                 }
             }
         }
@@ -396,8 +489,12 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         // Calculate price for motors
         if (motorsQuantity.isNotEmpty()) {
             itemList.forEach {
-                if (it.itemName == "Motors") {
-                    totalPrice += it.price.toInt() * motorsQuantity.toInt() * diffInDays
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("motor") -> {
+                        totalPrice += it.price.toInt() * motorsQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Motors: ${it.price} * $motorsQuantity * $diffInDays = ${it.price.toInt() * motorsQuantity.toInt() * diffInDays}");
+                    }
                 }
             }
         }
@@ -405,12 +502,17 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         // Calculate price for wheels
         if (wheelQuantity.isNotEmpty()) {
             itemList.forEach {
-                if (it.itemName == "Wheels" || it.itemName == "Wheel Borrows") {
-                    totalPrice += it.price.toInt() * wheelQuantity.toInt() * diffInDays
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("wheel") -> {
+                        totalPrice += it.price.toInt() * wheelQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Wheels: ${it.price} * $wheelQuantity * $diffInDays = ${it.price.toInt() * wheelQuantity.toInt() * diffInDays}");
+                    }
                 }
             }
         }
 
+        Log.d("CostComparisonDebug", "Total Price Calculated: $totalPrice")
         return totalPrice
     }
 
@@ -432,11 +534,11 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         binding.rentalDurationTo.addTextChangedListener(createTextWatcher())
 
         // Listen for changes in pipe quantity and length
-        binding.pipes.addTextChangedListener(createTextWatcher())
+        binding.pipesQuantity.addTextChangedListener(createTextWatcher())
         binding.pipesLength.addTextChangedListener(createTextWatcher())
 
         // Listen for changes in joints quantity
-        binding.joints.addTextChangedListener(createTextWatcher())
+        binding.jointsQuantity.addTextChangedListener(createTextWatcher())
     }
 
     private fun createTextWatcher(): TextWatcher {

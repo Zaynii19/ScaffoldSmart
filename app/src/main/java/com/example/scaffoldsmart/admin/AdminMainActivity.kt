@@ -4,7 +4,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,12 +13,14 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
-import com.example.scaffoldsmart.client.client_fragments.ClientInventoryFragment
 import com.example.scaffoldsmart.databinding.ActivityMainAdminBinding
 import com.example.scaffoldsmart.admin.admin_service.AdminMessageListenerService
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import org.json.JSONObject
 
@@ -88,7 +89,9 @@ class AdminMainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Get rental notification data on when noti clicks
-        //onesignal.getOneSignalNoti(prevNotiCompletedAt)
+        prevNotiCompletedAt = reqPreferences.getString("CompletedAt", "")!!
+        prevNotificationId = reqPreferences.getString("NotificationId", "")!!
+        onesignal.getOneSignalNoti(prevNotiCompletedAt, prevNotificationId)
 
         senderUid = chatPreferences.getString("SenderUid", null)
         if (senderUid == null) {
@@ -132,7 +135,7 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     companion object {
-        fun handleReqData(reqData: JSONObject) {
+        fun handleReqData(reqData: JSONObject, requestId: String) {
             reqData.let { data ->
                 val clientID = data.optString("clientID", "N/A")
                 val clientName = data.optString("clientName", "N/A")
@@ -153,12 +156,15 @@ class AdminMainActivity : AppCompatActivity() {
                 val wheel = data.optString("wheel", "N/A")
                 val totalRent = data.optString("rent", "N/A")
 
-                storeRentalReq(clientID, clientName, clientAddress, clientEmail, clientPhone, clientCnic, rentalAddress, startDuration, endDuration, pipes, pipesLength, joints, wench, pumps, motors, generators, wheel, totalRent)
+                storeRentalReq(clientID, requestId, clientName, clientAddress, clientEmail, clientPhone,
+                    clientCnic, rentalAddress, startDuration, endDuration, pipes, pipesLength, joints,
+                    wench, pumps, motors, generators, wheel, totalRent)
             }
         }
 
         private fun storeRentalReq(
             clientID: String,
+            requestId: String,
             clientName: String,
             clientAddress: String,
             clientEmail: String,
@@ -177,27 +183,37 @@ class AdminMainActivity : AppCompatActivity() {
             wheel: String,
             totalRent: String
         ) {
-            // Reference to the inventory in Firebase
             val databaseRef = Firebase.database.reference.child("Rentals")
-            val newItemRef = databaseRef.push()
-            val rentalId = newItemRef.key // Get the generated key
 
-            if (rentalId != null) {
-                // Create new rental request model
-                val newReq = RentalModel(clientID, rentalId, clientName, clientEmail, clientCnic, clientPhone, clientAddress, rentalAddress,
-                    startDuration, endDuration, pipes, pipesLength, joints, wench, motors, pumps, generators, wheel,"",totalRent,"")
+            // Check if rental with this requestId already exists
+            databaseRef.child(requestId).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Log.d("AdminMainDebug", "Rental request with ID $requestId already exists")
+                    } else {
+                        // Create new rental request model
+                        val newReq = RentalModel(
+                            clientID, requestId, clientName, clientEmail, clientCnic,
+                            clientPhone, clientAddress, rentalAddress, startDuration,
+                            endDuration, pipes, pipesLength, joints, wench, motors,
+                            pumps, generators, wheel, "", totalRent, ""
+                        )
 
-                // Store the new request in Firebase
-                newItemRef.setValue(newReq)
-                    .addOnSuccessListener {
-                        Log.d("AdminMainDebug", "Rental data stored successfully")
+                        // Store with requestId as the key
+                        databaseRef.child(requestId).setValue(newReq)
+                            .addOnSuccessListener {
+                                Log.d("AdminMainDebug", "Rental data stored successfully with ID $requestId")
+                            }
+                            .addOnFailureListener {
+                                Log.e("AdminMainDebug", "Failed to store rental data: ${it.message}")
+                            }
                     }
-                    .addOnFailureListener {
-                        Log.e("AdminMainDebug", "Failed to stored rental data: ${it.message}")
-                    }
-            } else {
-                Log.d("AdminMainDebug", "Failed to generate request ID")
-            }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("AdminMainDebug", "Database query cancelled: ${databaseError.message}")
+                }
+            })
         }
     }
 }

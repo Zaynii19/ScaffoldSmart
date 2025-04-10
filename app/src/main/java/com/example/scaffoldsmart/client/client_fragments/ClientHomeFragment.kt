@@ -2,25 +2,12 @@ package com.example.scaffoldsmart.client.client_fragments
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Typeface
-import android.graphics.pdf.PdfDocument
 import android.os.Bundle
-import android.os.Environment
-import android.text.Layout
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.StaticLayout
-import android.text.TextPaint
-import android.text.style.StyleSpan
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,13 +21,6 @@ import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
 import com.example.scaffoldsmart.util.DateFormater
 import com.example.scaffoldsmart.util.OnesignalService
-import com.example.scaffoldsmart.util.SmartContract
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class ClientHomeFragment : Fragment() {
     private val binding by lazy {
@@ -93,9 +73,12 @@ class ClientHomeFragment : Fragment() {
         binding.settingBtn.setOnClickListener {
             startActivity(Intent(context, ClientSettingActivity::class.java))
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
         binding.totalPaymentDue.text = buildString {
-            append(totalDueRent())
+            append(totalDueRent(dueRequests))
             append(" .Rs")
         }
     }
@@ -142,7 +125,10 @@ class ClientHomeFragment : Fragment() {
                 populateInfoList(filteredRentals)
 
                 dueRequests = rentals.filter { it.clientID == clientID && it.status.isEmpty()} as ArrayList<RentalModel>
-
+                binding.totalPaymentDue.text = buildString {
+                    append(totalDueRent(dueRequests))
+                    append(" .Rs")
+                }
             }
         }
     }
@@ -154,13 +140,13 @@ class ClientHomeFragment : Fragment() {
             // Calculate the duration in months
             val durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
 
-            // Create a ScafoldInfoModel instance and add to infoList
+            // Create a ScaffoldInfoModel instance and add to infoList
             infoList.add(ClientScafoldInfoModel(rental.rent, durationInMonths, rental.rentStatus))
             adapter.updateList(infoList)
         }
     }
 
-    private fun totalDueRent(): Int {
+    private fun totalDueRent(dueRequests: ArrayList<RentalModel>): Int {
         var total = 0
         for (request in dueRequests) {
             total += request.rent.toInt()

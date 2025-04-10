@@ -219,9 +219,9 @@ class AdminRentalReqFragment : BottomSheetDialogFragment(), RequestRcvAdapter.On
         // Modify the function to accept a list of RentalReqModel
         fun newInstance(reqList: List<RentalModel>): AdminRentalReqFragment {
             val fragment = AdminRentalReqFragment()
-            val args = Bundle()
 
             // Pass the list as Serializable
+            val args = Bundle()
             args.putSerializable(ARG_LIST, ArrayList(reqList))  // Make sure to convert it to ArrayList
             fragment.arguments = args
 

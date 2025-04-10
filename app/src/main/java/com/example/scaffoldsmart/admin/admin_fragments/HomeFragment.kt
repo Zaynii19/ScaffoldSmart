@@ -24,10 +24,12 @@ import com.example.scaffoldsmart.admin.InventoryActivity
 import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_adapters.ScafoldRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.AdminModel
+import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.FragmentHomeBinding
 import com.example.scaffoldsmart.admin.admin_models.ScafoldInfoModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
 import com.example.scaffoldsmart.util.DateFormater
@@ -38,11 +40,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class HomeFragment : Fragment() {
 
@@ -66,10 +63,11 @@ class HomeFragment : Fragment() {
     private lateinit var reqViewModel: RentalViewModel
     private var durationInMonths: String = ""
     private var status: String = ""
-    private var isApproved: Boolean = false
     private var bottomSheetDialog: BottomSheetDialogFragment? = null
     private lateinit var chatPreferences: SharedPreferences
     private var smartContract: SmartContract? = null
+    private var itemList = ArrayList<InventoryModel>()
+    private lateinit var viewModelI: InventoryViewModel
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,6 +83,9 @@ class HomeFragment : Fragment() {
 
         reqViewModel = ViewModelProvider(this)[RentalViewModel::class.java]
         reqViewModel.retrieveRentalReq()
+
+        viewModelI = ViewModelProvider(this)[InventoryViewModel::class.java]
+        viewModelI.retrieveInventory()
     }
 
     override fun onCreateView(
@@ -94,6 +95,7 @@ class HomeFragment : Fragment() {
         setRcv()
         observeAdminLiveData()
         observeRentalLiveData()
+        observeInventoryLiveData()
 
         return binding.root
     }
@@ -116,9 +118,12 @@ class HomeFragment : Fragment() {
         binding.notiAlert.setOnClickListener {
             showBottomSheet()
         }
+    }
 
+    override fun onResume() {
+        super.onResume()
         binding.totalPaymentReceived.text = buildString {
-            append(totalPaymentReceived())
+            append(totalPaymentReceived(filteredRentals))
             append(" .Rs")
         }
     }
@@ -197,10 +202,28 @@ class HomeFragment : Fragment() {
             if (rentals != null) {
                 // Filter rentals where the status is not empty
                 filteredRentals = rentals.filter { it.status.isNotEmpty() } as ArrayList<RentalModel>
+
+                binding.totalPaymentReceived.text = buildString {
+                    append(totalPaymentReceived(filteredRentals))
+                    append(" .Rs")
+                }
+
                 populateInfoList(filteredRentals)
+
                 // Filter rentals where the status is empty
                 val filteredRequests = rentals.filter { it.status.isEmpty() }
                 populateReqList(filteredRequests)
+            }
+        }
+    }
+
+    private fun observeInventoryLiveData() {
+        binding.loading.visibility = View.VISIBLE
+        viewModelI.observeInventoryLiveData().observe(requireActivity()) { items ->
+            binding.loading.visibility = View.GONE
+            itemList.clear()
+            items?.let {
+                itemList.addAll(it)
             }
         }
     }
@@ -260,13 +283,14 @@ class HomeFragment : Fragment() {
 
         // Set dialog details
         binder.clientName.text = currentReq.clientName
-        binder.address.text = currentReq.rentalAddress
+        binder.address.text = currentReq.clientAddress
         binder.phoneNum.text = currentReq.clientPhone
         binder.email.text = currentReq.clientEmail
         binder.cnic.text = currentReq.clientCnic
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
         binder.rent.text = currentReq.rent
+        binder.rentalAddress.text = currentReq.rentalAddress
         setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
         setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
         setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)
@@ -280,21 +304,20 @@ class HomeFragment : Fragment() {
             .setTitle("Rental Request Details ${index + 1}")
             .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
             .setPositiveButton("Approve") { dialog, _ ->
-                isApproved = true
                 approveRentalReq(currentReq)
-                notifyClient(currentReq, isApproved)
+                notifyClient(currentReq, true)
                 smartContract!!.createScaffoldingContractPdf(
-                    requireActivity(), isApproved, name, company, email, phone, address, currentReq.clientName, currentReq.clientPhone,
+                    requireActivity(), true, name, company, email, phone, address, currentReq.clientName, currentReq.clientPhone,
                     currentReq.clientEmail, currentReq.clientCnic, currentReq.clientAddress, currentReq.rentalAddress, currentReq.startDuration,
                     currentReq.endDuration, currentReq.pipes, currentReq.pipesLength, currentReq.joints, currentReq.wench,
                     currentReq.motors, currentReq.pumps, currentReq.generators, currentReq.wheel
                 )
+                updateInventory(currentReq.pipes, currentReq.joints, currentReq.wench, currentReq.pumps, currentReq.motors, currentReq.generators, currentReq.wheel)
                 dialog.dismiss()
             }
             .setNegativeButton("Reject") { dialog, _ ->
-                isApproved = false
                 delRentalReq(currentReq)
-                notifyClient(currentReq, isApproved)
+                notifyClient(currentReq, false)
                 dialog.dismiss()
             }
             .setNeutralButton(if (index == reqList.size - 1) "Previous" else "Next") { dialog, _ ->
@@ -395,12 +418,72 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun updateInventory(
+        pipeQuantity: String,
+        jointsQuantity: String,
+        wenchQuantity: String,
+        pumpsQuantity: String,
+        motorsQuantity: String,
+        generatorsQuantity: String,
+        wheelQuantity: String
+    ) {
+        itemList.forEach { item ->
+            val lowerName = item.itemName.lowercase()
+            val databaseRef = Firebase.database.reference.child("Inventory").child(item.itemId)
+
+            when {
+                lowerName.contains("pipe") && pipeQuantity.isNotEmpty() -> {
+                    if (item.quantity.toInt() >= pipeQuantity.toInt()) {
+                        val remaining = (item.quantity.toInt() - pipeQuantity.toInt()).toString()
+                        databaseRef.updateChildren(mapOf("quantity" to remaining))
+                    }
+                }
+                lowerName.contains("joint") && jointsQuantity.isNotEmpty() -> {
+                    if (item.quantity.toInt() >= jointsQuantity.toInt()) {
+                        val remaining = (item.quantity.toInt() - jointsQuantity.toInt()).toString()
+                        databaseRef.updateChildren(mapOf("quantity" to remaining))
+                    }
+                }
+                lowerName.contains("wench") && wenchQuantity.isNotEmpty() -> {
+                    if (item.quantity.toInt() >= wenchQuantity.toInt()) {
+                        val remaining = (item.quantity.toInt() - wenchQuantity.toInt()).toString()
+                        databaseRef.updateChildren(mapOf("quantity" to remaining))
+                    }
+                }
+                lowerName.contains("pump") && pumpsQuantity.isNotEmpty() -> {
+                    if (item.quantity.toInt() >= pumpsQuantity.toInt()) {
+                        val remaining = (item.quantity.toInt() - pumpsQuantity.toInt()).toString()
+                        databaseRef.updateChildren(mapOf("quantity" to remaining))
+                    }
+                }
+                lowerName.contains("motor") && motorsQuantity.isNotEmpty() -> {
+                    if (item.quantity.toInt() >= motorsQuantity.toInt()) {
+                        val remaining = (item.quantity.toInt() - motorsQuantity.toInt()).toString()
+                        databaseRef.updateChildren(mapOf("quantity" to remaining))
+                    }
+                }
+                lowerName.contains("generator") && generatorsQuantity.isNotEmpty() -> {
+                    if (item.quantity.toInt() >= generatorsQuantity.toInt()) {
+                        val remaining = (item.quantity.toInt() - generatorsQuantity.toInt()).toString()
+                        databaseRef.updateChildren(mapOf("quantity" to remaining))
+                    }
+                }
+                lowerName.contains("wheel") && wheelQuantity.isNotEmpty() -> {
+                    if (item.quantity.toInt() >= wheelQuantity.toInt()) {
+                        val remaining = (item.quantity.toInt() - wheelQuantity.toInt()).toString()
+                        databaseRef.updateChildren(mapOf("quantity" to remaining))
+                    }
+                }
+            }
+        }
+    }
+
     private fun showBottomSheet() {
         bottomSheetDialog = AdminRentalReqFragment.newInstance(reqList)
         bottomSheetDialog?.show(requireActivity().supportFragmentManager, "Request")
     }
 
-    private fun totalPaymentReceived(): Int {
+    private fun totalPaymentReceived(filteredRentals: ArrayList<RentalModel>): Int {
         var total = 0
         for (rental in filteredRentals) {
             total += rental.rent.toInt()

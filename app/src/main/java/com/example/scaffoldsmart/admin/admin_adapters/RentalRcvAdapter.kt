@@ -88,13 +88,14 @@ class RentalRcvAdapter(
         val binder = RentalsDetailsDialogBinding.bind(customDialog)
 
         binder.clientName.text = currentReq.clientName
-        binder.address.text = currentReq.rentalAddress
+        binder.address.text = currentReq.clientAddress
         binder.phoneNum.text = currentReq.clientPhone
         binder.email.text = currentReq.clientEmail
         binder.cnic.text = currentReq.clientCnic
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
         binder.rent.text = currentReq.rent
+        binder.rentalAddress.text = currentReq.rentalAddress
         setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
         setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
         setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)

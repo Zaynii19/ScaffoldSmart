@@ -36,6 +36,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     private lateinit var adapter: InventoryRcvAdapter
     private var isUpdate = false
     private lateinit var inventoryPreferences: SharedPreferences
+    private var itemList = ArrayList<InventoryModel>()
     private lateinit var viewModel: InventoryViewModel
     private lateinit var chatPreferences: SharedPreferences
     private var senderUid: String? = null
@@ -237,9 +238,5 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         presenceMap["status"] = "Offline"
         presenceMap["lastSeen"] = currentTime
         Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
-    }
-
-    companion object {
-        var itemList = ArrayList<InventoryModel>()
     }
 }

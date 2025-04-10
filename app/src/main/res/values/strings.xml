@@ -161,5 +161,6 @@
     <string name="calculate_rent">Calculate Rent</string>
     <string name="total_rent">Total Rent: </string>
     <string name="_0_rs">0. Rs</string>
+    <string name="_rental_address">Rental Address:</string>
 
 </resources>

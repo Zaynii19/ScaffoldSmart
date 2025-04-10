@@ -1,11 +1,8 @@
 package com.example.scaffoldsmart.client.client_fragments
 
 import android.app.DatePickerDialog
-import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import android.graphics.Color
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -23,10 +20,8 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
-import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.databinding.FragmentRentalReqBinding
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
@@ -34,9 +29,7 @@ import com.example.scaffoldsmart.util.CheckNetConnectvity
 import com.example.scaffoldsmart.util.DateFormater
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Locale
 
 class RentalReqFragment : BottomSheetDialogFragment() {
     private val binding by lazy {
@@ -47,6 +40,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     private var clientPhone: String = ""
     private var clientEmail: String = ""
     private var clientCnic: String = ""
+    private var clientAddress: String = ""
     private var pipeQuantity: String = ""
     private var year: Int = 0
     private var month: Int = 0
@@ -67,7 +61,6 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     private lateinit var dialog: AlertDialog
     private var datePickerDialog: DatePickerDialog? = null
     private var onSendReqListener: OnSendReqListener? = null
-    private lateinit var viewModel: InventoryViewModel
     private var itemList = ArrayList<InventoryModel>()
     private var totalPrice : Int = 0
 
@@ -90,17 +83,19 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        viewModel = ViewModelProvider(this)[InventoryViewModel::class.java]
-        viewModel.retrieveInventory()
+        // Retrieve the list of rental requests from arguments safely
+        arguments?.let {
+            itemList = it.getSerializable(ARG_LIST) as ArrayList<InventoryModel>
+            Log.d("RentReqDebug", "Inventory size: ${it.size()}")
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        setEditTest()
         setSpinner()
-        observeInventoryLiveData()
         // Inflate the layout for this fragment
         return binding.root
     }
@@ -116,7 +111,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
 
                 getClientInfo()
                 rentalAddress = binding.rentalAddress.text.toString()
-                jointsQuantity = binding.joints.text.toString()
+                jointsQuantity = binding.jointsQuantity.text.toString()
 
                 if (!isDurationValid()) {
                     Toast.makeText(context, "Please add start and end duration", Toast.LENGTH_SHORT).show()
@@ -142,6 +137,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         clientEmail = client.email
         clientPhone = client.phone
         clientCnic = client.cnic
+        clientAddress = client.address
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -155,13 +151,13 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             }
         }
 
-        binding.pipes.addTextChangedListener(object : TextWatcher {
+        binding.pipesQuantity.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
                 // Not needed for this specific scenario
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                pipeQuantity = binding.pipes.text.toString()
+                pipeQuantity = binding.pipesQuantity.text.toString()
                 pipeLength = binding.pipesLength.text.toString()
 
                 if (pipeQuantity.isNotEmpty()) {
@@ -308,34 +304,100 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         }
     }
 
+    private fun setEditTest() {
+        itemList.forEach { item ->
+            val lowerName = item.itemName.lowercase()
+            when {
+                lowerName.contains("pipe") -> {
+                    binding.pipes.hint = "${item.itemName} Quantity"
+                }
+            }
+        }
+
+        itemList.forEach { item ->
+            val lowerName = item.itemName.lowercase()
+            when {
+                lowerName.contains("joint") -> {
+                    binding.joints.hint = "${item.itemName} Quantity"
+                }
+            }
+        }
+    }
+
     private fun setSpinner() {
-        // Define the options for the Spinner
-        val pumpsOptions = listOf("", "1", "2", "3")
-        val generatorsOptions = listOf("", "1", "2")
-        val wenchOptions = listOf("", "0", "1")
-        val wheelOptions = listOf("", "1", "2", "3", "4", "5")
-        val motorOptions = listOf("", "1", "2", "3")
+        if (itemList.isNotEmpty()) {
 
-        // Create an ArrayAdapter using the string array and a default Spinner layout
-        val pumpsAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, pumpsOptions)
-        val generatorsAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, generatorsOptions)
-        val wenchAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, wenchOptions)
-        val wheelAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, wheelOptions)
-        val motorAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, motorOptions)
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("wench") -> {
+                        binding.wench.text = item.itemName
+                        val wenchOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val wenchAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, wenchOptions)
+                        wenchAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.wenchQuantitySpinner.adapter = wenchAdapter
+                    }
+                }
+            }
 
-        // Specify the layout to use when the list of choices appears
-        pumpsAdapter.setDropDownViewResource(R.layout.spinner_item)
-        generatorsAdapter.setDropDownViewResource(R.layout.spinner_item)
-        wenchAdapter.setDropDownViewResource(R.layout.spinner_item)
-        wheelAdapter.setDropDownViewResource(R.layout.spinner_item)
-        motorAdapter.setDropDownViewResource(R.layout.spinner_item)
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("pump") -> {
+                        binding.slugPumps.text = item.itemName
+                        val pumpsOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val pumpsAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, pumpsOptions)
+                        pumpsAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.slugPumpsQuantitySpinner.adapter = pumpsAdapter
+                    }
+                }
+            }
 
-        // Apply the adapter to the Spinner
-        binding.slugPumpsQuantitySpinner.adapter = pumpsAdapter
-        binding.generatorsQuantitySpinner.adapter = generatorsAdapter
-        binding.wenchQuantitySpinner.adapter = wenchAdapter
-        binding.wheelQuantitySpinner.adapter = wheelAdapter
-        binding.motorsQuantitySpinner.adapter = motorAdapter
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("motor") -> {
+                        binding.motors.text = item.itemName
+                        val motorOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val motorAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, motorOptions)
+                        motorAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.motorsQuantitySpinner.adapter = motorAdapter
+                    }
+                }
+            }
+
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("generator") -> {
+                        binding.generators.text = item.itemName
+                        val generatorsOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val generatorsAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, generatorsOptions)
+                        generatorsAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.generatorsQuantitySpinner.adapter = generatorsAdapter
+                    }
+                }
+            }
+
+            itemList.forEach { item ->
+                val lowerName = item.itemName.lowercase()
+                when {
+                    lowerName.contains("wheel") -> {
+                        binding.wheel.text = item.itemName
+                        val wheelOptions = generateSpinnerOptions(item.quantity.toInt())
+                        val wheelAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, wheelOptions)
+                        wheelAdapter.setDropDownViewResource(R.layout.spinner_item)
+                        binding.wheelQuantitySpinner.adapter = wheelAdapter
+                    }
+                }
+            }
+        } else {
+            Log.d("RentReqDebug", "itemList is empty")
+        }
+    }
+
+    private fun generateSpinnerOptions(quantity: Int): List<String> {
+        return listOf("") + (1..quantity).map { it.toString() }
     }
 
     private fun getSpinnerValues() {
@@ -401,92 +463,96 @@ class RentalReqFragment : BottomSheetDialogFragment() {
                 wheelQuantity.isNotEmpty()
     }
 
-    private fun observeInventoryLiveData() {
-        viewModel.observeInventoryLiveData().observe(viewLifecycleOwner) { items ->
-            itemList.clear()
-            items?.let {
-                itemList.addAll(it)
-                Log.d("RentReqDebug", "observeInventoryLiveData: ${it.size}")
-            }
-        }
-    }
-
     private fun calculateTotalPrice(): Int {
         totalPrice = 0 // Reset total price before calculation
 
         // Calculate price for pipes
         if (pipeQuantity.isNotEmpty()) {
-            Log.d("RentReqDebug", "Pipe Quantity: $pipeQuantity")
             itemList.forEach {
-                if (it.itemName == "Pipes" || it.itemName == "Scaffolding Pipes") {
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("pipe") -> {
                     totalPrice += it.price.toInt() * pipeQuantity.toInt() * diffInDays
                     Log.d("RentReqDebug", "Pipes: ${it.price} * $pipeQuantity * $diffInDays = ${it.price.toInt() * pipeQuantity.toInt() * diffInDays}")
+                    }
                 }
             }
         }
 
         // Calculate price for joints
         if (jointsQuantity.isNotEmpty()) {
-            Log.d("RentReqDebug", "Joints Quantity: $jointsQuantity")
             itemList.forEach {
-                if (it.itemName == "Joints") {
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("joint") -> {
                     totalPrice += it.price.toInt() * jointsQuantity.toInt() * diffInDays
                     Log.d("RentReqDebug", "Joints: ${it.price} * $jointsQuantity * $diffInDays = ${it.price.toInt() * jointsQuantity.toInt() * diffInDays}")
+                    }
                 }
             }
         }
 
         // Calculate price for wench
         if (wenchQuantity.isNotEmpty()) {
-            Log.d("RentReqDebug", "Wench Quantity: $wenchQuantity")
             itemList.forEach {
-                if (it.itemName == "Wench") {
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("wench") -> {
                     totalPrice += it.price.toInt() * wenchQuantity.toInt() * diffInDays
                     Log.d("RentReqDebug", "Wench: ${it.price} * $wenchQuantity * $diffInDays = ${it.price.toInt() * wenchQuantity.toInt() * diffInDays}")
+                    }
                 }
             }
         }
 
         // Calculate price for pumps
         if (pumpsQuantity.isNotEmpty()) {
-            Log.d("RentReqDebug", "Pumps Quantity: $pumpsQuantity")
             itemList.forEach {
-                if (it.itemName == "Pumps" || it.itemName == "Slug Pumps") {
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("pump") -> {
                     totalPrice += it.price.toInt() * pumpsQuantity.toInt() * diffInDays
                     Log.d("RentReqDebug", "Pumps: ${it.price} * $pumpsQuantity * $diffInDays = ${it.price.toInt() * pumpsQuantity.toInt() * diffInDays}");
+                    }
                 }
             }
         }
 
         // Calculate price for generators
         if (generatorsQuantity.isNotEmpty()) {
-            Log.d("RentReqDebug", "Generators Quantity: $generatorsQuantity")
             itemList.forEach {
-                if (it.itemName == "Generators") {
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("generator") -> {
                     totalPrice += it.price.toInt() * generatorsQuantity.toInt() * diffInDays
                     Log.d("RentReqDebug", "Generators: ${it.price} * $generatorsQuantity * $diffInDays = ${it.price.toInt() * generatorsQuantity.toInt() * diffInDays}");
+                    }
                 }
             }
         }
 
         // Calculate price for motors
         if (motorsQuantity.isNotEmpty()) {
-            Log.d("RentReqDebug", "Motors Quantity: $motorsQuantity")
             itemList.forEach {
-                if (it.itemName == "Motors") {
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("motor") -> {
                     totalPrice += it.price.toInt() * motorsQuantity.toInt() * diffInDays
                     Log.d("RentReqDebug", "Motors: ${it.price} * $motorsQuantity * $diffInDays = ${it.price.toInt() * motorsQuantity.toInt() * diffInDays}");
+                    }
                 }
             }
         }
 
         // Calculate price for wheels
         if (wheelQuantity.isNotEmpty()) {
-            Log.d("RentReqDebug", "Wheels Quantity: $wheelQuantity")
             itemList.forEach {
-                if (it.itemName == "Wheels" || it.itemName == "Wheel Borrows") {
+                val lowerName = it.itemName.lowercase()
+                when {
+                    lowerName.contains("wheel") -> {
                     totalPrice += it.price.toInt() * wheelQuantity.toInt() * diffInDays
                     Log.d("RentReqDebug", "Wheels: ${it.price} * $wheelQuantity * $diffInDays = ${it.price.toInt() * wheelQuantity.toInt() * diffInDays}");
+                    }
                 }
             }
         }
@@ -500,7 +566,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         val binder = RentalsDetailsDialogBinding.bind(customDialog)
 
         binder.clientName.text = clientName
-        binder.address.text = rentalAddress
+        binder.address.text = clientAddress
         binder.phoneNum.text = clientPhone
         binder.email.text = clientEmail
         binder.cnic.text = clientCnic
@@ -508,6 +574,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             append(calculateTotalPrice())
             append(" .Rs")
         }
+        binder.rentalAddress.text = rentalAddress
         binder.rentalDurationFrom.text = durationStart
         binder.rentalDurationTo.text = durationEnd
         setViewVisibilityAndText(binder.pipes, pipeQuantity, binder.entry8)
@@ -559,12 +626,14 @@ class RentalReqFragment : BottomSheetDialogFragment() {
 
     companion object {
         private const val ARG_CLIENT = "arg_client"
-        fun newInstance(listener: OnSendReqListener, client: ClientModel): RentalReqFragment {
+        private const val ARG_LIST = "arg_list"
+        fun newInstance(listener: OnSendReqListener, client: ClientModel, itemList: List<InventoryModel>): RentalReqFragment {
             val fragment = RentalReqFragment()
             fragment.onSendReqListener = listener
 
             val args = Bundle()
             args.putSerializable(ARG_CLIENT, client)  // Pass the client as Serializable
+            args.putSerializable(ARG_LIST, ArrayList(itemList))  // Make sure to convert it to ArrayList
             fragment.arguments = args
 
             return fragment
