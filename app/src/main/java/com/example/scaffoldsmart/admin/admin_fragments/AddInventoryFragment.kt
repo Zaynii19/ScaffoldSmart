@@ -30,8 +30,8 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
     private var onInventoryUpdatedListener: OnInventoryUpdatedListener? = null
 
     interface OnInventoryUpdatedListener {
-        fun onInventoryAdded(itemName: String, price: String, quantity: String, availability: String)
-        fun onInventoryUpdated(itemId: String, itemName: String, price: String, quantity: String, availability: String)
+        fun onInventoryAdded(itemName: String, price: Int, quantity: Int, availability: String)
+        fun onInventoryUpdated(itemId: String, itemName: String, price: Int, quantity: Int, availability: String)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,9 +65,9 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
 
             if (itemName.isNotEmpty() && price.isNotEmpty() && quantity.isNotEmpty() && statusValue.isNotEmpty()) {
                 if (isUpdate) {
-                    onInventoryUpdatedListener?.onInventoryUpdated(itemId, itemName, price, quantity, statusValue)
+                    onInventoryUpdatedListener?.onInventoryUpdated(itemId, itemName, price.toInt(), quantity.toInt(), statusValue)
                 } else{
-                    onInventoryUpdatedListener?.onInventoryAdded(itemName, price, quantity, statusValue)
+                    onInventoryUpdatedListener?.onInventoryAdded(itemName, price.toInt(), quantity.toInt(), statusValue)
                 }
                 dismiss() // Dismiss only after saving data
             } else {
@@ -108,8 +108,8 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
         binding.title.text = getString(R.string.update_inventory)
         itemId = item.itemId
         binding.itemName.setText(item.itemName)
-        binding.itemPrice.setText(item.price)
-        binding.itemQuantity.setText(item.quantity)
+        binding.itemPrice.setText("${item.price}")
+        binding.itemQuantity.setText("${item.quantity}")
         val position = availabilityOptions.indexOf(item.availability)
         binding.availabilitySpinner.setSelection(position)
     }

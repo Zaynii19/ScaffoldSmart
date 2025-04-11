@@ -39,7 +39,6 @@ class ClientCostComparisonActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityClientCostComparisonBinding.inflate(layoutInflater)
     }
-    private var pipeQuantity: String = ""
     private var year: Int = 0
     private var month: Int = 0
     private var day: Int = 0
@@ -49,6 +48,7 @@ class ClientCostComparisonActivity : AppCompatActivity() {
     private var durationEnd: String = ""
     private var diffInDays: Int = 0
     private var selectedPipeLength: Int = 0
+    private var pipeQuantity: String = ""
     private var pipeLength: String = ""
     private var wenchQuantity: String = ""
     private var jointsQuantity: String = ""
@@ -427,8 +427,8 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                 val lowerName = it.itemName.lowercase()
                 when {
                     lowerName.contains("pipe") -> {
-                        totalPrice += it.price.toInt() * pipeQuantity.toInt() * diffInDays
-                        Log.d("CostComparisonDebug", "Pipes: ${it.price} * $pipeQuantity * $diffInDays = ${it.price.toInt() * pipeQuantity.toInt() * diffInDays}")
+                        totalPrice += it.price * pipeQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Pipes: ${it.price} * $pipeQuantity * $diffInDays = ${it.price * pipeQuantity.toInt() * diffInDays}")
                     }
                 }
             }
@@ -440,8 +440,8 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                 val lowerName = it.itemName.lowercase()
                 when {
                     lowerName.contains("joint") -> {
-                        totalPrice += it.price.toInt() * jointsQuantity.toInt() * diffInDays
-                        Log.d("CostComparisonDebug", "Joints: ${it.price} * $jointsQuantity * $diffInDays = ${it.price.toInt() * jointsQuantity.toInt() * diffInDays}")
+                        totalPrice += it.price * jointsQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Joints: ${it.price} * $jointsQuantity * $diffInDays = ${it.price * jointsQuantity.toInt() * diffInDays}")
                     }
                 }
             }
@@ -453,8 +453,8 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                 val lowerName = it.itemName.lowercase()
                 when {
                     lowerName.contains("wench") -> {
-                        totalPrice += it.price.toInt() * wenchQuantity.toInt() * diffInDays
-                        Log.d("CostComparisonDebug", "Wench: ${it.price} * $wenchQuantity * $diffInDays = ${it.price.toInt() * wenchQuantity.toInt() * diffInDays}")
+                        totalPrice += it.price * wenchQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Wench: ${it.price} * $wenchQuantity * $diffInDays = ${it.price * wenchQuantity.toInt() * diffInDays}")
                     }
                 }
             }
@@ -466,8 +466,8 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                 val lowerName = it.itemName.lowercase()
                 when {
                     lowerName.contains("pump") -> {
-                        totalPrice += it.price.toInt() * pumpsQuantity.toInt() * diffInDays
-                        Log.d("CostComparisonDebug", "Pumps: ${it.price} * $pumpsQuantity * $diffInDays = ${it.price.toInt() * pumpsQuantity.toInt() * diffInDays}");
+                        totalPrice += it.price * pumpsQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Pumps: ${it.price} * $pumpsQuantity * $diffInDays = ${it.price * pumpsQuantity.toInt() * diffInDays}");
                     }
                 }
             }
@@ -479,8 +479,8 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                 val lowerName = it.itemName.lowercase()
                 when {
                     lowerName.contains("generator") -> {
-                        totalPrice += it.price.toInt() * generatorsQuantity.toInt() * diffInDays
-                        Log.d("CostComparisonDebug", "Generators: ${it.price} * $generatorsQuantity * $diffInDays = ${it.price.toInt() * generatorsQuantity.toInt() * diffInDays}");
+                        totalPrice += it.price * generatorsQuantity.toInt() * diffInDays
+                        Log.d("CostComparisonDebug", "Generators: ${it.price} * $generatorsQuantity * $diffInDays = ${it.price * generatorsQuantity.toInt() * diffInDays}");
                     }
                 }
             }
@@ -492,7 +492,7 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                 val lowerName = it.itemName.lowercase()
                 when {
                     lowerName.contains("motor") -> {
-                        totalPrice += it.price.toInt() * motorsQuantity.toInt() * diffInDays
+                        totalPrice += it.price * motorsQuantity.toInt() * diffInDays
                         Log.d("CostComparisonDebug", "Motors: ${it.price} * $motorsQuantity * $diffInDays = ${it.price.toInt() * motorsQuantity.toInt() * diffInDays}");
                     }
                 }
@@ -505,7 +505,7 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                 val lowerName = it.itemName.lowercase()
                 when {
                     lowerName.contains("wheel") -> {
-                        totalPrice += it.price.toInt() * wheelQuantity.toInt() * diffInDays
+                        totalPrice += it.price * wheelQuantity.toInt() * diffInDays
                         Log.d("CostComparisonDebug", "Wheels: ${it.price} * $wheelQuantity * $diffInDays = ${it.price.toInt() * wheelQuantity.toInt() * diffInDays}");
                     }
                 }

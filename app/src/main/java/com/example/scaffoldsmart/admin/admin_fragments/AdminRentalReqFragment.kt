@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -97,6 +98,7 @@ class AdminRentalReqFragment : BottomSheetDialogFragment(), RequestRcvAdapter.On
         showReqDetailsDialog(currentReq)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showReqDetailsDialog(currentReq: RentalModel) {
         val customDialog = LayoutInflater.from(requireActivity()).inflate(R.layout.rentals_details_dialog, null)
         val builder = MaterialAlertDialogBuilder(requireActivity())
@@ -109,6 +111,8 @@ class AdminRentalReqFragment : BottomSheetDialogFragment(), RequestRcvAdapter.On
         binder.cnic.text = currentReq.clientCnic
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
+        binder.rent.text = currentReq.rent.toString()
+        binder.rentalAddress.text = currentReq.rentalAddress
         setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
         setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
         setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)
@@ -127,9 +131,9 @@ class AdminRentalReqFragment : BottomSheetDialogFragment(), RequestRcvAdapter.On
                 notifyClient(currentReq, isApproved)
                 smartContract!!.createScaffoldingContractPdf(
                     requireActivity(), isApproved, adminName, adminCompany, adminEmail, adminPhone, adminAddress, currentReq.clientName, currentReq.clientPhone,
-                    currentReq.clientEmail, currentReq.clientCnic, currentReq.clientAddress, currentReq.rentalAddress, currentReq.startDuration,
-                    currentReq.endDuration, currentReq.pipes, currentReq.pipesLength, currentReq.joints, currentReq.wench,
-                    currentReq.motors, currentReq.pumps, currentReq.generators, currentReq.wheel
+                    currentReq.clientEmail, currentReq.clientCnic, currentReq.clientAddress, currentReq.rentalAddress, currentReq.startDuration, currentReq.endDuration,
+                    currentReq.pipes.toString(), currentReq.pipesLength.toString(), currentReq.joints.toString(), currentReq.wench.toString(),
+                    currentReq.motors.toString(), currentReq.pumps.toString(), currentReq.generators.toString(), currentReq.wheel.toString()
                 )
                 dialog.dismiss()
             }.setNegativeButton("Reject"){ dialog, _ ->
@@ -150,9 +154,9 @@ class AdminRentalReqFragment : BottomSheetDialogFragment(), RequestRcvAdapter.On
             }
     }
 
-    private fun setViewVisibilityAndText(view: TextView, text: String, entry: ConstraintLayout) {
-        if (text.isNotEmpty()) {
-            view.text = text
+    private fun setViewVisibilityAndText(view: TextView, text: Int, entry: ConstraintLayout) {
+        if (text.toString().isNotEmpty()) {
+            view.text = "$text"
         } else {
             entry.visibility = View.GONE
         }

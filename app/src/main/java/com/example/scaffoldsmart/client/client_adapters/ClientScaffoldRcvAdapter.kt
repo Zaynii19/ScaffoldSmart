@@ -5,12 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.databinding.ScafoldInfoRcvItemBinding
-import com.example.scaffoldsmart.admin.admin_models.ScafoldInfoModel
-import com.example.scaffoldsmart.client.client_models.ClientScafoldInfoModel
+import com.example.scaffoldsmart.client.client_models.ClientScaffoldInfoModel
 import com.example.scaffoldsmart.databinding.ClientScafoldInfoRcvItemBinding
 
-class ClientScafoldRcvAdapter (val context: Context, private var infoList: ArrayList<ClientScafoldInfoModel>): RecyclerView.Adapter<ClientScafoldRcvAdapter.MyInfoViewHolder>() {
+class ClientScaffoldRcvAdapter (val context: Context, private var infoList: ArrayList<ClientScaffoldInfoModel>): RecyclerView.Adapter<ClientScaffoldRcvAdapter.MyInfoViewHolder>() {
     class MyInfoViewHolder(val binding: ClientScafoldInfoRcvItemBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyInfoViewHolder {
@@ -22,8 +20,10 @@ class ClientScafoldRcvAdapter (val context: Context, private var infoList: Array
     }
 
     override fun onBindViewHolder(holder: MyInfoViewHolder, position: Int) {
-        holder.binding.srNo.text = (position + 1).toString()
-        holder.binding.rent.text = infoList[position].rent
+        holder.binding.srNo.text = buildString {
+            append(position + 1)
+        }
+        holder.binding.rent.text = "${infoList[position].rent}"
         holder.binding.duration.text = infoList[position].duration
         holder.binding.status.setBackgroundResource(
             when (infoList[position].rentStatus) {
@@ -36,9 +36,8 @@ class ClientScafoldRcvAdapter (val context: Context, private var infoList: Array
 
     }
 
-    fun updateList(newItems: ArrayList<ClientScafoldInfoModel>) {
+    fun updateList(newItems: ArrayList<ClientScaffoldInfoModel>) {
         infoList = newItems
         notifyDataSetChanged()
     }
-
 }

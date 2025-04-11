@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
@@ -68,6 +69,7 @@ class HomeFragment : Fragment() {
     private var smartContract: SmartContract? = null
     private var itemList = ArrayList<InventoryModel>()
     private lateinit var viewModelI: InventoryViewModel
+    private lateinit var dialog: AlertDialog
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -273,26 +275,30 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showReqDetailsDialog(reqList: List<RentalModel>, index: Int) {
         if (reqList.isEmpty()) return // Exit if the list is empty
 
         val currentReq = reqList[index]
+
         val customDialog = LayoutInflater.from(requireActivity()).inflate(R.layout.rentals_details_dialog, null)
-        val builder = MaterialAlertDialogBuilder(requireActivity())
         val binder = RentalsDetailsDialogBinding.bind(customDialog)
 
-        // Set dialog details
         binder.clientName.text = currentReq.clientName
         binder.address.text = currentReq.clientAddress
         binder.phoneNum.text = currentReq.clientPhone
         binder.email.text = currentReq.clientEmail
         binder.cnic.text = currentReq.clientCnic
+        binder.rent.text = buildString {
+            append(currentReq.rent)
+            append(" .Rs")
+        }
+        binder.rentalAddress.text = currentReq.rentalAddress
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
-        binder.rent.text = currentReq.rent
-        binder.rentalAddress.text = currentReq.rentalAddress
+
+        // Regular quantities (just numbers)
         setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
-        setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
         setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)
         setViewVisibilityAndText(binder.wench, currentReq.wench, binder.entry11)
         setViewVisibilityAndText(binder.slugPumps, currentReq.pumps, binder.entry12)
@@ -300,7 +306,19 @@ class HomeFragment : Fragment() {
         setViewVisibilityAndText(binder.generators, currentReq.generators, binder.entry14)
         setViewVisibilityAndText(binder.wheel, currentReq.wheel, binder.entry15)
 
-        builder.setView(customDialog)
+        // Special case for pipe length (with "feet" unit)
+        if (currentReq.pipesLength != 0) {
+            binder.pipesLength.text = buildString {
+                append(currentReq.pipesLength)
+                append(" feet")
+            }
+            binder.entry9.visibility = View.VISIBLE
+        } else {
+            binder.entry9.visibility = View.GONE
+        }
+
+        dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(customDialog)
             .setTitle("Rental Request Details ${index + 1}")
             .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
             .setPositiveButton("Approve") { dialog, _ ->
@@ -309,8 +327,8 @@ class HomeFragment : Fragment() {
                 smartContract!!.createScaffoldingContractPdf(
                     requireActivity(), true, name, company, email, phone, address, currentReq.clientName, currentReq.clientPhone,
                     currentReq.clientEmail, currentReq.clientCnic, currentReq.clientAddress, currentReq.rentalAddress, currentReq.startDuration,
-                    currentReq.endDuration, currentReq.pipes, currentReq.pipesLength, currentReq.joints, currentReq.wench,
-                    currentReq.motors, currentReq.pumps, currentReq.generators, currentReq.wheel
+                    currentReq.endDuration, currentReq.pipes.toString(), currentReq.pipesLength.toString(), currentReq.joints.toString(),
+                    currentReq.wench.toString(), currentReq.motors.toString(), currentReq.pumps.toString(), currentReq.generators.toString(), currentReq.wheel.toString()
                 )
                 updateInventory(currentReq.pipes, currentReq.joints, currentReq.wench, currentReq.pumps, currentReq.motors, currentReq.generators, currentReq.wheel)
                 dialog.dismiss()
@@ -346,9 +364,10 @@ class HomeFragment : Fragment() {
             }
     }
 
-    private fun setViewVisibilityAndText(view: TextView, text: String, entry: ConstraintLayout) {
-        if (text.isNotEmpty()) {
-            view.text = text
+    private fun setViewVisibilityAndText(view: TextView, quantity: Int, entry: ConstraintLayout) {
+        if (quantity != 0) {
+            view.text = "$quantity"
+            entry.visibility = View.VISIBLE
         } else {
             entry.visibility = View.GONE
         }
@@ -419,58 +438,58 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateInventory(
-        pipeQuantity: String,
-        jointsQuantity: String,
-        wenchQuantity: String,
-        pumpsQuantity: String,
-        motorsQuantity: String,
-        generatorsQuantity: String,
-        wheelQuantity: String
+        pipeQuantity: Int,
+        jointsQuantity: Int,
+        wenchQuantity: Int,
+        pumpsQuantity: Int,
+        motorsQuantity: Int,
+        generatorsQuantity: Int,
+        wheelQuantity: Int
     ) {
         itemList.forEach { item ->
             val lowerName = item.itemName.lowercase()
             val databaseRef = Firebase.database.reference.child("Inventory").child(item.itemId)
 
             when {
-                lowerName.contains("pipe") && pipeQuantity.isNotEmpty() -> {
-                    if (item.quantity.toInt() >= pipeQuantity.toInt()) {
-                        val remaining = (item.quantity.toInt() - pipeQuantity.toInt()).toString()
+                lowerName.contains("pipe") && pipeQuantity.toString().isNotEmpty() -> {
+                    if (item.quantity >= pipeQuantity) {
+                        val remaining = (item.quantity - pipeQuantity).toString()
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
-                lowerName.contains("joint") && jointsQuantity.isNotEmpty() -> {
-                    if (item.quantity.toInt() >= jointsQuantity.toInt()) {
-                        val remaining = (item.quantity.toInt() - jointsQuantity.toInt()).toString()
+                lowerName.contains("joint") && jointsQuantity.toString().isNotEmpty() -> {
+                    if (item.quantity >= jointsQuantity) {
+                        val remaining = (item.quantity - jointsQuantity).toString()
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
-                lowerName.contains("wench") && wenchQuantity.isNotEmpty() -> {
-                    if (item.quantity.toInt() >= wenchQuantity.toInt()) {
-                        val remaining = (item.quantity.toInt() - wenchQuantity.toInt()).toString()
+                lowerName.contains("wench") && wenchQuantity.toString().isNotEmpty() -> {
+                    if (item.quantity >= wenchQuantity) {
+                        val remaining = (item.quantity - wenchQuantity).toString()
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
-                lowerName.contains("pump") && pumpsQuantity.isNotEmpty() -> {
-                    if (item.quantity.toInt() >= pumpsQuantity.toInt()) {
-                        val remaining = (item.quantity.toInt() - pumpsQuantity.toInt()).toString()
+                lowerName.contains("pump") && pumpsQuantity.toString().isNotEmpty() -> {
+                    if (item.quantity >= pumpsQuantity) {
+                        val remaining = (item.quantity - pumpsQuantity).toString()
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
-                lowerName.contains("motor") && motorsQuantity.isNotEmpty() -> {
-                    if (item.quantity.toInt() >= motorsQuantity.toInt()) {
-                        val remaining = (item.quantity.toInt() - motorsQuantity.toInt()).toString()
+                lowerName.contains("motor") && motorsQuantity.toString().isNotEmpty() -> {
+                    if (item.quantity >= motorsQuantity) {
+                        val remaining = (item.quantity - motorsQuantity).toString()
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
-                lowerName.contains("generator") && generatorsQuantity.isNotEmpty() -> {
-                    if (item.quantity.toInt() >= generatorsQuantity.toInt()) {
-                        val remaining = (item.quantity.toInt() - generatorsQuantity.toInt()).toString()
+                lowerName.contains("generator") && generatorsQuantity.toString().isNotEmpty() -> {
+                    if (item.quantity >= generatorsQuantity) {
+                        val remaining = (item.quantity - generatorsQuantity).toString()
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
-                lowerName.contains("wheel") && wheelQuantity.isNotEmpty() -> {
-                    if (item.quantity.toInt() >= wheelQuantity.toInt()) {
-                        val remaining = (item.quantity.toInt() - wheelQuantity.toInt()).toString()
+                lowerName.contains("wheel") && wheelQuantity.toString().isNotEmpty() -> {
+                    if (item.quantity >= wheelQuantity) {
+                        val remaining = (item.quantity - wheelQuantity).toString()
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }

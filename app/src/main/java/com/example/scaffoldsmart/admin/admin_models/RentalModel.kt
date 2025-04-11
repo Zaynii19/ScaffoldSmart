@@ -13,16 +13,16 @@ class RentalModel : Serializable {
     var rentalAddress = ""
     var startDuration = ""
     var endDuration = ""
-    var pipes = ""
-    var pipesLength = ""
-    var joints = ""
-    var wench = ""
-    var motors = ""
-    var pumps = ""
-    var generators = ""
-    var wheel = ""
+    var pipes = 0
+    var pipesLength = 0
+    var joints = 0
+    var wench = 0
+    var motors = 0
+    var pumps = 0
+    var generators = 0
+    var wheel = 0
     var status = ""
-    var rent = ""
+    var rent = 0
     var rentStatus = ""
 
     constructor()
@@ -38,17 +38,15 @@ class RentalModel : Serializable {
         rentalAddress: String,
         startDuration: String,
         endDuration: String,
-        pipes: String,
-        pipesLength: String,
-        joints: String,
-        wench: String,
-        motors: String,
-        pumps: String,
-        generators: String,
-        wheel: String,
-        status: String,
-        rent: String,
-        rentStatus: String
+        pipes: Int,
+        pipesLength: Int,
+        joints: Int,
+        wench: Int,
+        motors: Int,
+        pumps: Int,
+        generators: Int,
+        wheel: Int,
+        rent: Int,
     ) {
         this.clientID = clientID
         this.rentalId = rentalId
@@ -68,8 +66,6 @@ class RentalModel : Serializable {
         this.pumps = pumps
         this.generators = generators
         this.wheel = wheel
-        this.status = status
         this.rent = rent
-        this.rentStatus = rentStatus
     }
 }

@@ -38,7 +38,6 @@ class ProfileFragment : Fragment() {
     private var company: String = ""
     private var address: String = ""
     private var phone: String = ""
-    private var bottomSheetDialog: BottomSheetDialogFragment? = null
     private lateinit var onesignal: OnesignalService
     private lateinit var chatPreferences: SharedPreferences
     private var senderUid: String? = null
@@ -172,7 +171,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun showBottomSheet() {
-        bottomSheetDialog = ReminderSendFragment()
-        bottomSheetDialog?.show(requireActivity().supportFragmentManager, "Reminder")
+        val bottomSheetDialog = ReminderSendFragment()
+        bottomSheetDialog.show(requireActivity().supportFragmentManager, "Reminder")
     }
 }

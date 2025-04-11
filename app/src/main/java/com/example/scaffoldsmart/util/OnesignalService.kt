@@ -173,14 +173,14 @@ class OnesignalService(val context: Context) {
         rentalAddress: String,
         startDuration: String,
         endDuration: String,
-        pipes: String,
-        pipesLength: String,
-        joints: String,
-        wench: String,
-        pumps: String,
-        motors: String,
-        generators: String,
-        wheel: String,
+        pipes: Int,
+        pipesLength: Int,
+        joints: Int,
+        wench: Int,
+        pumps: Int,
+        motors: Int,
+        generators: Int,
+        wheel: Int,
         rent: Int) {
         val message = "A new rental request has been submitted. Click to view rental details."
         val title = "Rental Request Alert"
@@ -217,6 +217,7 @@ class OnesignalService(val context: Context) {
             put("small_icon", "app_logo")
             put("large_icon", "app_logo")
             put("android_vibrate", true)
+            put("android_vibrate_timings", "[500, 1000, 500, 2000]")
             put("android_lights", true)
             put("priority", 10) // Set priority to high (10)
             put("data", customData) // Attach custom data

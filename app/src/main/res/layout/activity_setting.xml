@@ -99,7 +99,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/inventoryThresholdSetting"
+        android:id="@+id/lowInventoryAlert"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_50sdp"
         android:layout_marginTop="@dimen/_20sdp"
@@ -156,7 +156,7 @@
         android:layout_marginTop="@dimen/_20sdp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inventoryThresholdSetting">
+        app:layout_constraintTop_toBottomOf="@+id/lowInventoryAlert">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView3"

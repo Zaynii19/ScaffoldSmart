@@ -18,6 +18,7 @@ import com.example.scaffoldsmart.util.Encryption
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ActivitySettingBinding
 import com.example.scaffoldsmart.admin.admin_fragments.AdminUpdateFragment
+import com.example.scaffoldsmart.admin.admin_fragments.InventoryThresholdFragment
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -57,7 +58,11 @@ class SettingActivity : AppCompatActivity() {
         viewModel.retrieveAdminData()
 
         binding.accountSettingBtn.setOnClickListener {
-            showBottomSheet()
+            showUpdateBottomSheet()
+        }
+
+        binding.lowInventoryAlert.setOnClickListener {
+            showInventoryThresholdBottomSheet()
         }
 
     }
@@ -67,7 +72,7 @@ class SettingActivity : AppCompatActivity() {
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
     }
 
-    private fun showBottomSheet() {
+    private fun showUpdateBottomSheet() {
         val bottomSheetDialog: BottomSheetDialogFragment = AdminUpdateFragment.newInstance(object : AdminUpdateFragment.OnAdminUpdatedListener {
             override fun onAdminUpdated(name: String, email: String, pass: String, company: String, phone: String, address: String) {
                 updateAdminData(name, email, pass, company, address, phone)
@@ -196,6 +201,11 @@ class SettingActivity : AppCompatActivity() {
             // Set button color
             getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
         }
+    }
+
+    private fun showInventoryThresholdBottomSheet() {
+        val bottomSheetDialog = InventoryThresholdFragment()
+        bottomSheetDialog.show(this.supportFragmentManager, "InventoryThreshold")
     }
 
     override fun onResume() {

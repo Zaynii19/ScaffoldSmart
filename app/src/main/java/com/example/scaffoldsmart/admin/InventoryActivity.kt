@@ -138,11 +138,11 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     private fun showBottomSheet(item: InventoryModel) {
         val bottomSheetDialog: BottomSheetDialogFragment = AddInventoryFragment.newInstance(
             object : OnInventoryUpdatedListener {
-                override fun onInventoryUpdated(itemId: String, itemName: String, price: String, quantity: String, availability: String) {
+                override fun onInventoryUpdated(itemId: String, itemName: String, price: Int, quantity: Int, availability: String) {
                     updateInventoryItem(item.itemId, itemName, price, quantity, availability)
                 }
 
-                override fun onInventoryAdded(itemName: String, price: String, quantity: String, availability: String) {
+                override fun onInventoryAdded(itemName: String, price: Int, quantity: Int, availability: String) {
                     storeInventoryItem(itemName, price, quantity, availability)
                 }
             }
@@ -164,7 +164,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     }
 
     // Store inventory in common node accessible by both admin and client
-    private fun storeInventoryItem(itemName: String, price: String, quantity: String, availability: String) {
+    private fun storeInventoryItem(itemName: String, price: Int, quantity: Int, availability: String) {
         // Reference to the inventory in Firebase
         val databaseRef = Firebase.database.reference.child("Inventory")
         val newItemRef = databaseRef.push()
@@ -188,7 +188,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         }
     }
 
-    private fun updateInventoryItem(itemId: String, itemName: String, price: String, quantity: String, availability: String) {
+    private fun updateInventoryItem(itemId: String, itemName: String, price: Int, quantity: Int, availability: String) {
         // Reference to the specific item in Firebase
         val databaseRef = Firebase.database.reference.child("Inventory")
             .child(itemId) // Reference to the specific item using itemId

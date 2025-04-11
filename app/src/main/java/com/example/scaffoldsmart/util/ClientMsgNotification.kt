@@ -23,7 +23,8 @@ class ClientMsgNotification {
     ) {
         val title = "Message from Admin"
         createNotificationChannel(context)
-        showNotificationWithData(context, title, message, friendName, receiverUid)
+        val notificationId = message.hashCode() // Unique ID based on item name
+        showNotificationWithData(context, title, message, friendName, receiverUid, notificationId)
     }
 
     // Create notification channel
@@ -49,7 +50,8 @@ class ClientMsgNotification {
         title: String,
         message: String,
         friendName: String?,
-        receiverUid: String?
+        receiverUid: String?,
+        notificationId: Int
     ) {
         // Intent to launch EnterPinActivity when the notification is clicked
         val intent = Intent(context, ClientChatActivity::class.java).apply {
@@ -72,7 +74,7 @@ class ClientMsgNotification {
 
         val notificationManager = NotificationManagerCompat.from(context)
         try {
-            notificationManager.notify(1, notification)
+            notificationManager.notify(notificationId, notification)
             Log.d("NotiDebug", "Notification created with Title: $title ")
         } catch (e: SecurityException) {
             Log.e("NotiDebug", "Error to create notification: ${e.printStackTrace()}")

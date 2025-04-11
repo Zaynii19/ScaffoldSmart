@@ -15,8 +15,8 @@ import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.ChatViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.client.ClientSettingActivity
-import com.example.scaffoldsmart.client.client_adapters.ClientScafoldRcvAdapter
-import com.example.scaffoldsmart.client.client_models.ClientScafoldInfoModel
+import com.example.scaffoldsmart.client.client_adapters.ClientScaffoldRcvAdapter
+import com.example.scaffoldsmart.client.client_models.ClientScaffoldInfoModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
 import com.example.scaffoldsmart.util.DateFormater
@@ -30,9 +30,9 @@ class ClientHomeFragment : Fragment() {
     private var email: String = ""
     private var role: String = ""
     private var clientID: String = ""
-    private var infoList = ArrayList<ClientScafoldInfoModel>()
+    private var infoList = ArrayList<ClientScaffoldInfoModel>()
     private var dueRequests = ArrayList<RentalModel>()
-    private lateinit var adapter: ClientScafoldRcvAdapter
+    private lateinit var adapter: ClientScaffoldRcvAdapter
     private lateinit var viewModel: ClientViewModel
     private lateinit var onesignal: OnesignalService
     private lateinit var rentViewModel: RentalViewModel
@@ -85,7 +85,7 @@ class ClientHomeFragment : Fragment() {
 
     private fun setRcv() {
         binding.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        adapter = ClientScafoldRcvAdapter(requireActivity(), infoList)
+        adapter = ClientScaffoldRcvAdapter(requireActivity(), infoList)
         binding.rcv.adapter = adapter
         binding.rcv.setHasFixedSize(true)
     }
@@ -141,7 +141,7 @@ class ClientHomeFragment : Fragment() {
             val durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
 
             // Create a ScaffoldInfoModel instance and add to infoList
-            infoList.add(ClientScafoldInfoModel(rental.rent, durationInMonths, rental.rentStatus))
+            infoList.add(ClientScaffoldInfoModel(rental.rent, durationInMonths, rental.rentStatus))
             adapter.updateList(infoList)
         }
     }
@@ -149,7 +149,7 @@ class ClientHomeFragment : Fragment() {
     private fun totalDueRent(dueRequests: ArrayList<RentalModel>): Int {
         var total = 0
         for (request in dueRequests) {
-            total += request.rent.toInt()
+            total += request.rent
         }
         return total
     }

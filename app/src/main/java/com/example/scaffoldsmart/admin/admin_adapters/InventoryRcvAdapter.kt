@@ -72,7 +72,7 @@ class InventoryRcvAdapter(
         val binder = InventoryDetailsDialogBinding.bind(customDialog)
 
         binder.itemName.text = item.itemName
-        binder.itemQuantity.text = item.quantity
+        binder.itemQuantity.text = item.quantity.toString()
         binder.availability.text = item.availability
         val validItemNames = listOf("pipes", "pipe", "scaffolding pipe")
         if (validItemNames.any { it.equals(item.itemName, ignoreCase = true) }) {

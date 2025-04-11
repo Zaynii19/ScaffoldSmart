@@ -80,7 +80,11 @@ class ClientInventoryFragment : Fragment() {
                 if (client.cnic.isEmpty() && client.phone.isEmpty() && client.address.isEmpty()) {
                     showVerificationDialog()
                 } else {
-                    showReqBottomSheet()
+                    if (itemList.isEmpty()) {
+                        Toast.makeText(requireActivity(), "No inventory found. Please contact Admin", Toast.LENGTH_SHORT).show()
+                    } else {
+                        showReqBottomSheet()
+                    }
                 }
             }
         }
@@ -135,14 +139,14 @@ class ClientInventoryFragment : Fragment() {
                 rentalAddress: String,
                 startDuration: String,
                 endDuration: String,
-                pipes: String,
-                pipesLength: String,
-                joints: String,
-                wench: String,
-                pumps: String,
-                motors: String,
-                generators: String,
-                wheel: String,
+                pipes: Int,
+                pipesLength: Int,
+                joints: Int,
+                wench: Int,
+                pumps: Int,
+                motors: Int,
+                generators: Int,
+                wheel: Int,
                 rent: Int
             ) {
                 val onesignal = OnesignalService(requireActivity())
@@ -221,8 +225,4 @@ class ClientInventoryFragment : Fragment() {
             }
         })
     }*/
-
-    companion object {
-        var notificationId = ""
-    }
 }

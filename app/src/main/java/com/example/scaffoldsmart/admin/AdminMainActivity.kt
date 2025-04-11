@@ -15,6 +15,7 @@ import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.ActivityMainAdminBinding
 import com.example.scaffoldsmart.admin.admin_service.AdminMessageListenerService
+import com.example.scaffoldsmart.admin.admin_service.LowInventoryAlertService
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.Firebase
@@ -61,6 +62,8 @@ class AdminMainActivity : AppCompatActivity() {
         onesignal.getOneSignalNoti(prevNotiCompletedAt, prevNotificationId)
 
         getMessageNoti()
+
+        getLowInventoryAlert()
 
         // Get the FCM device token
         /*FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
@@ -134,6 +137,11 @@ class AdminMainActivity : AppCompatActivity() {
         startService(intent)
     }
 
+    private fun getLowInventoryAlert() {
+        val intent = Intent(this, LowInventoryAlertService::class.java)
+        startService(intent)
+    }
+
     companion object {
         fun handleReqData(reqData: JSONObject, requestId: String) {
             reqData.let { data ->
@@ -157,8 +165,9 @@ class AdminMainActivity : AppCompatActivity() {
                 val totalRent = data.optString("rent", "N/A")
 
                 storeRentalReq(clientID, requestId, clientName, clientAddress, clientEmail, clientPhone,
-                    clientCnic, rentalAddress, startDuration, endDuration, pipes, pipesLength, joints,
-                    wench, pumps, motors, generators, wheel, totalRent)
+                    clientCnic, rentalAddress, startDuration, endDuration, pipes.toInt(), pipesLength.toInt(),
+                    joints.toInt(), wench.toInt(), pumps.toInt(), motors.toInt(), generators.toInt(),
+                    wheel.toInt(), totalRent.toInt())
             }
         }
 
@@ -173,15 +182,15 @@ class AdminMainActivity : AppCompatActivity() {
             rentalAddress: String,
             startDuration: String,
             endDuration: String,
-            pipes: String,
-            pipesLength: String,
-            joints: String,
-            wench: String,
-            pumps: String,
-            motors: String,
-            generators: String,
-            wheel: String,
-            totalRent: String
+            pipes: Int,
+            pipesLength: Int,
+            joints: Int,
+            wench: Int,
+            pumps: Int,
+            motors: Int,
+            generators: Int,
+            wheel: Int,
+            totalRent: Int
         ) {
             val databaseRef = Firebase.database.reference.child("Rentals")
 
@@ -196,7 +205,7 @@ class AdminMainActivity : AppCompatActivity() {
                             clientID, requestId, clientName, clientEmail, clientCnic,
                             clientPhone, clientAddress, rentalAddress, startDuration,
                             endDuration, pipes, pipesLength, joints, wench, motors,
-                            pumps, generators, wheel, "", totalRent, ""
+                            pumps, generators, wheel, totalRent
                         )
 
                         // Store with requestId as the key

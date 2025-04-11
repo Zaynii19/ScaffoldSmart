@@ -162,5 +162,15 @@
     <string name="total_rent">Total Rent: </string>
     <string name="_0_rs">0. Rs</string>
     <string name="_rental_address">Rental Address:</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="set_inventory_threshold">Set Inventory Threshold</string>
+    <string name="pipes_threshold">Pipes Threshold</string>
+    <string name="joints_threshold">Joints Threshold</string>
+    <string name="wench_threshold">Wench Threshold</string>
+    <string name="pumps_threshold">Pumps Threshold</string>
+    <string name="motors_threshold">Motors Threshold</string>
+    <string name="generators_threshold">Generators Threshold</string>
+    <string name="wheel_threshold">Wheel Threshold</string>
 
 </resources>

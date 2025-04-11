@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.admin.admin_adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -11,12 +12,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.admin_adapters.InventoryRcvAdapter.OnItemActionListener
-import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.RentalRcvItemBinding
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
-import com.example.scaffoldsmart.util.SmartContract
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class RentalRcvAdapter(
@@ -48,13 +46,13 @@ class RentalRcvAdapter(
         holder.binding.clientName.text = currentItem.clientName
 
         val itemsList = mutableListOf<String>()
-        if (currentItem.pipes.isNotEmpty()) itemsList.add("Pipes")
-        if (currentItem.joints.isNotEmpty()) itemsList.add("Joints")
-        if (currentItem.wench.isNotEmpty()) itemsList.add("Wench")
-        if (currentItem.pumps.isNotEmpty()) itemsList.add("Pumps")
-        if (currentItem.generators.isNotEmpty()) itemsList.add("Generators")
-        if (currentItem.wheel.isNotEmpty()) itemsList.add("Wheel")
-        if (currentItem.motors.isNotEmpty()) itemsList.add("Motors")
+        if (currentItem.pipes.toString().isNotEmpty()) itemsList.add("Pipes")
+        if (currentItem.joints.toString().isNotEmpty()) itemsList.add("Joints")
+        if (currentItem.wench.toString().isNotEmpty()) itemsList.add("Wench")
+        if (currentItem.pumps.toString().isNotEmpty()) itemsList.add("Pumps")
+        if (currentItem.generators.toString().isNotEmpty()) itemsList.add("Generators")
+        if (currentItem.wheel.toString().isNotEmpty()) itemsList.add("Wheel")
+        if (currentItem.motors.toString().isNotEmpty()) itemsList.add("Motors")
 
         if (itemsList.isNotEmpty()) {
             holder.binding.rentalItems.text = itemsList.joinToString(", ")
@@ -92,18 +90,33 @@ class RentalRcvAdapter(
         binder.phoneNum.text = currentReq.clientPhone
         binder.email.text = currentReq.clientEmail
         binder.cnic.text = currentReq.clientCnic
+        binder.rent.text = buildString {
+            append(currentReq.rent)
+            append(" .Rs")
+        }
+        binder.rentalAddress.text = currentReq.rentalAddress
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
-        binder.rent.text = currentReq.rent
-        binder.rentalAddress.text = currentReq.rentalAddress
+
+        // Regular quantities (just numbers)
         setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
-        setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
         setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)
         setViewVisibilityAndText(binder.wench, currentReq.wench, binder.entry11)
         setViewVisibilityAndText(binder.slugPumps, currentReq.pumps, binder.entry12)
         setViewVisibilityAndText(binder.motors, currentReq.motors, binder.entry13)
         setViewVisibilityAndText(binder.generators, currentReq.generators, binder.entry14)
         setViewVisibilityAndText(binder.wheel, currentReq.wheel, binder.entry15)
+
+        // Special case for pipe length (with "feet" unit)
+        if (currentReq.pipesLength != 0) {
+            binder.pipesLength.text = buildString {
+                append(currentReq.pipesLength)
+                append(" feet")
+            }
+            binder.entry9.visibility = View.VISIBLE
+        } else {
+            binder.entry9.visibility = View.GONE
+        }
 
         builder.setView(customDialog)
             .setTitle("Rental Details")
@@ -120,9 +133,9 @@ class RentalRcvAdapter(
             }
     }
 
-    private fun setViewVisibilityAndText(view: TextView, text: String, entry: ConstraintLayout) {
-        if (text.isNotEmpty()) {
-            view.text = text
+    private fun setViewVisibilityAndText(view: TextView, text: Int, entry: ConstraintLayout) {
+        if (text.toString().isNotEmpty()) {
+            view.text = "$text"
         } else {
             entry.visibility = View.GONE
         }

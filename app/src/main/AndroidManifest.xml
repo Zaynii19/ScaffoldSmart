@@ -68,6 +68,10 @@
             android:enabled="true"
             android:exported="false" />
         <service
+            android:name=".admin.admin_service.LowInventoryAlertService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
             android:name=".client.client_service.ClientMessageListenerService"
             android:enabled="true"
             android:exported="false" />

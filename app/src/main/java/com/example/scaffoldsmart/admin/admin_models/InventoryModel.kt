@@ -5,13 +5,14 @@ import java.io.Serializable
 class InventoryModel : Serializable {
     var itemId = ""
     var itemName = ""
-    var price = ""
-    var quantity = ""
+    var price = 0
+    var quantity = 0
     var availability = ""
+    var threshold = 0
 
     constructor()
 
-    constructor(itemId: String, itemName: String, price: String, quantity: String, availability: String) {
+    constructor(itemId: String, itemName: String, price: Int, quantity: Int, availability: String) {
         this.itemId = itemId
         this.itemName = itemName
         this.price = price

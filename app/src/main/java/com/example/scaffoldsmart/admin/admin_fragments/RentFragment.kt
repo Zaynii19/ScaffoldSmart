@@ -21,15 +21,7 @@ import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.FragmentRentBinding
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
-import com.example.scaffoldsmart.util.DateFormater
 import com.example.scaffoldsmart.util.SmartContract
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import java.text.ParseException
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
     private val binding by lazy {
@@ -147,8 +139,8 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
         smartContract!!.createScaffoldingContractPdf(
             requireActivity(), false, name, company, email, phone, address, rental.clientName, rental.clientPhone,
             rental.clientEmail, rental.clientCnic, rental.clientAddress, rental.rentalAddress, rental.startDuration,
-            rental.endDuration, rental.pipes, rental.pipesLength, rental.joints, rental.wench, rental.motors,
-            rental.pumps, rental.generators, rental.wheel
+            rental.endDuration, rental.pipes.toString(), rental.pipesLength.toString(), rental.joints.toString(),
+            rental.wench.toString(), rental.motors.toString(), rental.pumps.toString(), rental.generators.toString(), rental.wheel.toString()
         )
     }
 }

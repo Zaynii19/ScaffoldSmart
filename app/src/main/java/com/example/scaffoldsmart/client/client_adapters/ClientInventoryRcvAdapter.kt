@@ -1,5 +1,6 @@
 package com.example.scaffoldsmart.client.client_adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -39,6 +40,7 @@ class ClientInventoryRcvAdapter (val context: Context, private var itemList: Arr
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun inventoryDetailsDialog(item: InventoryModel) {
         val customDialog = LayoutInflater.from(context).inflate(R.layout.inventory_details_dialog, null)
         val builder = MaterialAlertDialogBuilder(context)
@@ -48,7 +50,7 @@ class ClientInventoryRcvAdapter (val context: Context, private var itemList: Arr
         binder.availability.visibility = View.GONE
 
         binder.itemName.text = item.itemName
-        binder.itemQuantity.text = item.quantity
+        binder.itemQuantity.text = item.quantity.toString()
         val validItemNames = listOf("pipes", "pipe", "scaffolding pipe")
         if (validItemNames.any { it.equals(item.itemName, ignoreCase = true) }) {
             binder.cardView3.visibility = View.VISIBLE

@@ -17,14 +17,9 @@ class ReminderRcvAdapter(
     val context: Context,
     private var rentalList: ArrayList<RentalModel>,
     private val oneSignal: OnesignalService
-    //private val listener: OnItemActionListener
 ): RecyclerView.Adapter<ReminderRcvAdapter.MyReminderViewHolder>() {
 
     class MyReminderViewHolder(val binding: SendReminderRcvItemBinding): RecyclerView.ViewHolder(binding.root)
-
-/*    interface OnItemActionListener {
-        fun onDialogDismissed()
-    }*/
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyReminderViewHolder {
         return MyReminderViewHolder(SendReminderRcvItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -54,8 +49,6 @@ class ReminderRcvAdapter(
                 // Disable the button if clientObj is null
                 holder.binding.sendBtn.isEnabled = false
                 holder.binding.sendBtn.backgroundTintList = ContextCompat.getColorStateList(context, R.color.dark_gray)
-                // Notify the fragment about the dismissal
-                //listener.onDialogDismissed()
             } else {
                 Toast.makeText(context, "Please check your internet connection and try again", Toast.LENGTH_SHORT).show()
             }

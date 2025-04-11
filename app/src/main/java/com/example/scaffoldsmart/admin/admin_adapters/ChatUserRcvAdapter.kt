@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.ChatActivity
 import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
-import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.ChatUserItemBinding
 
 class ChatUserRcvAdapter(val context: Context, private var userList: ArrayList<ChatUserModel>): RecyclerView.Adapter<ChatUserRcvAdapter.MyChatUserViewHolder>() {
