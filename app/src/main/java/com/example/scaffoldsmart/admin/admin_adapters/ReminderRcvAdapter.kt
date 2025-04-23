@@ -41,7 +41,7 @@ class ReminderRcvAdapter(
         holder.binding.sendBtn.setOnClickListener {
             if (CheckNetConnectvity.hasInternetConnection(context)) {
                 val dueDate = DateFormater.formatDateString(currentRent.endDuration)
-                val title = "Scaffold Reminder"
+                val title = "Scaffold Rental Reminder"
                 val msg = "Your scaffold rental is about to expire. Due date is $dueDate"
                 val externalId = listOf(currentRent.clientEmail)
                 oneSignal.sendNotiByOneSignalToExternalId(title, msg, externalId)

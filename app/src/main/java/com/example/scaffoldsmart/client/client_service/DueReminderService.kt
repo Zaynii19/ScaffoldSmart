@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.admin.admin_service
+package com.example.scaffoldsmart.client.client_service
 
 import android.annotation.SuppressLint
 import android.app.NotificationChannel
@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.IBinder
 import android.util.Log
@@ -13,22 +14,26 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.AdminMainActivity
-import com.example.scaffoldsmart.admin.admin_models.InventoryModel
+import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
-class LowInventoryAlertService : Service() {
+class DueReminderService : Service() {
 
     private lateinit var database: FirebaseDatabase
-    private var itemList = ArrayList<InventoryModel>()
+    private var rentalList = ArrayList<RentalModel>()
+    private var clientUid: String? = null
+    private lateinit var chatPreferences: SharedPreferences
 
     override fun onCreate() {
         super.onCreate()
         database = FirebaseDatabase.getInstance()
-        retrieveInventoryData() // Fetch Inventory data
-        Log.d("LowInventoryService", "Service created")
+        chatPreferences = getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
+        clientUid = chatPreferences.getString("SenderUid", null)
+        retrieveRentalData() // Fetch Inventory data
+        Log.d("DueReminderService", "Service created")
     }
 
     @SuppressLint("NewApi")
@@ -36,39 +41,45 @@ class LowInventoryAlertService : Service() {
         return START_STICKY // Service will be restarted if terminated
     }
 
-    private fun retrieveInventoryData() {
-        database.reference.child("Inventory")
+    private fun retrieveRentalData() {
+        database.reference.child("Rentals")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    itemList.clear() // Clear old data
+                    rentalList.clear() // Clear old data
                     for (child in snapshot.children) {
-                        val inventoryItem = child.getValue(InventoryModel::class.java)
-                        if (inventoryItem != null) {
-                            itemList.add(inventoryItem)
+                        val rental = child.getValue(RentalModel::class.java)
+                        if (
+                            rental != null &&
+                            rental.status.isNotEmpty() &&
+                            rental.clientID == clientUid &&
+                            rental.rentStatus == "ongoing"
+                            ) {
+                            rental.let {
+                                rentalList.add(it)
+                            }
                         }
                     }
+                    Log.d("DueReminderService", "Rental Data: ${rentalList.size} ")
                     // Check thresholds AFTER all items are loaded
-                    checkInventoryThresholds(itemList)
+                    checkRemainingDays(rentalList)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("LowInventoryService", "Failed to retrieve inventory", error.toException())
+                    Log.e("DueReminderService", "Failed to retrieve rentals", error.toException())
                 }
             })
     }
 
-    private fun checkInventoryThresholds(items: List<InventoryModel>) {
-        items.forEach { item ->
-            if (item.quantity < item.threshold) {
-                notifyLowInventory(item.itemName, item.quantity, item.threshold)
-            }
+    private fun checkRemainingDays(rentals: List<RentalModel>) {
+        rentals.forEach { rental ->
+
         }
     }
 
-    private fun notifyLowInventory(itemName: String, qty: Int, threshold: Int) {
-        val title = "Low Inventory Alert"
-        val message = "$itemName is running low!. Current Quantity: $qty, Threshold Value: $threshold)"
-        val notificationId = itemName.hashCode() // Unique ID based on item name
+    private fun notifyLowInventory(dueDate: String) {
+        val title = "Due Date Reminder"
+        val message = "Your scaffold rental is about to expire. Due date is $dueDate"
+        val notificationId = dueDate.hashCode() // Unique ID based on item name
         handleNotification(title, message, notificationId)
     }
 
@@ -80,18 +91,18 @@ class LowInventoryAlertService : Service() {
 
     // Create notification channel
     private fun createNotificationChannel() {
-        val channelId = "low_inventory_channel"
-        val channelName = "Alert Notifications"
+        val channelId = "reminder_channel"
+        val channelName = "Reminder Notifications"
         val importance = NotificationManager.IMPORTANCE_HIGH // Set importance level
         val channel = NotificationChannel(channelId, channelName, importance).apply {
-            description = "Channel for alert notifications"
+            description = "Channel for reminder notifications"
             enableLights(true)
             lightColor = Color.RED
             enableVibration(true)
         }
 
         // Register the channel with the system
-        val notificationManager = this@LowInventoryAlertService.getSystemService(NotificationManager::class.java)
+        val notificationManager = this@DueReminderService.getSystemService(NotificationManager::class.java)
         notificationManager?.createNotificationChannel(channel)
     }
 
@@ -102,13 +113,13 @@ class LowInventoryAlertService : Service() {
         notificationId: Int
     ) {
         // Intent to launch EnterPinActivity when the notification is clicked
-        val intent = Intent(this@LowInventoryAlertService, AdminMainActivity::class.java).apply {
+        val intent = Intent(this@DueReminderService, AdminMainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
-        val pendingIntent = PendingIntent.getActivity(this@LowInventoryAlertService, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getActivity(this@DueReminderService, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val channelId = "low_inventory_channel"
-        val notification = NotificationCompat.Builder(this@LowInventoryAlertService, channelId)
+        val channelId = "reminder_channel"
+        val notification = NotificationCompat.Builder(this@DueReminderService, channelId)
             .setContentIntent(pendingIntent) // Perform action when clicked
             .setSmallIcon(R.drawable.app_logo)
             .setContentTitle(title)
@@ -118,12 +129,12 @@ class LowInventoryAlertService : Service() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
 
-        val notificationManager = NotificationManagerCompat.from(this@LowInventoryAlertService)
+        val notificationManager = NotificationManagerCompat.from(this@DueReminderService)
         try {
             notificationManager.notify(notificationId, notification)
-            Log.d("LowInventoryService", "Notification created")
+            Log.d("DueReminderService", "Notification created")
         } catch (e: SecurityException) {
-            Log.e("LowInventoryService", "Error to create notification: ${e.printStackTrace()}")
+            Log.e("DueReminderService", "Error to create notification: ${e.printStackTrace()}")
         }
     }
 

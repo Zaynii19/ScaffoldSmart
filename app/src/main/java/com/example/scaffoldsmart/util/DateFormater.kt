@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 object DateFormater {
@@ -188,5 +189,17 @@ object DateFormater {
         val currentDateParsed = inputFormat.parse(currentDateFormatted)
 
         return currentDateParsed!!.after(endDate)
+    }
+
+    fun convertDateStringToDateMillis(dateString: String): Long? {
+        val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        return try {
+            val date: Date? = inputFormat.parse(dateString)
+            date!!.time
+        } catch (e: Exception) {
+            // Handle parsing exception (e.g., invalid date format)
+            e.printStackTrace()
+            null
+        }
     }
 }
