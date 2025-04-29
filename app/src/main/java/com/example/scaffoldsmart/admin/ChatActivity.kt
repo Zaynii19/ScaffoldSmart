@@ -240,20 +240,7 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
-    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1 && data?.data != null)
-            uploadImage(data.data!!)
-    }*/
-
     private fun setupAttachmentButton() {
-//        binding.sendImageBtn.setOnClickListener {
-//            val intent = Intent()
-//            intent.action = Intent.ACTION_GET_CONTENT
-//            intent.type = "image/*"
-//            startActivityForResult(intent, 1)
-//        }
-
         binding.sendImageBtn.setOnClickListener {
             ImagePicker.with(this)
                 .crop()

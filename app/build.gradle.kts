@@ -106,7 +106,12 @@ dependencies {
     implementation (libs.glide)
 
     implementation(libs.kotlinx.coroutines.android)
+    implementation (libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.android.mail)
     implementation(libs.android.activation)
+
+    implementation(libs.tensorflow.lite)
+    implementation(libs.tensorflow.lite.task.vision)
+    implementation(libs.tensorflow.lite.gpu)
 
 }

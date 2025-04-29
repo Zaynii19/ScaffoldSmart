@@ -172,5 +172,11 @@
     <string name="motors_threshold">Motors Threshold</string>
     <string name="generators_threshold">Generators Threshold</string>
     <string name="wheel_threshold">Wheel Threshold</string>
+    <string name="pipes_counting">Pipes Counting</string>
+    <string name="detect_and_count_pipes">Detect and Count Pipes</string>
+    <string name="number_of_pipes">Number of Pipes: </string>
+    <string name="_0">0</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
 
 </resources>

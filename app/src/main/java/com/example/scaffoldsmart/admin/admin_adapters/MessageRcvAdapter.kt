@@ -14,8 +14,8 @@ import com.bumptech.glide.Glide
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.DateHeader
 import com.example.scaffoldsmart.admin.admin_models.MessageModel
-import com.example.scaffoldsmart.databinding.DateHeaderBinding
-import com.example.scaffoldsmart.databinding.DeleteMessageBinding
+import com.example.scaffoldsmart.databinding.DateHeaderItemBinding
+import com.example.scaffoldsmart.databinding.DeleteMessageDialogBinding
 import com.example.scaffoldsmart.databinding.ReceiveMessageBinding
 import com.example.scaffoldsmart.databinding.SendMessageBinding
 import com.example.scaffoldsmart.util.DateFormater
@@ -36,13 +36,13 @@ class MessageRcvAdapter(
 
     inner class SendMsgViewHolder(val bindingS: SendMessageBinding) : RecyclerView.ViewHolder(bindingS.root)
     inner class ReceiveMsgViewHolder(val bindingR: ReceiveMessageBinding) : RecyclerView.ViewHolder(bindingR.root)
-    inner class DateHeaderViewHolder(val bindingD: DateHeaderBinding) : RecyclerView.ViewHolder(bindingD.root)
+    inner class DateHeaderViewHolder(val bindingD: DateHeaderItemBinding) : RecyclerView.ViewHolder(bindingD.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ITEM_SENT -> SendMsgViewHolder(SendMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
             ITEM_RECEIVE -> ReceiveMsgViewHolder(ReceiveMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false))
-            ITEM_DATE_HEADER -> DateHeaderViewHolder(DateHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            ITEM_DATE_HEADER -> DateHeaderViewHolder(DateHeaderItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
@@ -168,11 +168,11 @@ class MessageRcvAdapter(
     }
 
     private fun showDeleteDialog(messageModel: MessageModel, isSender: Boolean): Boolean {
-        val view = LayoutInflater.from(context).inflate(R.layout.delete_message, null)
-        val binder: DeleteMessageBinding = DeleteMessageBinding.bind(view)
+        val customDialog = LayoutInflater.from(context).inflate(R.layout.delete_message_dialog, null)
+        val binder: DeleteMessageDialogBinding = DeleteMessageDialogBinding.bind(customDialog)
         val dialog = MaterialAlertDialogBuilder(context)
             .setTitle("Delete Message")
-            .setView(view)
+            .setView(customDialog)
             .setBackground(ContextCompat.getDrawable(context, R.drawable.msg_view_received))
             .create().apply {
                 show()
@@ -190,7 +190,7 @@ class MessageRcvAdapter(
         }
 
         binder.delForMe.setOnClickListener { deleteForMe(messageModel, dialog) }
-        dialog.show()
+
         return false
     }
 
