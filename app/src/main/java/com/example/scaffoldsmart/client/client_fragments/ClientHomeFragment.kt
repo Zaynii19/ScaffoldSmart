@@ -21,6 +21,7 @@ import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
 import com.example.scaffoldsmart.util.DateFormater
 import com.example.scaffoldsmart.util.OnesignalService
+import androidx.core.content.edit
 
 class ClientHomeFragment : Fragment() {
     private val binding by lazy {
@@ -107,8 +108,8 @@ class ClientHomeFragment : Fragment() {
 
                 onesignal.oneSignalLogin(email, role)
 
-                chatPreferences.edit().putString("SenderUid", clientID).apply()
-                chatPreferences.edit().putString("SenderName", name).apply()
+                chatPreferences.edit { putString("SenderUid", clientID) }
+                chatPreferences.edit { putString("SenderName", name) }
 
                 Log.d("ClientHomeFragDebug", "SenderUid: $clientID, SenderName: $name")
             }

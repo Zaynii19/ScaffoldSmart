@@ -202,4 +202,38 @@ object DateFormater {
             null
         }
     }
+
+    fun combineAlarmDateTime(dueDate: String): Long {
+        val dueDateTime = "10:00 AM" //Trigger alarm on 10 AM of due date
+        try {
+            val calendar = Calendar.getInstance().apply {
+                clear()
+
+                // Parse date (format: dd-MM-yyyy)
+                val dateParts = dueDate.split("-")
+                require(dateParts.size == 3) { "Invalid date format" }
+                set(Calendar.DAY_OF_MONTH, dateParts[0].toInt())
+                set(Calendar.MONTH, dateParts[1].toInt() - 1) // Month is 0-based
+                set(Calendar.YEAR, dateParts[2].toInt())
+
+                // Parse hardcoded time (format: h:mm a)
+                val timeParts = dueDateTime.split(":")
+                require(timeParts.size == 2) { "Invalid time format" }
+
+                val hour = timeParts[0].trim().toInt()
+                val minuteAndPeriod = timeParts[1].split(" ")
+                require(minuteAndPeriod.isNotEmpty()) { "Invalid time format" }
+
+                val minute = minuteAndPeriod[0].trim().toInt()
+
+                set(Calendar.HOUR_OF_DAY, hour)
+                set(Calendar.MINUTE, minute)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            return calendar.timeInMillis
+        } catch (e: Exception) {
+            return 0L
+        }
+    }
 }

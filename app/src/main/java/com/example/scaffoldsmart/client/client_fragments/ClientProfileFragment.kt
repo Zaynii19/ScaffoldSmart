@@ -38,6 +38,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import androidx.core.content.edit
 
 class ClientProfileFragment : Fragment() {
     private val binding by lazy {
@@ -188,8 +189,10 @@ class ClientProfileFragment : Fragment() {
                 for (child in snapshot.children) {
                     val user = child.getValue(ClientModel::class.java)
                     if (user != null) {
-                        chatPreferences.edit().putString("receiverUid", user.id).apply()
-                        chatPreferences.edit().putString("receiverName", user.name).apply()
+                        chatPreferences.edit { putString("receiverUid", user.id) }
+                        chatPreferences.edit { putString("receiverName", user.name) }
+
+                        Log.d("ClientProfileDebug", "ReceiverUid: ${user.id}, ReceiverName: ${user.name}")
                     }
                 }
             }

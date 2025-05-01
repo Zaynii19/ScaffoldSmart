@@ -52,6 +52,13 @@ class ClientActivity : AppCompatActivity() {
 
         fetchingClientsData()
 
+        binding.swipeRefresh.setColorSchemeResources(R.color.item_color)
+        binding.swipeRefresh.setOnRefreshListener {
+            // Refresh data here
+            fetchingClientsData() // Call your method to fetch data again
+            binding.swipeRefresh.isRefreshing = false // Hide the refresh animation after data is fetched
+        }
+
         binding.backBtn.setOnClickListener {
             finish()
         }

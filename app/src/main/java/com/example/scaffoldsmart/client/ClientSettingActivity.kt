@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
@@ -27,7 +26,6 @@ import com.example.scaffoldsmart.client.client_fragments.ClientUpdateFragment
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientSettingBinding
 import com.example.scaffoldsmart.util.AlarmUtils
-import com.example.scaffoldsmart.util.DateFormater
 import com.example.scaffoldsmart.util.Encryption
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -35,8 +33,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
-import kotlin.math.log
 import androidx.core.net.toUri
+import com.example.scaffoldsmart.util.DateFormater
 
 class ClientSettingActivity : AppCompatActivity() {
     private val binding by lazy {
@@ -100,14 +98,10 @@ class ClientSettingActivity : AppCompatActivity() {
                     switchOn = false
                 } else{
                     rentalList.forEach {
-                        val dueDateMiles = DateFormater.convertDateStringToDateMillis(it.endDuration)
-                        if (dueDateMiles != null){
-                            scheduleAlarms(this, dueDateMiles)
-                            binding.dueDateSwitch.setImageResource(R.drawable.switch_on)
-                            switchOn = true
-                        } else {
-                            Log.d("ClientSettingActivity", "Invalid date format")
-                        }
+                        val dueDate = it.endDuration
+                        scheduleAlarms(dueDate)
+                        binding.dueDateSwitch.setImageResource(R.drawable.switch_on)
+                        switchOn = true
                     }
                 }
             } else {
@@ -289,26 +283,36 @@ class ClientSettingActivity : AppCompatActivity() {
         Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
     }
 
-    private fun scheduleAlarms(context: Context, dueDateMillis: Long) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
-            if (!alarmManager.canScheduleExactAlarms()) {
-                // Launch permission request
-                val intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                intent.data = "package:${context.packageName}".toUri()
-                context.startActivity(intent)
-                return
-            }
-        }
+    private fun scheduleAlarms(dueDate: String) {
+        getAlarmPermission()
+
+        val dueDateMillis = DateFormater.combineAlarmDateTime(dueDate)
 
         // Proceed with scheduling alarms
         AlarmUtils.scheduleDueDateAlarms(this, dueDateMillis)
     }
 
+    private fun getAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                // Launch permission request
+                val intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                    data = "package:$packageName".toUri()
+                }
+                startActivity(intent)
+            }
+        }
+    }
+
     private fun checkAlarmPermissionAndSchedule() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-            if (alarmManager.canScheduleExactAlarms()) {
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Toast.makeText(this, "Alarm permission is required for timely Alert", Toast.LENGTH_LONG).show()
+                getAlarmPermission()
+                return
+            } else {
                 // Permission granted, schedule alarms
                 dueDateAlertOnOf()
             }

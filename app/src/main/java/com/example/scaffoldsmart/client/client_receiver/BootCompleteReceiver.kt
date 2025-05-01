@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.client
+package com.example.scaffoldsmart.client.client_receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -30,12 +30,8 @@ class BootCompleteReceiver : BroadcastReceiver() {
                         val rental = rentalSnapshot.getValue(RentalModel::class.java)
                         rental?.let {
                             if (it.clientID == getCurrentUserId(context) && it.rentStatus == "ongoing") {
-                                val dueDateMiles = DateFormater.convertDateStringToDateMillis(it.endDuration)
-                                if (dueDateMiles != null) {
-                                    scheduleDueDateAlarms(context, dueDateMiles)
-                                } else {
-                                    Log.d("BootCompleteReceiver", "Invalid date format")
-                                }
+                                val dueDateMillis = DateFormater.combineAlarmDateTime(it.endDuration)
+                                scheduleDueDateAlarms(context, dueDateMillis)
                             }
                         }
                     }

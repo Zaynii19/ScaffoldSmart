@@ -470,43 +470,43 @@ class HomeFragment : Fragment() {
             when {
                 lowerName.contains("pipe") && pipeQuantity.toString().isNotEmpty() -> {
                     if (item.quantity >= pipeQuantity) {
-                        val remaining = (item.quantity - pipeQuantity).toString()
+                        val remaining = (item.quantity - pipeQuantity)
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
                 lowerName.contains("joint") && jointsQuantity.toString().isNotEmpty() -> {
                     if (item.quantity >= jointsQuantity) {
-                        val remaining = (item.quantity - jointsQuantity).toString()
+                        val remaining = (item.quantity - jointsQuantity)
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
                 lowerName.contains("wench") && wenchQuantity.toString().isNotEmpty() -> {
                     if (item.quantity >= wenchQuantity) {
-                        val remaining = (item.quantity - wenchQuantity).toString()
+                        val remaining = (item.quantity - wenchQuantity)
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
                 lowerName.contains("pump") && pumpsQuantity.toString().isNotEmpty() -> {
                     if (item.quantity >= pumpsQuantity) {
-                        val remaining = (item.quantity - pumpsQuantity).toString()
+                        val remaining = (item.quantity - pumpsQuantity)
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
                 lowerName.contains("motor") && motorsQuantity.toString().isNotEmpty() -> {
                     if (item.quantity >= motorsQuantity) {
-                        val remaining = (item.quantity - motorsQuantity).toString()
+                        val remaining = (item.quantity - motorsQuantity)
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
                 lowerName.contains("generator") && generatorsQuantity.toString().isNotEmpty() -> {
                     if (item.quantity >= generatorsQuantity) {
-                        val remaining = (item.quantity - generatorsQuantity).toString()
+                        val remaining = (item.quantity - generatorsQuantity)
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
                 lowerName.contains("wheel") && wheelQuantity.toString().isNotEmpty() -> {
                     if (item.quantity >= wheelQuantity) {
-                        val remaining = (item.quantity - wheelQuantity).toString()
+                        val remaining = (item.quantity - wheelQuantity)
                         databaseRef.updateChildren(mapOf("quantity" to remaining))
                     }
                 }
