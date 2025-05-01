@@ -41,6 +41,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
+import androidx.core.content.edit
 
 class HomeFragment : Fragment() {
 
@@ -191,8 +192,8 @@ class HomeFragment : Fragment() {
 
                 onesignal.oneSignalLogin(email, userType)
 
-                chatPreferences.edit().putString("SenderUid", id).apply()
-                chatPreferences.edit().putString("SenderName", name).apply()
+                chatPreferences.edit { putString("SenderUid", id) }
+                chatPreferences.edit { putString("SenderName", name) }
             }
         }
     }
@@ -248,7 +249,23 @@ class HomeFragment : Fragment() {
             // Create a ScaffoldInfoModel instance and add to infoList
             infoList.add(ScafoldInfoModel(rental.clientName, durationInMonths, status))
             adapter.updateList(infoList)
+
+            updateRentalStatus(rental, status)
         }
+    }
+
+    private fun updateRentalStatus(currentRental: RentalModel, newRentStatus: String) {
+        val databaseRef = Firebase.database.reference.child("Rentals")
+            .child(currentRental.rentalId) // Reference to the specific rental using rentalId
+
+        val updates = hashMapOf<String, Any>(
+            "rentStatus" to newRentStatus
+        )
+
+        // Update the item with the new values
+        databaseRef.updateChildren(updates)
+            .addOnSuccessListener {}
+            .addOnFailureListener {}
     }
 
     private fun populateReqList(filteredRequests: List<RentalModel>) {

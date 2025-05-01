@@ -4,12 +4,12 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -19,12 +19,14 @@ import com.example.scaffoldsmart.util.ScaffoldingPipeDetector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.core.graphics.createBitmap
 
 class ImageProcessingActivity : AppCompatActivity() {
+
     private val binding by lazy {
         ActivityImageProcessingBinding.inflate(layoutInflater)
     }
-    private var currentImageBitmap: Bitmap? = null
+    private var originalBitmap: Bitmap? = null
     private var scaffoldingDetector: ScaffoldingPipeDetector? = null
     private val TAG = "ImageProcessingDebug"
     private var progressDialog: ProgressDialog? = null
@@ -39,81 +41,100 @@ class ImageProcessingActivity : AppCompatActivity() {
             insets
         }
 
-        scaffoldingDetector = ScaffoldingPipeDetector(this@ImageProcessingActivity)
-        progressDialog = ProgressDialog(this@ImageProcessingActivity)
-        progressDialog?.setMessage("Counting Scaffolding Pipes...")
-        progressDialog?.setCancelable(false)
-
-        // Retrieve the image data from intent
-        val byteArray = intent.getByteArrayExtra("image_data")
-        if (byteArray != null) {
-            val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-            currentImageBitmap = bitmap
-            binding.imageToProcess.setImageBitmap(bitmap)
-        } else {
-            finish() // Close activity if no image was passed
+        scaffoldingDetector = ScaffoldingPipeDetector(this)
+        progressDialog = ProgressDialog(this).apply {
+            setMessage("Detecting pipes...")
+            setCancelable(false)
         }
 
+        // Load image from intent
+        val byteArray = intent.getByteArrayExtra("image_data")
+        if (byteArray != null) {
+            originalBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+            binding.imageToProcess.setImageBitmap(originalBitmap)
+        } else {
+            Toast.makeText(this, "No image provided", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+
+        // Setup buttons
         binding.detectButton.setOnClickListener { detectPipes() }
-
         binding.backBtn.setOnClickListener { finish() }
-
         binding.settingBtn.setOnClickListener {
-            startActivity(Intent(this@ImageProcessingActivity, SettingActivity::class.java))
+            startActivity(Intent(this, SettingActivity::class.java))
             finish()
         }
     }
 
     private fun detectPipes() {
-        currentImageBitmap?.let { bitmap ->
+        originalBitmap?.let { bitmap ->
             lifecycleScope.launch {
                 try {
                     // Show loading UI
-                    Log.d(TAG, "Starting pipe detection...")
                     progressDialog?.show()
                     binding.detectButton.isEnabled = false
-                    binding.detectButton.backgroundTintList = ContextCompat.getColorStateList(this@ImageProcessingActivity, R.color.dark_gray)
-                    binding.countResult.text = "" // Clear previous result
+                    binding.countResult.text = ""
 
-                    // Run detection on background thread
-                    val pipeCount = withContext(Dispatchers.IO) {
-                        scaffoldingDetector?.detectAndCountPipes(bitmap) ?: 0
+                    // Run detection
+                    val result = withContext(Dispatchers.IO) {
+                        scaffoldingDetector?.detectPipes(bitmap)
                     }
-                    Log.d(TAG, "Detection completed. Count: $pipeCount")
 
-                    // Update UI with results
-                    binding.countResult.text = "$pipeCount"
-
-                    when {
-                        pipeCount == 0 -> {
-                            Toast.makeText(this@ImageProcessingActivity, "No pipes detected", Toast.LENGTH_SHORT).show()
-                        }
-                        pipeCount > 0 -> {
-                            Toast.makeText(this@ImageProcessingActivity, "Detected $pipeCount pipes", Toast.LENGTH_SHORT).show()
-                        }
+                    // Update UI
+                    result?.let {
+                        displayResults(it)
+                    } ?: run {
+                        Toast.makeText(
+                            this@ImageProcessingActivity,
+                            "Detection failed",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Detection error", e)
-                    Toast.makeText(this@ImageProcessingActivity, "Detection failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@ImageProcessingActivity,
+                        "Error: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
                 } finally {
-                    // Restore UI state
                     progressDialog?.dismiss()
-                    binding.detectButton.backgroundTintList = ContextCompat.getColorStateList(this@ImageProcessingActivity, R.color.buttons_color)
                     binding.detectButton.isEnabled = true
                 }
             }
         } ?: run {
-            Toast.makeText(
-                this@ImageProcessingActivity,
-                "No image to process",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "No image to process", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun displayResults(result: ScaffoldingPipeDetector.PipeDetectionResult) {
+        // Show overlay image with pipe detections
+        result.overlayBitmap?.let { overlay ->
+            // Combine original image with overlay
+            val combined = createBitmap(originalBitmap!!.width, originalBitmap!!.height)
+            val canvas = Canvas(combined)
+            canvas.drawBitmap(originalBitmap!!, 0f, 0f, null)
+            canvas.drawBitmap(overlay, 0f, 0f, null)
+            binding.imageToProcess.setImageBitmap(combined)
+        }
+
+        // Update count display
+        binding.countResult.text = "${result.pipeCount}"
+
+        // Show appropriate toast
+        when {
+            result.pipeCount == 0 -> {
+                Toast.makeText(this, "No pipes detected", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                Toast.makeText(this, "Found ${result.pipeCount} pipes", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     override fun onDestroy() {
         scaffoldingDetector?.close()
-        currentImageBitmap?.recycle()
+        originalBitmap?.recycle()
         super.onDestroy()
     }
 }

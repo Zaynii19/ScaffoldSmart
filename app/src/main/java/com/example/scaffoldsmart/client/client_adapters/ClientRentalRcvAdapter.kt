@@ -36,13 +36,13 @@ class ClientRentalRcvAdapter (val context: Context, private var rentalList: Arra
         val currentItem = rentalList[position]
 
         val itemsList = mutableListOf<String>()
-        if (currentItem.pipes.toString().isNotEmpty()) itemsList.add("Pipes")
-        if (currentItem.joints.toString().isNotEmpty()) itemsList.add("Joints")
-        if (currentItem.wench.toString().isNotEmpty()) itemsList.add("Wench")
-        if (currentItem.pumps.toString().isNotEmpty()) itemsList.add("Pumps")
-        if (currentItem.generators.toString().isNotEmpty()) itemsList.add("Generators")
-        if (currentItem.wheel.toString().isNotEmpty()) itemsList.add("Wheel")
-        if (currentItem.motors.toString().isNotEmpty()) itemsList.add("Motors")
+        if (currentItem.pipes != 0) itemsList.add("Pipes")
+        if (currentItem.joints != 0) itemsList.add("Joints")
+        if (currentItem.wench != 0) itemsList.add("Wench")
+        if (currentItem.pumps != 0) itemsList.add("Pumps")
+        if (currentItem.generators != 0) itemsList.add("Generators")
+        if (currentItem.wheel != 0) itemsList.add("Wheel")
+        if (currentItem.motors != 0) itemsList.add("Motors")
 
         if (itemsList.isNotEmpty()) {
             holder.binding.rentalItems.text = itemsList.joinToString(", ")
@@ -113,9 +113,9 @@ class ClientRentalRcvAdapter (val context: Context, private var rentalList: Arra
             }
     }
 
-    private fun setViewVisibilityAndText(view: TextView, text: Int, entry: ConstraintLayout) {
-        if (text.toString().isNotEmpty()) {
-            view.text = "$text"
+    private fun setViewVisibilityAndText(view: TextView, quantity: Int, entry: ConstraintLayout) {
+        if (quantity !=0 ) {
+            view.text = "$quantity"
         } else {
             entry.visibility = View.GONE
         }
