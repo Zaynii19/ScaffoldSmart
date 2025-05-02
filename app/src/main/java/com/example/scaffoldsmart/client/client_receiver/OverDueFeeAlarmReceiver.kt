@@ -14,23 +14,13 @@ import androidx.core.app.NotificationCompat
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.client.ClientMainActivity
 
-class DueDateAlarmReceiver : BroadcastReceiver() {
+class OverDueFeeAlarmReceiver : BroadcastReceiver() {
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     override fun onReceive(context: Context, intent: Intent?) {
         val dueDate = intent?.getLongExtra("DUE_DATE", 0L) ?: return
-        val notificationType = intent.getIntExtra("NOTIFICATION_TYPE", 0)
 
-        val title = when (notificationType) {
-            1 -> "Due Date Approaching (5 Days Left)"
-            2 -> "Due Date Approaching (3 Days Left)"
-            else -> "Due Date Today!"
-        }
-
-        val message = when (notificationType) {
-            1 -> "Your rental is due in 5 days. Please prepare for return."
-            2 -> "Your rental is due in 3 days. Don't forget!"
-            else -> "Today is the due date for your rental. Please return the items."
-        }
+        val title = "Overdue Rental Fee Alert"
+        val message = "Your rental for the selected date has been overdue. Please Return Items. Due Date: $dueDate, Overdue Fee: 1000 per day."
 
         createNotificationChannel(context)
         showNotification(context, title, message)
@@ -39,11 +29,11 @@ class DueDateAlarmReceiver : BroadcastReceiver() {
     private fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                "due_date_channel",
-                "Due Date Notifications",
+                "over_due_channel",
+                "Over Due Notifications",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "Channel for due date notifications"
+                description = "Channel for over due notifications"
                 enableVibration(true)
                 enableLights(true)
                 lightColor = Color.RED
@@ -67,7 +57,7 @@ class DueDateAlarmReceiver : BroadcastReceiver() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        val notification = NotificationCompat.Builder(context, "due_date_channel")
+        val notification = NotificationCompat.Builder(context, "over_due_channel")
             .setContentTitle(title)
             .setContentText(message)
             .setSmallIcon(R.drawable.app_logo)
@@ -82,9 +72,9 @@ class DueDateAlarmReceiver : BroadcastReceiver() {
         try {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(ALARM_NOTIFICATION_ID, notification)
-            Log.d("DueDateNoti", "Notification created: $title")
+            Log.d("OverDueNoti", "Notification created: $title")
         } catch (e: Exception) {
-            Log.e("DueDateNoti", "Error showing notification", e)
+            Log.e("OverDueNoti", "Error showing notification", e)
         }
     }
 
@@ -101,6 +91,6 @@ class DueDateAlarmReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        const val ALARM_NOTIFICATION_ID = 1001
+        const val ALARM_NOTIFICATION_ID = 2001
     }
 }

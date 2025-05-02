@@ -101,6 +101,11 @@
             android:enabled="true"
             android:exported="false">
         </receiver>
+        <receiver
+            android:name=".client.client_receiver.OverDueFeeAlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+        </receiver>
         <!-- Boot Complete Receiver (for re-scheduling alarms after reboot) -->
         <receiver
             android:name=".client.client_receiver.BootCompleteReceiver"

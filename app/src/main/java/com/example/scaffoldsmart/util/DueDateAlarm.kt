@@ -11,7 +11,7 @@ import android.widget.Toast
 import com.example.scaffoldsmart.client.client_receiver.DueDateAlarmReceiver
 import java.util.concurrent.TimeUnit
 
-object AlarmUtils {
+object DueDateAlarm {
     private const val ALARM_REQUEST_CODE_PREFIX = 1000
 
     fun scheduleDueDateAlarms(context: Context, dueDateMillis: Long) {
@@ -76,7 +76,7 @@ object AlarmUtils {
         }
     }
 
-    private fun cancelAlarmsForDueDate(context: Context, dueDateMillis: Long) {
+    fun cancelAlarmsForDueDate(context: Context, dueDateMillis: Long) {
         val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager
 
         // Cancel all 3 possible alarms for this due date

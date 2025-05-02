@@ -25,7 +25,7 @@ import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.client.client_fragments.ClientUpdateFragment
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientSettingBinding
-import com.example.scaffoldsmart.util.AlarmUtils
+import com.example.scaffoldsmart.util.DueDateAlarm
 import com.example.scaffoldsmart.util.Encryption
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -35,6 +35,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.database.database
 import androidx.core.net.toUri
 import com.example.scaffoldsmart.util.DateFormater
+import com.example.scaffoldsmart.util.OverDueFeeAlarm
 
 class ClientSettingActivity : AppCompatActivity() {
     private val binding by lazy {
@@ -44,7 +45,8 @@ class ClientSettingActivity : AppCompatActivity() {
     private var switchOn = false
     private var senderUid: String? = null
     private lateinit var chatPreferences: SharedPreferences
-    private var rentalList = ArrayList<RentalModel>()
+    private var dueRentalList = ArrayList<RentalModel>()
+    private var overDueRentalList = ArrayList<RentalModel>()
     private lateinit var viewModelR: RentalViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,13 +82,7 @@ class ClientSettingActivity : AppCompatActivity() {
         }
 
         binding.dueFeeSwitch.setOnClickListener {
-            if (switchOn){
-                binding.dueFeeSwitch.setImageResource(R.drawable.switch_off)
-                switchOn = false
-            }else{
-                binding.dueFeeSwitch.setImageResource(R.drawable.switch_on)
-                switchOn = true
-            }
+            overDueAlertOnOf()
         }
     }
 
@@ -96,10 +92,15 @@ class ClientSettingActivity : AppCompatActivity() {
                 if (switchOn){
                     binding.dueDateSwitch.setImageResource(R.drawable.switch_off)
                     switchOn = false
+                    // Canceling all scheduled alarms
+                    dueRentalList.forEach {
+                        val dueDateMillis = DateFormater.combineAlarmDateTime(it.endDuration)
+                        DueDateAlarm.cancelAlarmsForDueDate(this, dueDateMillis)
+                    }
                 } else{
-                    rentalList.forEach {
+                    dueRentalList.forEach {
                         val dueDate = it.endDuration
-                        scheduleAlarms(dueDate)
+                        scheduleDueDateAlarms(dueDate)
                         binding.dueDateSwitch.setImageResource(R.drawable.switch_on)
                         switchOn = true
                     }
@@ -110,15 +111,54 @@ class ClientSettingActivity : AppCompatActivity() {
         }
     }
 
+    private fun overDueAlertOnOf() {
+        checkOverdueRentalList { hasOverDueRentals ->
+            if (hasOverDueRentals) {
+                if (switchOn){
+                    binding.dueFeeSwitch.setImageResource(R.drawable.switch_off)
+                    switchOn = false
+                    // Canceling all scheduled alarms
+                    overDueRentalList.forEach {
+                        val dueDateMillis = DateFormater.combineAlarmDateTime(it.endDuration)
+                        OverDueFeeAlarm.cancelAlarmsForOverDue(this, dueDateMillis)
+                    }
+                } else{
+                    overDueRentalList.forEach {
+                        val dueDate = it.endDuration
+                        scheduleOverDueAlarms(dueDate)
+                        binding.dueFeeSwitch.setImageResource(R.drawable.switch_on)
+                        switchOn = true
+                    }
+                }
+            } else {
+                Toast.makeText(this@ClientSettingActivity, "No overdue rental found", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     private fun checkOngoingRentalList(callback: (Boolean) -> Unit) {
         viewModelR.observeRentalReqLiveData().observe(this@ClientSettingActivity) { rentals ->
             val filteredRentals = rentals?.filter {
                 it.status.isNotEmpty() && it.clientID == senderUid && it.rentStatus == "ongoing"
             } ?: emptyList()
 
-            rentalList.clear()
-            rentalList.addAll(filteredRentals)
-            Log.d("ClientSettingActivityDebug", "observeRentalReqLiveData: ${rentalList.size}")
+            dueRentalList.clear()
+            dueRentalList.addAll(filteredRentals)
+            Log.d("ClientSettingActivityDebug", "observeRentalReqLiveData: ${dueRentalList.size}")
+            // Invoke the callback
+            callback(filteredRentals.isNotEmpty())
+        }
+    }
+
+    private fun checkOverdueRentalList(callback: (Boolean) -> Unit) {
+        viewModelR.observeRentalReqLiveData().observe(this@ClientSettingActivity) { rentals ->
+            val filteredRentals = rentals?.filter {
+                it.status.isNotEmpty() && it.clientID == senderUid && it.rentStatus == "overdue"
+            } ?: emptyList()
+
+            overDueRentalList.clear()
+            overDueRentalList.addAll(filteredRentals)
+            Log.d("ClientSettingActivityDebug", "observeRentalReqLiveData: ${overDueRentalList.size}")
             // Invoke the callback
             callback(filteredRentals.isNotEmpty())
         }
@@ -283,13 +323,22 @@ class ClientSettingActivity : AppCompatActivity() {
         Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
     }
 
-    private fun scheduleAlarms(dueDate: String) {
+    private fun scheduleDueDateAlarms(dueDate: String) {
         getAlarmPermission()
 
         val dueDateMillis = DateFormater.combineAlarmDateTime(dueDate)
 
         // Proceed with scheduling alarms
-        AlarmUtils.scheduleDueDateAlarms(this, dueDateMillis)
+        DueDateAlarm.scheduleDueDateAlarms(this, dueDateMillis)
+    }
+
+    private fun scheduleOverDueAlarms(dueDate: String) {
+        getAlarmPermission()
+
+        val dueDateMillis = DateFormater.combineAlarmDateTime(dueDate)
+
+        // Proceed with scheduling alarms
+        OverDueFeeAlarm.scheduleOverDueAlarms(this, dueDateMillis)
     }
 
     private fun getAlarmPermission() {

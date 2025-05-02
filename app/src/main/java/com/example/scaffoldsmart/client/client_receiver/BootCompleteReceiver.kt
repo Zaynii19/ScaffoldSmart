@@ -6,7 +6,7 @@ import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.util.Log
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
-import com.example.scaffoldsmart.util.AlarmUtils.scheduleDueDateAlarms
+import com.example.scaffoldsmart.util.DueDateAlarm.scheduleDueDateAlarms
 import com.example.scaffoldsmart.util.DateFormater
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -17,11 +17,12 @@ class BootCompleteReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
             // Re-schedule all alarms after device reboot
-            rescheduleAllAlarms(context)
+            rescheduleAllDueDateAlarms(context)
+            rescheduleAllOverDueAlarms(context)
         }
     }
 
-    private fun rescheduleAllAlarms(context: Context) {
+    private fun rescheduleAllDueDateAlarms(context: Context) {
         // Fetch all due dates from Firebase and re-schedule alarms
         FirebaseDatabase.getInstance().reference.child("Rentals")
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -38,7 +39,29 @@ class BootCompleteReceiver : BroadcastReceiver() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("BootCompleteReceiver", "Failed to fetch rentals", error.toException())
+                    Log.e("BootCompleteReceiver", "Failed to fetch ongoing rentals", error.toException())
+                }
+            })
+    }
+
+    private fun rescheduleAllOverDueAlarms(context: Context) {
+        // Fetch all due dates from Firebase and re-schedule alarms
+        FirebaseDatabase.getInstance().reference.child("Rentals")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (rentalSnapshot in snapshot.children) {
+                        val rental = rentalSnapshot.getValue(RentalModel::class.java)
+                        rental?.let {
+                            if (it.clientID == getCurrentUserId(context) && it.rentStatus == "overdue") {
+                                val dueDateMillis = DateFormater.combineAlarmDateTime(it.endDuration)
+                                scheduleDueDateAlarms(context, dueDateMillis)
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("BootCompleteReceiver", "Failed to fetch overdue rentals", error.toException())
                 }
             })
     }
