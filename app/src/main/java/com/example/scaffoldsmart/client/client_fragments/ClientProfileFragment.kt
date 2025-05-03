@@ -39,6 +39,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import androidx.core.content.edit
+import com.example.scaffoldsmart.admin.admin_fragments.InvoiceFragment
+import com.example.scaffoldsmart.admin.admin_models.AdminModel
 
 class ClientProfileFragment : Fragment() {
     private val binding by lazy {
@@ -51,12 +53,14 @@ class ClientProfileFragment : Fragment() {
     private var phone: String = ""
     private lateinit var viewModel: ClientViewModel
     private lateinit var chatPreferences: SharedPreferences
+    private lateinit var invoicePreferences: SharedPreferences
     private var senderUid: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         chatPreferences = requireActivity().getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
+        invoicePreferences = requireActivity().getSharedPreferences("INVOICE", MODE_PRIVATE)
 
         viewModel = ViewModelProvider(this)[ClientViewModel::class.java]
         viewModel.retrieveClientData()
@@ -90,6 +94,11 @@ class ClientProfileFragment : Fragment() {
 
         binding.costComparisonBtn.setOnClickListener {
             startActivity(Intent(context, ClientCostComparisonActivity::class.java))
+        }
+
+        binding.invoiceGenerateBtn.setOnClickListener {
+            invoicePreferences.edit { putString("USER", "client") }
+            showInvoiceBottomSheet()
         }
 
         binding.logoutBtn.setOnClickListener {
@@ -187,12 +196,12 @@ class ClientProfileFragment : Fragment() {
             ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (child in snapshot.children) {
-                    val user = child.getValue(ClientModel::class.java)
-                    if (user != null) {
-                        chatPreferences.edit { putString("receiverUid", user.id) }
-                        chatPreferences.edit { putString("receiverName", user.name) }
+                    val admin = child.getValue(AdminModel::class.java)
+                    if (admin != null) {
+                        chatPreferences.edit { putString("receiverUid", admin.id) }
+                        chatPreferences.edit { putString("receiverName", admin.name) }
 
-                        Log.d("ClientProfileDebug", "ReceiverUid: ${user.id}, ReceiverName: ${user.name}")
+                        Log.d("ClientProfileDebug", "ReceiverUid: ${admin.id}, ReceiverName: ${admin.name}")
                     }
                 }
             }
@@ -201,5 +210,10 @@ class ClientProfileFragment : Fragment() {
                 Log.e("ClientProfileDebug", "Failed to retrieve others user data", error.toException())
             }
         })
+    }
+
+    private fun showInvoiceBottomSheet() {
+        val bottomSheetDialog = InvoiceFragment()
+        bottomSheetDialog.show(requireActivity().supportFragmentManager, "Invoice")
     }
 }

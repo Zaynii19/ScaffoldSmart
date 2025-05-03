@@ -20,8 +20,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavOptions
+import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.AdminMainActivity
+import com.example.scaffoldsmart.admin.ChatActivity
 import com.example.scaffoldsmart.admin.admin_adapters.MessageRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.DateHeader
 import com.example.scaffoldsmart.admin.admin_models.MessageModel
@@ -63,6 +67,7 @@ class ClientChatActivity : AppCompatActivity() {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             // Handle back button press here
+            startActivity(Intent(this@ClientChatActivity, ClientMainActivity::class.java))
             finish()
         }
     }

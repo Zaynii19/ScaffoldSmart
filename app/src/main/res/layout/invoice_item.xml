@@ -1,0 +1,945 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/_10sdp"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/invoiceView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Company info -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@color/app_bg">
+
+            <!-- Company Name and Logo -->
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/app_logo"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/companyName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/_5sdp"
+                android:text="@string/company_name"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/logo"
+                app:layout_constraintTop_toBottomOf="@+id/logo" />
+
+            <!-- Company Address -->
+            <TextView
+                android:id="@+id/companyAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/company_address"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Company Phone -->
+            <TextView
+                android:id="@+id/companyPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/company_phone"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/companyAddress" />
+
+            <!-- Email -->
+            <TextView
+                android:id="@+id/companyEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/company_email"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/companyPhone" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- "Invoice To:" Label -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_10sdp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+
+            <TextView
+                android:id="@+id/invoiceToLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/invoice_to"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Customer Name -->
+            <TextView
+                android:id="@+id/customerName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:text="@string/customer_name"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/invoiceToLabel" />
+
+            <!-- Phone -->
+            <TextView
+                android:id="@+id/customerPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:text="@string/customer_phone"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/customerName" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Invoice Title and Info -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_10sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+
+            <TextView
+                android:id="@+id/invoiceTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/invoice"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/dark_gray"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Invoice No -->
+            <TextView
+                android:id="@+id/invoiceNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:text="@string/invoice_no"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/invoiceTitle" />
+
+            <!-- Issued Date -->
+            <TextView
+                android:id="@+id/issuedDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_3sdp"
+                android:text="@string/issued_date"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/invoiceNumber" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Table For Items -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/tableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout3">
+
+
+            <!-- Header Row -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/headerItemLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- Table Header Row -->
+                <TextView
+                    android:id="@+id/headerItem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/table_header"
+                    android:padding="8dp"
+                    android:text="@string/item"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_11ssp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/headerQty"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/headerQty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/table_header"
+                    android:padding="8dp"
+                    android:text="@string/quantity"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_11ssp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/headerUnitRent"
+                    app:layout_constraintStart_toEndOf="@id/headerItem"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/headerUnitRent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/table_header"
+                    android:padding="8dp"
+                    android:text="@string/unit_rent"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_11ssp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/headerDays"
+                    app:layout_constraintStart_toEndOf="@id/headerQty"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/headerDays"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/table_header"
+                    android:padding="8dp"
+                    android:text="@string/days"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_11ssp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/headerRent"
+                    app:layout_constraintStart_toEndOf="@id/headerUnitRent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/headerRent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@color/table_header"
+                    android:padding="8dp"
+                    android:text="@string/rent"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/_11ssp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/headerDays"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Divider Line -->
+            <View
+                android:id="@+id/rowDivider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="#CCCCCC"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/headerItemLayout" />
+
+            <!-- Row Item 1 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item1Layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/headerItemLayout">
+
+                <!-- Data Row -->
+                <TextView
+                    android:id="@+id/item1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Pipes"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item1Qty"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/item1Qty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item1UnitPrice"
+                    app:layout_constraintStart_toEndOf="@id/item1"
+                    app:layout_constraintTop_toTopOf="@id/item1" />
+
+                <TextView
+                    android:id="@+id/item1UnitPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item1Days"
+                    app:layout_constraintStart_toEndOf="@id/item1Qty"
+                    app:layout_constraintTop_toTopOf="@id/item1Qty" />
+
+                <TextView
+                    android:id="@+id/item1Days"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item1Amount"
+                    app:layout_constraintStart_toEndOf="@id/item1UnitPrice"
+                    app:layout_constraintTop_toTopOf="@id/item1UnitPrice" />
+
+                <TextView
+                    android:id="@+id/item1Amount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/item1Days"
+                    app:layout_constraintTop_toTopOf="@id/item1Days" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Divider Line -->
+            <View
+                android:id="@+id/rowDivider2"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="#CCCCCC"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item1Layout" />
+
+            <!-- Row Item 2 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item2Layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rowDivider2">
+
+                <!-- Data Row -->
+                <TextView
+                    android:id="@+id/item2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Joints"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item2Qty"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/item2Qty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item2UnitPrice"
+                    app:layout_constraintStart_toEndOf="@id/item2"
+                    app:layout_constraintTop_toTopOf="@id/item2" />
+
+                <TextView
+                    android:id="@+id/item2UnitPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item2Days"
+                    app:layout_constraintStart_toEndOf="@id/item2Qty"
+                    app:layout_constraintTop_toTopOf="@id/item2Qty" />
+
+                <TextView
+                    android:id="@+id/item2Days"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item2Amount"
+                    app:layout_constraintStart_toEndOf="@id/item2UnitPrice"
+                    app:layout_constraintTop_toTopOf="@id/item2UnitPrice" />
+
+                <TextView
+                    android:id="@+id/item2Amount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/item2Days"
+                    app:layout_constraintTop_toTopOf="@id/item2Days" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Divider Line -->
+            <View
+                android:id="@+id/rowDivider3"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="#CCCCCC"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item2Layout" />
+
+            <!-- Row Item 3 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item3Layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rowDivider3">
+
+                <!-- Data Row -->
+                <TextView
+                    android:id="@+id/item3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Wrench"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item3Qty"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/item3Qty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item3UnitPrice"
+                    app:layout_constraintStart_toEndOf="@id/item3"
+                    app:layout_constraintTop_toTopOf="@id/item3" />
+
+                <TextView
+                    android:id="@+id/item3UnitPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item3Days"
+                    app:layout_constraintStart_toEndOf="@id/item3Qty"
+                    app:layout_constraintTop_toTopOf="@id/item3Qty" />
+
+                <TextView
+                    android:id="@+id/item3Days"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item3Amount"
+                    app:layout_constraintStart_toEndOf="@id/item3UnitPrice"
+                    app:layout_constraintTop_toTopOf="@id/item3UnitPrice" />
+
+                <TextView
+                    android:id="@+id/item3Amount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/item3Days"
+                    app:layout_constraintTop_toTopOf="@id/item3Days" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Divider Line -->
+            <View
+                android:id="@+id/rowDivider4"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="#CCCCCC"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item3Layout" />
+
+            <!-- Row Item 4 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item4Layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rowDivider4">
+
+                <!-- Data Row -->
+                <TextView
+                    android:id="@+id/item4"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Pumps"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item4Qty"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/item4Qty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item4UnitPrice"
+                    app:layout_constraintStart_toEndOf="@id/item4"
+                    app:layout_constraintTop_toTopOf="@id/item4" />
+
+                <TextView
+                    android:id="@+id/item4UnitPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item4Days"
+                    app:layout_constraintStart_toEndOf="@id/item4Qty"
+                    app:layout_constraintTop_toTopOf="@id/item4Qty" />
+
+                <TextView
+                    android:id="@+id/item4Days"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item4Amount"
+                    app:layout_constraintStart_toEndOf="@id/item4UnitPrice"
+                    app:layout_constraintTop_toTopOf="@id/item4UnitPrice" />
+
+                <TextView
+                    android:id="@+id/item4Amount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/item4Days"
+                    app:layout_constraintTop_toTopOf="@id/item4Days" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Divider Line -->
+            <View
+                android:id="@+id/rowDivider5"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="#CCCCCC"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item4Layout" />
+
+            <!-- Row Item 5 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item5Layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rowDivider5">
+
+                <!-- Data Row -->
+                <TextView
+                    android:id="@+id/item5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Motors"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item5Qty"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/item5Qty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item5UnitPrice"
+                    app:layout_constraintStart_toEndOf="@id/item5"
+                    app:layout_constraintTop_toTopOf="@id/item5" />
+
+                <TextView
+                    android:id="@+id/item5UnitPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item5Days"
+                    app:layout_constraintStart_toEndOf="@id/item5Qty"
+                    app:layout_constraintTop_toTopOf="@id/item5Qty" />
+
+                <TextView
+                    android:id="@+id/item5Days"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item5Amount"
+                    app:layout_constraintStart_toEndOf="@id/item5UnitPrice"
+                    app:layout_constraintTop_toTopOf="@id/item5UnitPrice" />
+
+                <TextView
+                    android:id="@+id/item5Amount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/item5Days"
+                    app:layout_constraintTop_toTopOf="@id/item5Days" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Divider Line -->
+            <View
+                android:id="@+id/rowDivider6"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="#CCCCCC"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item5Layout" />
+
+            <!-- Row Item 6 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item6Layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rowDivider6">
+
+                <!-- Data Row -->
+                <TextView
+                    android:id="@+id/item6"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Generators"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item6Qty"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/item6Qty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item6UnitPrice"
+                    app:layout_constraintStart_toEndOf="@id/item6"
+                    app:layout_constraintTop_toTopOf="@id/item6" />
+
+                <TextView
+                    android:id="@+id/item6UnitPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item6Days"
+                    app:layout_constraintStart_toEndOf="@id/item6Qty"
+                    app:layout_constraintTop_toTopOf="@id/item6Qty" />
+
+                <TextView
+                    android:id="@+id/item6Days"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item6Amount"
+                    app:layout_constraintStart_toEndOf="@id/item6UnitPrice"
+                    app:layout_constraintTop_toTopOf="@id/item6UnitPrice" />
+
+                <TextView
+                    android:id="@+id/item6Amount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/item6Days"
+                    app:layout_constraintTop_toTopOf="@id/item6Days" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Divider Line -->
+            <View
+                android:id="@+id/rowDivider7"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="#CCCCCC"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item6Layout" />
+
+            <!-- Row Item 7 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/item7Layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rowDivider7">
+
+                <!-- Data Row -->
+                <TextView
+                    android:id="@+id/item7"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Wheel"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item7Qty"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/item7Qty"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item7UnitPrice"
+                    app:layout_constraintStart_toEndOf="@id/item7"
+                    app:layout_constraintTop_toTopOf="@id/item7" />
+
+                <TextView
+                    android:id="@+id/item7UnitPrice"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item7Days"
+                    app:layout_constraintStart_toEndOf="@id/item7Qty"
+                    app:layout_constraintTop_toTopOf="@id/item7Qty" />
+
+                <TextView
+                    android:id="@+id/item7Days"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toStartOf="@id/item7Amount"
+                    app:layout_constraintStart_toEndOf="@id/item7UnitPrice"
+                    app:layout_constraintTop_toTopOf="@id/item7UnitPrice" />
+
+                <TextView
+                    android:id="@+id/item7Amount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_11ssp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/item7Days"
+                    app:layout_constraintTop_toTopOf="@id/item7Days" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Divider Line -->
+            <View
+                android:id="@+id/rowDivider8"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:background="#CCCCCC"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/item7Layout" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Totals -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_5sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tableLayout">
+
+            <!-- Totals Text-->
+            <TextView
+                android:id="@+id/total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/total"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_12ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/totalRent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textColor="@color/payment_color"
+                android:textSize="@dimen/_11ssp"
+                android:layout_marginStart="@dimen/_2sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/total"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/thankYou"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:text="@string/thank_you_for_renting_with_us"
+            android:textColor="@color/dark_gray"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_20sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/invoiceView">
+
+        <ImageView
+            android:id="@+id/shareBtn"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:layout_marginEnd="@dimen/_50sdp"
+            android:src="@drawable/share"
+            app:layout_constraintEnd_toStartOf="@+id/saveImageBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/share"
+            android:textColor="@color/light_gray"
+            app:layout_constraintTop_toBottomOf="@+id/shareBtn"
+            app:layout_constraintStart_toStartOf="@+id/shareBtn"
+            app:layout_constraintEnd_toEndOf="@+id/shareBtn"/>
+
+
+        <ImageView
+            android:id="@+id/saveImageBtn"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:layout_marginEnd="@dimen/_60sdp"
+            android:src="@drawable/image"
+            app:layout_constraintEnd_toStartOf="@+id/savePdfBtn"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save_to_gallery"
+            android:textColor="@color/light_gray"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_constraintTop_toBottomOf="@+id/saveImageBtn"
+            app:layout_constraintStart_toStartOf="@+id/saveImageBtn"
+            app:layout_constraintEnd_toEndOf="@+id/saveImageBtn"/>
+
+        <ImageView
+            android:id="@+id/savePdfBtn"
+            android:layout_width="@dimen/_15sdp"
+            android:layout_height="@dimen/_15sdp"
+            android:layout_marginEnd="@dimen/_20sdp"
+            android:src="@drawable/pdf"
+            android:layout_marginHorizontal="@dimen/_30sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save_as_pdf"
+            android:textColor="@color/light_gray"
+            android:layout_marginEnd="@dimen/_10sdp"
+            app:layout_constraintTop_toBottomOf="@+id/savePdfBtn"
+            app:layout_constraintStart_toStartOf="@+id/savePdfBtn"
+            app:layout_constraintEnd_toEndOf="@+id/savePdfBtn"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

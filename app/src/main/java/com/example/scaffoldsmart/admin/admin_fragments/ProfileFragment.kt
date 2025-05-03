@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
@@ -20,10 +21,10 @@ import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.AdminDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentProfileBinding
+import com.example.scaffoldsmart.databinding.InvoiceItemBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
 import com.example.scaffoldsmart.util.CheckNetConnectvity
 import com.example.scaffoldsmart.util.OnesignalService
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -40,13 +41,15 @@ class ProfileFragment : Fragment() {
     private var phone: String = ""
     private lateinit var onesignal: OnesignalService
     private lateinit var chatPreferences: SharedPreferences
+    private lateinit var invoicePreferences: SharedPreferences
     private var senderUid: String? = null
-
     private lateinit var viewModel: AdminViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         chatPreferences = requireActivity().getSharedPreferences("CHATADMIN", MODE_PRIVATE)
+        invoicePreferences = requireActivity().getSharedPreferences("INVOICE", MODE_PRIVATE)
 
         onesignal = OnesignalService(requireActivity())
 
@@ -78,6 +81,15 @@ class ProfileFragment : Fragment() {
             otherPlatformDialog()
         }
 
+        binding.sendReminderBtn.setOnClickListener {
+            showReminderBottomSheet()
+        }
+
+        binding.invoiceGenerateBtn.setOnClickListener {
+            invoicePreferences.edit { putString("USER", "admin") }
+            showInvoiceBottomSheet()
+        }
+
         binding.logoutBtn.setOnClickListener {
             if (CheckNetConnectvity.hasInternetConnection(requireActivity())) {
                 val auth = FirebaseAuth.getInstance()
@@ -96,11 +108,6 @@ class ProfileFragment : Fragment() {
                 Toast.makeText(requireActivity(), "Please check your internet connection and try again", Toast.LENGTH_SHORT).show()
             }
         }
-
-        binding.sendReminderBtn.setOnClickListener {
-            showBottomSheet()
-        }
-
     }
 
     private fun observeAdminLiveData() {
@@ -170,8 +177,13 @@ class ProfileFragment : Fragment() {
             }
     }
 
-    private fun showBottomSheet() {
+    private fun showReminderBottomSheet() {
         val bottomSheetDialog = ReminderSendFragment()
         bottomSheetDialog.show(requireActivity().supportFragmentManager, "Reminder")
+    }
+
+    private fun showInvoiceBottomSheet() {
+        val bottomSheetDialog = InvoiceFragment()
+        bottomSheetDialog.show(requireActivity().supportFragmentManager, "Invoice")
     }
 }

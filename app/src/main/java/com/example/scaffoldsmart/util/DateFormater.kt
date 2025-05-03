@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 object DateFormater {
     /*fun formatRelativeTimestamp(timestamp: Long?): String {
@@ -175,6 +176,24 @@ object DateFormater {
         val totalMonthDifference = yearsDifference * 12 + monthsDifference
 
         return totalMonthDifference.toString() + " month" + (if (totalMonthDifference != 1) "s" else "")
+    }
+
+    fun calculateDurationInDays(startDateString: String, endDateString: String): Int {
+        val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+
+        val startDate: Date? = inputFormat.parse(startDateString)
+        val endDate: Date? = inputFormat.parse(endDateString)
+
+        if (startDate == null || endDate == null) {
+            // Consider throwing an exception or returning a specific error value
+            return -1 // Example error value
+        }
+
+        // Calculate the difference in milliseconds
+        val timeDifference = endDate.time - startDate.time
+
+        // Convert milliseconds to days
+        return TimeUnit.DAYS.convert(timeDifference, TimeUnit.MILLISECONDS).toInt()
     }
 
     fun compareDateWithCurrentDate(endDuration: String): Boolean {

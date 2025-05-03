@@ -12,6 +12,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import androidx.core.content.edit
 
 class AdminMessageListenerService : Service() {
 
@@ -122,9 +123,9 @@ class AdminMessageListenerService : Service() {
      */
     private fun saveNotifiedMessageIds() {
         val sharedPreferences = getSharedPreferences("NotifiedMessages", MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putStringSet("notifiedMessageIds", notifiedMessageIds)
-        editor.apply()
+        sharedPreferences.edit {
+            putStringSet("notifiedMessageIds", notifiedMessageIds)
+        }
         Log.d("MessageListenerService", "Saved notifiedMessageIds: $notifiedMessageIds")
     }
 

@@ -65,7 +65,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var chatPreferences: SharedPreferences
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            // Handle back button press here
+            startActivity(Intent(this@ChatActivity, AdminMainActivity::class.java))
             finish()
         }
     }

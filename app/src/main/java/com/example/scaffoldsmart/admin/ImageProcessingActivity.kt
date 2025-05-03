@@ -84,19 +84,11 @@ class ImageProcessingActivity : AppCompatActivity() {
                     result?.let {
                         displayResults(it)
                     } ?: run {
-                        Toast.makeText(
-                            this@ImageProcessingActivity,
-                            "Detection failed",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this@ImageProcessingActivity, "Detection failed", Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Detection error", e)
-                    Toast.makeText(
-                        this@ImageProcessingActivity,
-                        "Error: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this@ImageProcessingActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 } finally {
                     progressDialog?.dismiss()
                     binding.detectButton.isEnabled = true
