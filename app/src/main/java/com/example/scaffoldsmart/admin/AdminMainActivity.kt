@@ -27,6 +27,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
+import com.example.scaffoldsmart.ImageProcessingActivity
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.ActivityMainAdminBinding
@@ -235,17 +236,6 @@ class AdminMainActivity : AppCompatActivity() {
             Toast.makeText(this, "Error processing image: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-
-    /*private fun uriToBitmap(uri: Uri): Bitmap {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri)) { decoder, _, _ ->
-                decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
-                decoder.isMutableRequired = true
-            }
-        } else {
-            MediaStore.Images.Media.getBitmap(contentResolver, uri).copy(Bitmap.Config.ARGB_8888, false)
-        }
-    }*/
 
     private fun requestPermissionsAndLaunchCamera(dialog: AlertDialog) {
         if (checkCameraPermission()) {

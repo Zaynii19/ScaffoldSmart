@@ -30,7 +30,7 @@ class ScaffoldingPipeDetector(context: Context) {
 
     // Detection parameters
     private val PIPE_CLASS_ID = 0 // Assuming pipe is class 0
-    private val MIN_CONFIDENCE = 0.5f
+    private val MIN_CONFIDENCE = 0.7f
     private val NMS_THRESHOLD = 0.5f
 
     init {

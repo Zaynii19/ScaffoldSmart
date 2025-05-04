@@ -37,7 +37,7 @@
             android:name=".InvoiceActivity"
             android:exported="false" />
         <activity
-            android:name=".admin.ImageProcessingActivity"
+            android:name=".ImageProcessingActivity"
             android:exported="false" />
         <activity
             android:name=".client.ClientCostComparisonActivity"

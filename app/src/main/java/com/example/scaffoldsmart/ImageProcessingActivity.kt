@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.admin
+package com.example.scaffoldsmart
 
 import android.app.ProgressDialog
 import android.content.Intent
@@ -10,16 +10,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.createBitmap
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.databinding.ActivityImageProcessingBinding
 import com.example.scaffoldsmart.util.ScaffoldingPipeDetector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.core.graphics.createBitmap
 
 class ImageProcessingActivity : AppCompatActivity() {
 
@@ -59,7 +59,9 @@ class ImageProcessingActivity : AppCompatActivity() {
 
         // Setup buttons
         binding.detectButton.setOnClickListener { detectPipes() }
+
         binding.backBtn.setOnClickListener { finish() }
+
         binding.settingBtn.setOnClickListener {
             startActivity(Intent(this, SettingActivity::class.java))
             finish()
