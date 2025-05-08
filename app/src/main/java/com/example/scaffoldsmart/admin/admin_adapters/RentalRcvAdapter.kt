@@ -46,7 +46,7 @@ class RentalRcvAdapter(
         holder.binding.clientName.text = currentItem.clientName
 
         val itemsList = mutableListOf<String>()
-        if (currentItem.pipes != 0) itemsList.add("Pipes")
+        if (currentItem.pipes != 0) itemsList.add("Scaffolding Pipes")
         if (currentItem.joints != 0) itemsList.add("Joints")
         if (currentItem.wench != 0) itemsList.add("Wench")
         if (currentItem.pumps != 0) itemsList.add("Pumps")
@@ -56,6 +56,7 @@ class RentalRcvAdapter(
 
         if (itemsList.isNotEmpty()) {
             holder.binding.rentalItems.text = itemsList.joinToString(", ")
+            holder.binding.rentalItems.isSelected = true
         } else {
             holder.binding.rentalItems.text = ""
         }

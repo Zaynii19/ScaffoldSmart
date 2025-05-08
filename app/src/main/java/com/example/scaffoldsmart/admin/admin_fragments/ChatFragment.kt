@@ -177,29 +177,6 @@ class ChatFragment : Fragment() {
         })
     }
 
-    /*private fun storeChatUser(users: ArrayList<ChatUserModel>) {
-        // store client data
-        for (user in users) {
-            Firebase.database.reference.child("ChatUser").child(user.uid!!).setValue(user)
-                .addOnSuccessListener {
-                    Log.d("ChatFragDebug", "User data added to Firebase successfully!")
-                }
-                .addOnFailureListener { error ->
-                    Log.e("ChatFragDebug", "Failed to add user data to Firebase: ${error.message}")
-                }
-        }
-
-        // store Admin data
-        val user = ChatUserModel(senderUid, senderName)
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).setValue(user)
-            .addOnSuccessListener {
-                Log.d("ChatFragDebug", "User data added to Firebase successfully!")
-            }
-            .addOnFailureListener { error ->
-                Log.e("ChatFragDebug", "Failed to add user data to Firebase: ${error.message}")
-            }
-    }*/
-
     private fun storeChatUser(users: ArrayList<ChatUserModel>) {
         // store client data
         for (user in users) {

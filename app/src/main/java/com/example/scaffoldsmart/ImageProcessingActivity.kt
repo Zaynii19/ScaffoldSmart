@@ -10,13 +10,15 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.databinding.ActivityImageProcessingBinding
-import com.example.scaffoldsmart.util.ScaffoldingPipeDetector
+import com.example.scaffoldsmart.util.RoboflowObjectDetector
+import com.example.scaffoldsmart.util.TfliteObjectDetector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,7 +29,8 @@ class ImageProcessingActivity : AppCompatActivity() {
         ActivityImageProcessingBinding.inflate(layoutInflater)
     }
     private var originalBitmap: Bitmap? = null
-    private var scaffoldingDetector: ScaffoldingPipeDetector? = null
+    //private var tfliteObjectDetector: tfliteObjectDetector? = null
+    private var roboflowObjectDetector: RoboflowObjectDetector? = null
     private val TAG = "ImageProcessingDebug"
     private var progressDialog: ProgressDialog? = null
 
@@ -41,7 +44,10 @@ class ImageProcessingActivity : AppCompatActivity() {
             insets
         }
 
-        scaffoldingDetector = ScaffoldingPipeDetector(this)
+        //tfliteObjectDetector = tfliteObjectDetector(this)
+
+        roboflowObjectDetector = RoboflowObjectDetector()
+
         progressDialog = ProgressDialog(this).apply {
             setMessage("Detecting pipes...")
             setCancelable(false)
@@ -75,16 +81,18 @@ class ImageProcessingActivity : AppCompatActivity() {
                     // Show loading UI
                     progressDialog?.show()
                     binding.detectButton.isEnabled = false
-                    binding.countResult.text = ""
+                    binding.detectButton.backgroundTintList = ContextCompat.getColorStateList(this@ImageProcessingActivity, R.color.dark_gray)
 
                     // Run detection
                     val result = withContext(Dispatchers.IO) {
-                        scaffoldingDetector?.detectPipes(bitmap)
+                        //tfliteObjectDetector?.detectPipes(bitmap)
+                        roboflowObjectDetector?.detectPipes(bitmap)
                     }
 
                     // Update UI
                     result?.let {
                         displayResults(it)
+                        Log.d(TAG, "Detection Result : ${it.pipeCount}, ${it.overlayBitmap}, ${it.allDetections}")
                     } ?: run {
                         Toast.makeText(this@ImageProcessingActivity, "Detection failed", Toast.LENGTH_SHORT).show()
                     }
@@ -94,6 +102,7 @@ class ImageProcessingActivity : AppCompatActivity() {
                 } finally {
                     progressDialog?.dismiss()
                     binding.detectButton.isEnabled = true
+                    binding.detectButton.backgroundTintList = ContextCompat.getColorStateList(this@ImageProcessingActivity, R.color.buttons_color)
                 }
             }
         } ?: run {
@@ -101,7 +110,7 @@ class ImageProcessingActivity : AppCompatActivity() {
         }
     }
 
-    private fun displayResults(result: ScaffoldingPipeDetector.PipeDetectionResult) {
+    private fun displayResults(result: RoboflowObjectDetector.PipeDetectionResult) {
         // Show overlay image with pipe detections
         result.overlayBitmap?.let { overlay ->
             // Combine original image with overlay
@@ -127,7 +136,8 @@ class ImageProcessingActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        scaffoldingDetector?.close()
+        //tfliteObjectDetector?.close()
+        roboflowObjectDetector?.close()
         originalBitmap?.recycle()
         super.onDestroy()
     }

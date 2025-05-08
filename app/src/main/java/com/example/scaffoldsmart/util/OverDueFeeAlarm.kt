@@ -28,7 +28,6 @@ object OverDueFeeAlarm {
         }
     }
 
-
     @SuppressLint("ScheduleExactAlarm")
     private fun scheduleSingleAlarm(context: Context, triggerAtMillis: Long) {
         val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager

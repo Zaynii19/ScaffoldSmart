@@ -94,29 +94,6 @@ class AdminMainActivity : AppCompatActivity() {
         binding.countPipes.setOnClickListener {
             showImageOptionDialog()
         }
-
-        // Get the FCM device token
-        /*FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("AdminMainDebug", "Fetching FCM registration token failed", task.exception)
-                return@OnCompleteListener
-            }
-
-            // Get new FCM registration token
-            val token = task.result
-
-            Log.d("AdminMainDebug", "Admin Token: $token")
-        })*/
-
-        // Subscribe to the FCM topic
-        /*FirebaseMessaging.getInstance().subscribeToTopic("admin_topic")
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d("AdminMainDebug", "Subscription successful", task.exception)
-                } else{
-                    Log.e("AdminMainDebug", "Subscription failed", task.exception)
-                }
-            }*/
     }
 
     override fun onResume() {

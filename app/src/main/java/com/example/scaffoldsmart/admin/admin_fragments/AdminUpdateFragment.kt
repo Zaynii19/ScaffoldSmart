@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
-import com.example.scaffoldsmart.util.Encryption
+import com.example.scaffoldsmart.util.Security
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.FragmentAdminUpdateBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -42,7 +42,7 @@ class AdminUpdateFragment : BottomSheetDialogFragment() {
             if (admin != null) {
                 binding.adminName.setText(admin.name)
                 binding.email.setText(admin.email)
-                val decryptedPassword = Encryption.decrypt(admin.pass)
+                val decryptedPassword = Security.decrypt(admin.pass)
                 binding.password.setText(decryptedPassword)
                 binding.companyName.setText(admin.company)
                 binding.phoneNum.setText(admin.phone)

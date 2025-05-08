@@ -30,6 +30,7 @@ class RecentChaRcvAdapter(
         val chatItem = chatList[position]
         holder.binding.userName.text = chatItem.userName
         holder.binding.message.text = chatItem.lastMsg
+        holder.binding.message.isSelected = true
         holder.binding.lastMessageTime.text = DateFormater.formatTimestampForMsg(chatItem.lastMsgTime)
         if (chatItem.clientNewMsgCount == 0) {
             holder.binding.newMessageCount.visibility = View.GONE

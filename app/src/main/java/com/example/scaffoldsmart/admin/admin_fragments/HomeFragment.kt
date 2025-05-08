@@ -19,11 +19,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.util.Encryption
+import com.example.scaffoldsmart.util.Security
 import com.example.scaffoldsmart.admin.ClientActivity
 import com.example.scaffoldsmart.admin.InventoryActivity
 import com.example.scaffoldsmart.admin.SettingActivity
-import com.example.scaffoldsmart.admin.admin_adapters.ScafoldRcvAdapter
+import com.example.scaffoldsmart.admin.admin_adapters.ScaffoldRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.AdminModel
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
@@ -58,13 +58,12 @@ class HomeFragment : Fragment() {
     private var userType: String = ""
     private var pass: String = ""
     private var infoList = ArrayList<ScafoldInfoModel>()
-    private lateinit var adapter: ScafoldRcvAdapter
+    private lateinit var adapter: ScaffoldRcvAdapter
     private var reqList = ArrayList<RentalModel>()
     private var filteredRentals = ArrayList<RentalModel>()
     private lateinit var viewModel: AdminViewModel
     private lateinit var reqViewModel: RentalViewModel
     private var durationInMonths: String = ""
-    private var status: String = ""
     private var bottomSheetDialog: BottomSheetDialogFragment? = null
     private lateinit var chatPreferences: SharedPreferences
     private var smartContract: SmartContract? = null
@@ -133,13 +132,13 @@ class HomeFragment : Fragment() {
 
     private fun setRcv() {
         binding.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        adapter = ScafoldRcvAdapter(requireActivity(), infoList)
+        adapter = ScaffoldRcvAdapter(requireActivity(), infoList)
         binding.rcv.adapter = adapter
         binding.rcv.setHasFixedSize(true)
     }
 
     private fun storeAdminData() {
-        val encryptedPassword = Encryption.encrypt(pass)
+        val encryptedPassword = Security.encrypt(pass)
         userType = "Admin"
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
@@ -237,7 +236,7 @@ class HomeFragment : Fragment() {
 
             // Determine the status
             val isOverdue = DateFormater.compareDateWithCurrentDate(rental.endDuration)
-            status = if (isOverdue) {
+            val status = if (isOverdue) {
                 "overdue"
             } else {
                 "ongoing"

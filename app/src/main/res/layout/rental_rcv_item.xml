@@ -2,7 +2,7 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/_120sdp"
+    android:layout_height="@dimen/_140sdp"
     android:layout_margin="@dimen/_10sdp"
     android:backgroundTint="@color/white"
     app:cardCornerRadius="@dimen/_10sdp"
@@ -46,6 +46,12 @@
             android:textColor="@color/black"
             android:textSize="@dimen/_12ssp"
             android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             app:layout_constraintStart_toStartOf="@+id/userProfile"
             app:layout_constraintTop_toBottomOf="@+id/userProfile" />
 
@@ -76,11 +82,12 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/delItem"
+            android:id="@+id/doneRental"
             style="@style/Widget.AppCompat.Button.Borderless"
             android:layout_width="@dimen/_50sdp"
             android:layout_height="@dimen/_50sdp"
             android:scaleType="fitCenter"
+            android:layout_marginTop="@dimen/_40sdp"
             app:layout_constraintEnd_toEndOf="@+id/status"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/status"
@@ -95,8 +102,8 @@
             android:layout_height="@dimen/_50sdp"
             android:scaleType="fitCenter"
             android:layout_marginEnd="@dimen/_10sdp"
-            app:layout_constraintEnd_toStartOf="@+id/delItem"
-            app:layout_constraintTop_toTopOf="@+id/delItem"
+            app:layout_constraintEnd_toStartOf="@+id/doneRental"
+            app:layout_constraintTop_toTopOf="@+id/doneRental"
             app:srcCompat="@drawable/download_contract"
             app:tint="@drawable/menu_item_selector" />
 

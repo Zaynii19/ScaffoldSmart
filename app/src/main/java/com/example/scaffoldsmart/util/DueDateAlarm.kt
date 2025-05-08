@@ -42,7 +42,6 @@ object DueDateAlarm {
         }
     }
 
-
     @SuppressLint("ScheduleExactAlarm")
     private fun scheduleSingleAlarm(context: Context, triggerAtMillis: Long, notificationType: Int) {
         val alarmManager = context.getSystemService(ALARM_SERVICE) as AlarmManager

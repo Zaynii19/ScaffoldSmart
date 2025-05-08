@@ -22,7 +22,7 @@ import com.example.scaffoldsmart.client.client_adapters.ClientInventoryRcvAdapte
 import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientInventoryBinding
-import com.example.scaffoldsmart.util.Encryption
+import com.example.scaffoldsmart.util.Security
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -123,7 +123,7 @@ class ClientInventoryFragment : Fragment() {
         viewModel2.observeClientLiveData().observe(viewLifecycleOwner) { client ->
             binding.loading.visibility = View.GONE
             if (client != null) {
-                currentDecryptedPassword = Encryption.decrypt(client.pass)
+                currentDecryptedPassword = Security.decrypt(client.pass)
                 clientObj = client //Passing whole client to the obj
 
                 // Enable the button if clientObj is not null

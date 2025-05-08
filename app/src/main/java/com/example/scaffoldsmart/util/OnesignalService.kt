@@ -257,8 +257,7 @@ class OnesignalService(val context: Context) {
 
     fun getOneSignalNoti(prevNotiCompletedAt: String, prevNotificationId: String) {
         // Construct the URL for fetching the notification details
-        val notiId = ""
-        val url = "https://api.onesignal.com/notifications/$notiId?app_id=$appId"
+        val url = "https://api.onesignal.com/notifications/?app_id=$appId"
 
         // Build the request
         val request = Request.Builder()

@@ -22,6 +22,8 @@ import com.example.scaffoldsmart.databinding.FragmentClientHomeBinding
 import com.example.scaffoldsmart.util.DateFormater
 import com.example.scaffoldsmart.util.OnesignalService
 import androidx.core.content.edit
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 
 class ClientHomeFragment : Fragment() {
     private val binding by lazy {
@@ -138,13 +140,37 @@ class ClientHomeFragment : Fragment() {
         infoList.clear()
         for (rental in rentals) {
 
+            // Determine the status
+            val isOverdue = DateFormater.compareDateWithCurrentDate(rental.endDuration)
+            val status = if (isOverdue) {
+                "overdue"
+            } else {
+                "ongoing"
+            }
+
             // Calculate the duration in months
             val durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
 
             // Create a ScaffoldInfoModel instance and add to infoList
-            infoList.add(ClientScaffoldInfoModel(rental.rent, durationInMonths, rental.rentStatus))
+            infoList.add(ClientScaffoldInfoModel(rental.rent, durationInMonths, status))
             adapter.updateList(infoList)
+
+            updateRentalStatus(rental, status)
         }
+    }
+
+    private fun updateRentalStatus(currentRental: RentalModel, newRentStatus: String) {
+        val databaseRef = Firebase.database.reference.child("Rentals")
+            .child(currentRental.rentalId) // Reference to the specific rental using rentalId
+
+        val updates = hashMapOf<String, Any>(
+            "rentStatus" to newRentStatus
+        )
+
+        // Update the item with the new values
+        databaseRef.updateChildren(updates)
+            .addOnSuccessListener {}
+            .addOnFailureListener {}
     }
 
     private fun totalDueRent(dueRequests: ArrayList<RentalModel>): Int {

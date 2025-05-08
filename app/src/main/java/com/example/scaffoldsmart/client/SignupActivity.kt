@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.scaffoldsmart.util.Encryption
+import com.example.scaffoldsmart.util.Security
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.client.client_models.ClientModel
@@ -68,7 +68,7 @@ class SignupActivity : AppCompatActivity() {
             email = ""
         }
         pass = binding.pass.text.toString()
-        encryptedPassword = Encryption.encrypt(pass)
+        encryptedPassword = Security.encrypt(pass)
         if (binding.confrmPass.text.toString() != pass) {
             Toast.makeText(this@SignupActivity, "Confirm password not matched", Toast.LENGTH_SHORT).show()
             binding.confrmPass.setText("")
