@@ -1,14 +1,12 @@
-package com.example.scaffoldsmart.admin.admin_fragments
+package com.example.scaffoldsmart.admin.admin_bottomsheets
 
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.edit
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.admin.admin_adapters.InvoiceRcvAdapter
@@ -18,8 +16,7 @@ import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
-import com.example.scaffoldsmart.client.client_models.ClientModel
-import com.example.scaffoldsmart.databinding.FragmentInvoiceBinding
+import com.example.scaffoldsmart.databinding.ShowInvoiceBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
@@ -27,9 +24,9 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 
-class InvoiceFragment : BottomSheetDialogFragment() {
+class ShowInvoice : BottomSheetDialogFragment() {
     private val binding by lazy {
-        FragmentInvoiceBinding.inflate(layoutInflater)
+        ShowInvoiceBinding.inflate(layoutInflater)
     }
     private lateinit var adapter: InvoiceRcvAdapter
     private var rentalList = ArrayList<RentalModel>()
@@ -37,16 +34,16 @@ class InvoiceFragment : BottomSheetDialogFragment() {
     private lateinit var viewModelR: RentalViewModel
     private lateinit var viewModelA: AdminViewModel
     private lateinit var viewModelI: InventoryViewModel
-    private lateinit var adminObj: AdminModel
+    private var adminObj: AdminModel? = null
     private lateinit var invoicePreferences: SharedPreferences
     private lateinit var chatPreferences: SharedPreferences
     private var userType : String? = null
     private var clientUid : String? = null
 
     // Flags to track if data is loaded
-    private var isRentalLoaded = false
-    private var isAdminLoaded = false
-    private var isInventoryLoaded = false
+    private var isRentalLoaded: Boolean? = null
+    private var isAdminLoaded: Boolean? = null
+    private var isInventoryLoaded: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,8 +52,6 @@ class InvoiceFragment : BottomSheetDialogFragment() {
         userType = invoicePreferences.getString("USER", null)
         chatPreferences = requireActivity().getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
         clientUid = chatPreferences.getString("SenderUid", null)
-
-        adminObj = AdminModel()
 
         viewModelR = ViewModelProvider(requireActivity())[RentalViewModel::class.java]
         viewModelR.retrieveRentalReq()
@@ -102,7 +97,7 @@ class InvoiceFragment : BottomSheetDialogFragment() {
             if (rentals != null) {
                 rentalList.clear()
                 // Filter rentals where the status is not empty
-                val filteredRentals = rentals.filter { it.status.isNotEmpty() } as ArrayList<RentalModel>
+                val filteredRentals = rentals.filter { it.status?.isNotEmpty() == true }
                 rentalList.addAll(filteredRentals)
 
                 isRentalLoaded = true
@@ -121,9 +116,8 @@ class InvoiceFragment : BottomSheetDialogFragment() {
             if (rentals != null) {
                 rentalList.clear()
                 // Filter rentals where the status is not empty
-                val filteredRentals = rentals.filter { it.status.isNotEmpty() && it.clientID == clientUid} as ArrayList<RentalModel>
+                val filteredRentals = rentals.filter { rental -> rental.status?.isNotEmpty() == true && rental.clientID == clientUid }.toCollection(ArrayList())
                 rentalList.addAll(filteredRentals)
-
                 isRentalLoaded = true
                 checkAllDataLoaded()
 
@@ -175,7 +169,7 @@ class InvoiceFragment : BottomSheetDialogFragment() {
     }
 
     private fun checkAllDataLoaded() {
-        if (isRentalLoaded && isAdminLoaded && isInventoryLoaded) {
+        if (isRentalLoaded == true && isAdminLoaded == true && isInventoryLoaded == true) {
             // All data is loaded, update the adapter
             adapter.updateData(rentalList, itemList, adminObj)
         }

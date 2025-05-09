@@ -17,14 +17,14 @@ class ClientMsgNotification {
     // Method to handle notification creation
     fun handleNotification(
         context: Context,
-        message: String,
+        message: String?,
         friendName: String?,
         receiverUid: String?
     ) {
         val title = "Message from Admin"
         createNotificationChannel(context)
         val notificationId = message.hashCode() // Unique ID based on item name
-        showNotificationWithData(context, title, message, friendName, receiverUid, notificationId)
+        message?.let { showNotificationWithData(context, title, it, friendName, receiverUid, notificationId) }
     }
 
     // Create notification channel

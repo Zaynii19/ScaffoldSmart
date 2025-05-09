@@ -23,11 +23,11 @@ object DateFormater {
         }
     }*/
 
-    fun formatRentDuration(calendar: Calendar): String {
+    fun formatRentDuration(calendar: Calendar?): String {
         // Create a SimpleDateFormat instance with the desired format
         val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         // Format the date and return the string
-        return dateFormat.format(calendar.time)
+        return dateFormat.format(calendar!!.time)
     }
 
     fun formatTimestampForMsg(timestamp: Long?): String {
@@ -141,14 +141,14 @@ object DateFormater {
         return formattedDate
     }
 
-    fun formatDateString(dateString: String): String {
+    fun formatDateString(dateString: String?): String {
         // Create a SimpleDateFormat instance to parse the input date string
         val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         // Create a SimpleDateFormat instance for the desired output format
         val outputFormat = SimpleDateFormat("d MMMM, yyyy", Locale.getDefault())
 
         // Parse the date string
-        val date = inputFormat.parse(dateString)
+        val date = inputFormat.parse(dateString!!)
 
         // Format the date into the desired output format
         val formattedDate = outputFormat.format(date!!)
@@ -156,11 +156,11 @@ object DateFormater {
         return formattedDate
     }
 
-    fun calculateDurationInMonths(startDateString: String, endDateString: String): String {
+    fun calculateDurationInMonths(startDateString: String?, endDateString: String?): String {
         val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
-        val startDate = inputFormat.parse(startDateString)
-        val endDate = inputFormat.parse(endDateString)
+        val startDate = inputFormat.parse(startDateString!!)
+        val endDate = inputFormat.parse(endDateString!!)
 
         // Create Calendar instances for both dates
         val startCalendar = Calendar.getInstance()
@@ -178,11 +178,11 @@ object DateFormater {
         return totalMonthDifference.toString() + " month" + (if (totalMonthDifference != 1) "s" else "")
     }
 
-    fun calculateDurationInDays(startDateString: String, endDateString: String): Int {
+    fun calculateDurationInDays(startDateString: String?, endDateString: String?): Int {
         val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
-        val startDate: Date? = inputFormat.parse(startDateString)
-        val endDate: Date? = inputFormat.parse(endDateString)
+        val startDate: Date? = inputFormat.parse(startDateString!!)
+        val endDate: Date? = inputFormat.parse(endDateString!!)
 
         if (startDate == null || endDate == null) {
             // Consider throwing an exception or returning a specific error value
@@ -196,11 +196,11 @@ object DateFormater {
         return TimeUnit.DAYS.convert(timeDifference, TimeUnit.MILLISECONDS).toInt()
     }
 
-    fun compareDateWithCurrentDate(endDuration: String): Boolean {
+    fun compareDateWithCurrentDate(endDuration: String?): Boolean {
         val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
 
         // Convert end duration strings to Date type
-        val endDate = inputFormat.parse(endDuration)
+        val endDate = inputFormat.parse(endDuration!!)
 
         // Get current date and format it
         val currentDate = LocalDate.now() // Get current date
@@ -210,10 +210,10 @@ object DateFormater {
         return currentDateParsed!!.after(endDate)
     }
 
-    fun convertDateStringToDateMillis(dateString: String): Long? {
+    fun convertDateStringToDateMillis(dateString: String?): Long? {
         val inputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         return try {
-            val date: Date? = inputFormat.parse(dateString)
+            val date: Date? = inputFormat.parse(dateString!!)
             date!!.time
         } catch (e: Exception) {
             // Handle parsing exception (e.g., invalid date format)
@@ -222,14 +222,14 @@ object DateFormater {
         }
     }
 
-    fun combineAlarmDateTime(dueDate: String): Long {
+    fun combineAlarmDateTime(dueDate: String?): Long {
         val dueDateTime = "10:00 AM" //Trigger alarm on 10 AM of due date
         try {
             val calendar = Calendar.getInstance().apply {
                 clear()
 
                 // Parse date (format: dd-MM-yyyy)
-                val dateParts = dueDate.split("-")
+                val dateParts = dueDate!!.split("-")
                 require(dateParts.size == 3) { "Invalid date format" }
                 set(Calendar.DAY_OF_MONTH, dateParts[0].toInt())
                 set(Calendar.MONTH, dateParts[1].toInt() - 1) // Month is 0-based

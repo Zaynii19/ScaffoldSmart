@@ -19,6 +19,8 @@ import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_adapters.ClientInventoryRcvAdapter
+import com.example.scaffoldsmart.client.client_bottomsheets.UpdateClient
+import com.example.scaffoldsmart.client.client_bottomsheets.SendRentalReq
 import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientInventoryBinding
@@ -77,7 +79,7 @@ class ClientInventoryFragment : Fragment() {
 
         binding.rentalRequestBtn.setOnClickListener {
             clientObj?.let { client ->
-                if (client.cnic.isEmpty() && client.phone.isEmpty() && client.address.isEmpty()) {
+                if (client.cnic.isNullOrEmpty() && client.phone.isNullOrEmpty() && client.address.isNullOrEmpty()) {
                     showVerificationDialog()
                 } else {
                     if (itemList.isEmpty()) {
@@ -123,7 +125,7 @@ class ClientInventoryFragment : Fragment() {
         viewModel2.observeClientLiveData().observe(viewLifecycleOwner) { client ->
             binding.loading.visibility = View.GONE
             if (client != null) {
-                currentDecryptedPassword = Security.decrypt(client.pass)
+                client.pass?.let { currentDecryptedPassword = Security.decrypt(it) }
                 clientObj = client //Passing whole client to the obj
 
                 // Enable the button if clientObj is not null
@@ -134,30 +136,30 @@ class ClientInventoryFragment : Fragment() {
     }
 
     private fun showReqBottomSheet() {
-        val bottomSheetDialog: BottomSheetDialogFragment = RentalReqFragment.newInstance(object : RentalReqFragment.OnSendReqListener {
+        val bottomSheetDialog: BottomSheetDialogFragment = SendRentalReq.newInstance(object : SendRentalReq.OnSendReqListener {
             override fun onReqSendUpdated(
-                rentalAddress: String,
-                startDuration: String,
-                endDuration: String,
-                pipes: Int,
-                pipesLength: Int,
-                joints: Int,
-                wench: Int,
-                pumps: Int,
-                motors: Int,
-                generators: Int,
-                wheel: Int,
-                rent: Int
+                rentalAddress: String?,
+                startDuration: String?,
+                endDuration: String?,
+                pipes: Int?,
+                pipesLength: Int?,
+                joints: Int?,
+                wench: Int?,
+                pumps: Int?,
+                motors: Int?,
+                generators: Int?,
+                wheel: Int?,
+                rent: Int?
             ) {
                 val onesignal = OnesignalService(requireActivity())
                 onesignal.sendReqNotiByOneSignalToSegment(
-                    clientObj!!.id, clientObj!!.name, clientObj!!.address,
-                    clientObj!!.email, clientObj!!.phone, clientObj!!.cnic,
+                    clientObj?.id, clientObj?.name, clientObj?.address,
+                    clientObj?.email, clientObj?.phone, clientObj?.cnic,
                     rentalAddress ,startDuration, endDuration, pipes, pipesLength,
                     joints, wench, pumps, motors, generators, wheel, rent
                 )
             }
-        }, clientObj!!, itemList)
+        }, clientObj, itemList)
         bottomSheetDialog.show(requireActivity().supportFragmentManager, "RentalReq")
     }
 
@@ -184,10 +186,10 @@ class ClientInventoryFragment : Fragment() {
     }
 
     private fun showVerifyBottomSheet() {
-        val bottomSheetDialog: BottomSheetDialogFragment = ClientUpdateFragment.newInstance(object : ClientUpdateFragment.OnClientUpdatedListener {
-            override fun onClientUpdated(name: String, email: String, pass: String, cnic: String, phone: String, address: String) {}
+        val bottomSheetDialog: BottomSheetDialogFragment = UpdateClient.newInstance(object : UpdateClient.OnClientUpdatedListener {
+            override fun onClientUpdated(name: String?, email: String?, pass: String?, cnic: String?, phone: String?, address: String?) {}
 
-            override fun onClientVerified(cnic: String, phone: String, address: String) {
+            override fun onClientVerified(cnic: String?, phone: String?, address: String?) {
                 ClientSettingActivity.verifyClient(cnic, address, phone, currentDecryptedPassword, requireActivity())
             }
         }, true)

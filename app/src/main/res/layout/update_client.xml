@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    tools:context=".client.client_fragments.ClientUpdateFragment">
+    tools:context=".client.client_bottomsheets.UpdateClient">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

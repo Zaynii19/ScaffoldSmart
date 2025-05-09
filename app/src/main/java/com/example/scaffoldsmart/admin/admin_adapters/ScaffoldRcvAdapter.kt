@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ScafoldInfoRcvItemBinding
-import com.example.scaffoldsmart.admin.admin_models.ScafoldInfoModel
+import com.example.scaffoldsmart.admin.admin_models.ScaffoldInfoModel
 
-class ScaffoldRcvAdapter (val context: Context, private var infoList: ArrayList<ScafoldInfoModel>): RecyclerView.Adapter<ScaffoldRcvAdapter.MyInfoViewHolder>() {
+class ScaffoldRcvAdapter (val context: Context, private var infoList: ArrayList<ScaffoldInfoModel>): RecyclerView.Adapter<ScaffoldRcvAdapter.MyInfoViewHolder>() {
     class MyInfoViewHolder(val binding: ScafoldInfoRcvItemBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyInfoViewHolder {
@@ -33,7 +33,7 @@ class ScaffoldRcvAdapter (val context: Context, private var infoList: ArrayList<
         )
     }
 
-    fun updateList(newItems: ArrayList<ScafoldInfoModel>) {
+    fun updateList(newItems: ArrayList<ScaffoldInfoModel>) {
         infoList = newItems
         notifyDataSetChanged()
     }

@@ -36,7 +36,7 @@ class ClientRentalRcvAdapter (val context: Context, private var rentalList: Arra
         val currentItem = rentalList[position]
 
         val itemsList = mutableListOf<String>()
-        if (currentItem.pipes != 0) itemsList.add("Pipes")
+        if (currentItem.pipes != 0) itemsList.add("Scaffolding Pipes")
         if (currentItem.joints != 0) itemsList.add("Joints")
         if (currentItem.wench != 0) itemsList.add("Wench")
         if (currentItem.pumps != 0) itemsList.add("Pumps")
@@ -46,6 +46,7 @@ class ClientRentalRcvAdapter (val context: Context, private var rentalList: Arra
 
         if (itemsList.isNotEmpty()) {
             holder.binding.rentalItems.text = itemsList.joinToString(", ")
+            holder.binding.rentalItems.isSelected = true
         } else {
             holder.binding.rentalItems.text = ""
         }
@@ -89,14 +90,14 @@ class ClientRentalRcvAdapter (val context: Context, private var rentalList: Arra
         binder.rentalDurationTo.text = currentReq.endDuration
         binder.rent.text = "${currentReq.rent}"
         binder.rentalAddress.text = currentReq.rentalAddress
-        setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
-        setViewVisibilityAndText(binder.pipesLength, currentReq.pipesLength, binder.entry9)
-        setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)
-        setViewVisibilityAndText(binder.wench, currentReq.wench, binder.entry11)
-        setViewVisibilityAndText(binder.slugPumps, currentReq.pumps, binder.entry12)
-        setViewVisibilityAndText(binder.motors, currentReq.motors, binder.entry13)
-        setViewVisibilityAndText(binder.generators, currentReq.generators, binder.entry14)
-        setViewVisibilityAndText(binder.wheel, currentReq.wheel, binder.entry15)
+        currentReq.pipes?.let { setViewVisibilityAndText(binder.pipes, it, binder.entry8) }
+        currentReq.pipesLength?.let { setViewVisibilityAndText(binder.pipesLength, it, binder.entry9) }
+        currentReq.joints?.let { setViewVisibilityAndText(binder.joints, it, binder.entry10) }
+        currentReq.wench?.let { setViewVisibilityAndText(binder.wench, it, binder.entry11) }
+        currentReq.pumps?.let { setViewVisibilityAndText(binder.slugPumps, it, binder.entry12) }
+        currentReq.motors?.let { setViewVisibilityAndText(binder.motors, it, binder.entry13) }
+        currentReq.generators?.let { setViewVisibilityAndText(binder.generators, it, binder.entry14) }
+        currentReq.wheel?.let { setViewVisibilityAndText(binder.wheel, it, binder.entry15) }
 
         builder.setView(customDialog)
             .setTitle("Rental Details")

@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import androidx.core.graphics.withTranslation
 
 class SmartContract {
 
@@ -26,28 +27,28 @@ class SmartContract {
 
     fun createScaffoldingContractPdf(
         context: Context,
-        isApproved: Boolean,
-        ownerName: String,
-        company: String,
-        ownerEmail: String,
-        ownerPhone: String,
-        companyAddress: String,
-        clientName: String,
-        clientPhone: String,
-        clientEmail: String,
-        clientCnic: String,
-        clientAddress: String,
-        rentalAddress: String,
-        startDuration: String,
-        endDuration: String,
-        pipes: String,
-        pipesLength: String,
-        joints: String,
-        wench: String,
-        motors: String,
-        pumps: String,
-        generators: String,
-        wheel: String
+        isApproved: Boolean?,
+        ownerName: String?,
+        company: String?,
+        ownerEmail: String?,
+        ownerPhone: String?,
+        companyAddress: String?,
+        clientName: String?,
+        clientPhone: String?,
+        clientEmail: String?,
+        clientCnic: String?,
+        clientAddress: String?,
+        rentalAddress: String?,
+        startDuration: String?,
+        endDuration: String?,
+        pipes: String?,
+        pipesLength: String?,
+        joints: String?,
+        wench: String?,
+        motors: String?,
+        pumps: String?,
+        generators: String?,
+        wheel: String?
     ) {
         // Create a new PdfDocument
         val document = PdfDocument()
@@ -68,7 +69,7 @@ class SmartContract {
         document.finishPage(page1)
 
         try {
-            if (isApproved) {
+            if (isApproved!!) {
                 // Create PDF in memory and send directly
                 val outputStream = ByteArrayOutputStream()
                 document.writeTo(outputStream)
@@ -103,30 +104,30 @@ class SmartContract {
 
     private fun drawPage1Content(
         canvas: Canvas,
-        ownerName: String,
-        company: String,
-        ownerEmail: String,
-        ownerPhone: String,
-        companyAddress: String,
-        clientName: String,
-        clientPhone: String,
-        clientEmail: String,
-        clientCnic: String,
-        clientAddress: String,
-        rentalAddress: String,
-        startDuration: String,
-        endDuration: String,
-        pipes: String,
-        pipesLength: String,
-        joints: String,
-        wench: String,
-        motors: String,
-        pumps: String,
-        generators: String,
-        wheel: String
+        ownerName: String?,
+        company: String?,
+        ownerEmail: String?,
+        ownerPhone: String?,
+        companyAddress: String?,
+        clientName: String?,
+        clientPhone: String?,
+        clientEmail: String?,
+        clientCnic: String?,
+        clientAddress: String?,
+        rentalAddress: String?,
+        startDuration: String?,
+        endDuration: String?,
+        pipes: String?,
+        pipesLength: String?,
+        joints: String?,
+        wench: String?,
+        motors: String?,
+        pumps: String?,
+        generators: String?,
+        wheel: String?
     ) {
-        val formatedStartDate = DateFormater.formatDateString(startDuration)
-        val formatedEndDate = DateFormater.formatDateString(endDuration)
+        val formatedStartDate = DateFormater.formatDateString(startDuration!!)
+        val formatedEndDate = DateFormater.formatDateString(endDuration!!)
         val durationInMonths = DateFormater.calculateDurationInMonths(startDuration, endDuration)
 
         val titlePaint = TextPaint().apply {
@@ -207,34 +208,31 @@ class SmartContract {
             .build()
 
         // Draw the StaticLayout
-        canvas.save()
-        canvas.translate(50f, 80f)
-        staticLayout.draw(canvas)
-        canvas.restore()
+        canvas.withTranslation(50f, 80f) { staticLayout.draw(this) }
 
         // Draw OWNER section
         canvas.drawText("OWNER:", 50f, 120f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, ownerName, 90f, 120f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, company, 50f, 140f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, companyAddress, 50f, 160f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, ownerPhone, 50f, 180f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, ownerEmail, 50f, 200f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, ownerName!!, 90f, 120f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, company!!, 50f, 140f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, companyAddress!!, 50f, 160f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, ownerPhone!!, 50f, 180f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, ownerEmail!!, 50f, 200f + staticLayout.height, textPaint)
 
         // Draw RENTER section
         canvas.drawText("RENTER: ", 50f, 240f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientName, 93f, 240f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientName!!, 93f, 240f + staticLayout.height, textPaint)
         canvas.drawText("Address: ", 50f, 260f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientAddress, 90f, 260f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientAddress!!, 90f, 260f + staticLayout.height, textPaint)
         canvas.drawText("CNIC: ", 50f, 280f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientCnic, 75f, 280f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientCnic!!, 75f, 280f + staticLayout.height, textPaint)
         canvas.drawText("Phone: ", 50f, 300f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientPhone, 85f, 300f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientPhone!!, 85f, 300f + staticLayout.height, textPaint)
         canvas.drawText("Email: ", 50f, 320f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientEmail, 82f, 320f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, clientEmail!!, 82f, 320f + staticLayout.height, textPaint)
 
         // Draw Place of Use & Rental Period
         canvas.drawText("Place of Use: ", 50f, 360f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, rentalAddress, 110f, 360f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, rentalAddress!!, 110f, 360f + staticLayout.height, textPaint)
         canvas.drawText("Rental Period: ", 50f, 380f + staticLayout.height, textPaint)
         drawUnderlinedText(canvas, durationInMonths, 118f, 380f + staticLayout.height, textPaint)
 
@@ -242,20 +240,20 @@ class SmartContract {
         canvas.drawText("Equipment Rented", 230f, 420f + staticLayout.height, titlePaint)
         canvas.drawText("Item                           Quantity                            Length ", 160f, 460f + staticLayout.height, textPaint)
         canvas.drawText("1.Scaffolding Pipes", 140f, 480f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, pipes, 275f, 480f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, pipesLength, 390f, 480f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, pipes!!, 275f, 480f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, pipesLength!!, 390f, 480f + staticLayout.height, textPaint)
         canvas.drawText("2.Joints", 140f, 500f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, joints, 275f, 500f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, joints!!, 275f, 500f + staticLayout.height, textPaint)
         canvas.drawText("3.Electric Motors", 140f, 520f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, motors, 275f, 520f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, motors!!, 275f, 520f + staticLayout.height, textPaint)
         canvas.drawText("4.Generators", 140f, 540f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, generators, 275f, 540f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, generators!!, 275f, 540f + staticLayout.height, textPaint)
         canvas.drawText("5.Slug Pumps", 140f, 560f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, pumps, 275f, 560f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, pumps!!, 275f, 560f + staticLayout.height, textPaint)
         canvas.drawText("6.Wench", 140f, 580f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, wench, 275f, 580f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, wench!!, 275f, 580f + staticLayout.height, textPaint)
         canvas.drawText("7.Wheel Barrows", 140f, 600f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, wheel, 275f, 600f + staticLayout.height, textPaint)
+        drawUnderlinedText(canvas, wheel!!, 275f, 600f + staticLayout.height, textPaint)
 
         // Draw Terms & Conditions
         canvas.drawText("TERMS & CONDITIONS", 50f, 640f + staticLayout.height, conditionTitlePaint)

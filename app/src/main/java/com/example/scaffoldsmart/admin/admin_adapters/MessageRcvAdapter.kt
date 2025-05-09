@@ -24,10 +24,10 @@ import com.google.firebase.database.FirebaseDatabase
 
 class MessageRcvAdapter(
     val context: Context,
-    private val messages: ArrayList<Any>, // Hold both Message and DateHeader
-    private val senderRoom: String,
-    private val receiverRoom: String,
-    private val senderUid: String
+    private val messages: ArrayList<Any>?, // Hold both Message and DateHeader
+    private val senderRoom: String?,
+    private val receiverRoom: String?,
+    private val senderUid: String?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder?>() {
 
     val ITEM_SENT = 1
@@ -48,17 +48,17 @@ class MessageRcvAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (messages[position]) {
+        return when (messages?.get(position)) {
             is MessageModel -> if (senderUid == (messages[position] as MessageModel).senderId) ITEM_SENT else ITEM_RECEIVE
             is DateHeader -> ITEM_DATE_HEADER
             else -> throw IllegalArgumentException("Invalid item type")
         }
     }
 
-    override fun getItemCount(): Int = messages.size
+    override fun getItemCount(): Int = messages?.size ?: 0
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val currentItem = messages[position]) {
+        when (val currentItem = messages?.get(position)) {
             is MessageModel -> {
                 if (holder is SendMsgViewHolder) {
                     bindSentMessage(holder, currentItem)
@@ -205,9 +205,14 @@ class MessageRcvAdapter(
 
         senderMessage.messageId?.let {
             // Update message for sender
-            FirebaseDatabase.getInstance().reference.child("Chat").child(senderRoom).child("Messages").child(it).setValue(senderMessage)
+            senderRoom?.let { sr -> FirebaseDatabase.getInstance().reference.child("Chat").child(sr)
+                .child("Messages").child(it).setValue(senderMessage)
+            }
+
             // Update message for receiver
-            FirebaseDatabase.getInstance().reference.child("Chat").child(receiverRoom).child("Messages").child(it).setValue(receiverMessage)
+            receiverRoom?.let { rr -> FirebaseDatabase.getInstance().reference.child("Chat").child(rr)
+                .child("Messages").child(it).setValue(receiverMessage)
+            }
         }
 
         dialog.dismiss()
@@ -215,7 +220,9 @@ class MessageRcvAdapter(
 
     private fun deleteForMe(messageModel: MessageModel, dialog: AlertDialog) {
         messageModel.messageId?.let {
-            FirebaseDatabase.getInstance().reference.child("Chat").child(senderRoom).child("Messages").child(it).setValue(null)
+            senderRoom?.let { sr -> FirebaseDatabase.getInstance().reference.child("Chat").child(sr)
+                .child("Messages").child(it).setValue(null)
+            }
         }
         dialog.dismiss()
     }

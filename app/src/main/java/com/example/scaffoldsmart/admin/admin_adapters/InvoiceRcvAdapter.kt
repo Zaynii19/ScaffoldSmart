@@ -2,10 +2,6 @@ package com.example.scaffoldsmart.admin.admin_adapters
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
-import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,14 +15,11 @@ import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.AdminModel
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
-import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.databinding.GenerateInvoiceRcvItemBinding
 import com.example.scaffoldsmart.databinding.InvoiceItemBinding
 import com.example.scaffoldsmart.util.DateFormater
 import com.example.scaffoldsmart.util.InvoiceGenerator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.io.ByteArrayOutputStream
-import kotlin.collections.plusAssign
 
 class InvoiceRcvAdapter(
     val context: Context,
@@ -72,7 +65,7 @@ class InvoiceRcvAdapter(
         binder.customerPhone.text = currentRent.clientPhone
 
         binder.invoiceNumber.text = buildString {
-            append("Invoice ID# ")
+            append("ShowInvoice ID# ")
             append(generateInvoiceId())
         }
 
@@ -107,7 +100,7 @@ class InvoiceRcvAdapter(
                 putExtra(Intent.EXTRA_STREAM, InvoiceGenerator.getImageUri(context, bitmap))
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            context.startActivity(Intent.createChooser(shareIntent, "Share Invoice"))
+            context.startActivity(Intent.createChooser(shareIntent, "Share ShowInvoice"))
             dialog.dismiss()
         }
 
@@ -115,7 +108,7 @@ class InvoiceRcvAdapter(
             val bitmap = InvoiceGenerator.createBitmapFromView(binder.main)
             val uri = InvoiceGenerator.saveBitmapToGallery(bitmap, context)
             if (uri != null) {
-                Toast.makeText(context, "Invoice saved to gallery", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "ShowInvoice saved to gallery", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(context, "Failed to save invoice", Toast.LENGTH_SHORT).show()
             }
@@ -137,7 +130,7 @@ class InvoiceRcvAdapter(
                 ))
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            context.startActivity(Intent.createChooser(shareIntent, "Share PDF Invoice"))
+            context.startActivity(Intent.createChooser(shareIntent, "Share PDF ShowInvoice"))
             dialog.dismiss()
         }
 
@@ -167,7 +160,7 @@ class InvoiceRcvAdapter(
             else -> Triple("", 0, 0)
         }
 
-        if (quantity > 0 && price > 0) {
+        if (quantity != null && price != null && quantity > 0 && price > 0) {
             entry.visibility = View.VISIBLE
             item.text = itemName
             qty.text = quantity.toString()
@@ -182,7 +175,7 @@ class InvoiceRcvAdapter(
         }
     }
 
-    private fun findItemData(currentRent: RentalModel, itemType: String): Triple<String, Int, Int> {
+    private fun findItemData(currentRent: RentalModel, itemType: String): Triple<String?, Int?, Int?> {
         val quantity = when (itemType) {
             "pipe" -> currentRent.pipes
             "joint" -> currentRent.joints
@@ -197,14 +190,14 @@ class InvoiceRcvAdapter(
         if (quantity == 0) return Triple("", 0, 0)
 
         val item = itemList.find {
-            it.itemName.lowercase().contains(itemType)
+            it.itemName?.lowercase()!!.contains(itemType)
         }
 
-        return if (item != null) {
+        return (if (item != null) {
             Triple(item.itemName, quantity, item.price)
         } else {
             Triple("", 0, 0)
-        }
+        })
     }
 
     private fun generateInvoiceId(): String {
@@ -221,12 +214,14 @@ class InvoiceRcvAdapter(
         return invoiceId.padStart(8, '0').take(8)
     }
 
-    fun updateData(newRentalList: List<RentalModel>, newItemList: List<InventoryModel>, newAdminObj: AdminModel) {
+    fun updateData(newRentalList: List<RentalModel>, newItemList: List<InventoryModel>, newAdminObj: AdminModel?) {
         rentalList.clear()
         rentalList.addAll(newRentalList)
         itemList.clear()
         itemList.addAll(newItemList)
-        adminObj = newAdminObj
+        if (newAdminObj != null) {
+            adminObj = newAdminObj
+        }
         notifyDataSetChanged()
     }
 }

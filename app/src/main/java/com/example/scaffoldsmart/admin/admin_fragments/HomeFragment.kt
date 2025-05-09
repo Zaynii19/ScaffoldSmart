@@ -28,7 +28,7 @@ import com.example.scaffoldsmart.admin.admin_models.AdminModel
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.FragmentHomeBinding
-import com.example.scaffoldsmart.admin.admin_models.ScafoldInfoModel
+import com.example.scaffoldsmart.admin.admin_models.ScaffoldInfoModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
@@ -42,6 +42,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
 import androidx.core.content.edit
+import com.example.scaffoldsmart.admin.admin_bottomsheets.ShowRentalReq
 
 class HomeFragment : Fragment() {
 
@@ -49,21 +50,20 @@ class HomeFragment : Fragment() {
         FragmentHomeBinding.inflate(layoutInflater)
     }
     private lateinit var onesignal: OnesignalService
-    private var id: String = ""
-    private var name: String = ""
-    private var email: String = ""
-    private var company: String = ""
-    private var address: String = ""
-    private var phone: String = ""
-    private var userType: String = ""
-    private var pass: String = ""
-    private var infoList = ArrayList<ScafoldInfoModel>()
+    private var id: String? = null
+    private var name: String? = null
+    private var email: String? = null
+    private var company: String? = null
+    private var address: String? = null
+    private var phone: String? = null
+    private var userType: String? = null
+    private var pass: String? = null
+    private var infoList = ArrayList<ScaffoldInfoModel>()
     private lateinit var adapter: ScaffoldRcvAdapter
     private var reqList = ArrayList<RentalModel>()
     private var filteredRentals = ArrayList<RentalModel>()
     private lateinit var viewModel: AdminViewModel
     private lateinit var reqViewModel: RentalViewModel
-    private var durationInMonths: String = ""
     private var bottomSheetDialog: BottomSheetDialogFragment? = null
     private lateinit var chatPreferences: SharedPreferences
     private var smartContract: SmartContract? = null
@@ -138,7 +138,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun storeAdminData() {
-        val encryptedPassword = Security.encrypt(pass)
+        val encryptedPassword = pass?.let { Security.encrypt(it) }
         userType = "Admin"
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
@@ -203,7 +203,7 @@ class HomeFragment : Fragment() {
             binding.loading.visibility = View.GONE
             if (rentals != null) {
                 // Filter rentals where the status is not empty
-                filteredRentals = rentals.filter { it.status.isNotEmpty() } as ArrayList<RentalModel>
+                val filteredRentals = rentals.filter { it.status?.isNotEmpty() == true } as ArrayList<RentalModel>
 
                 binding.totalPaymentReceived.text = buildString {
                     append(totalPaymentReceived(filteredRentals))
@@ -213,7 +213,7 @@ class HomeFragment : Fragment() {
                 populateInfoList(filteredRentals)
 
                 // Filter rentals where the status is empty
-                val filteredRequests = rentals.filter { it.status.isEmpty() }
+                val filteredRequests = rentals.filter { it.status?.isEmpty() == true }
                 populateReqList(filteredRequests)
             }
         }
@@ -243,10 +243,10 @@ class HomeFragment : Fragment() {
             }
 
             // Calculate the duration in months
-            durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
+            val durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
 
             // Create a ScaffoldInfoModel instance and add to infoList
-            infoList.add(ScafoldInfoModel(rental.clientName, durationInMonths, status))
+            infoList.add(ScaffoldInfoModel(rental.clientName, durationInMonths, status))
             adapter.updateList(infoList)
 
             updateRentalStatus(rental, status)
@@ -254,17 +254,17 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateRentalStatus(currentRental: RentalModel, newRentStatus: String) {
-        val databaseRef = Firebase.database.reference.child("Rentals")
-            .child(currentRental.rentalId) // Reference to the specific rental using rentalId
+        currentRental.rentalId?.let { rentalId ->
 
-        val updates = hashMapOf<String, Any>(
-            "rentStatus" to newRentStatus
-        )
-
-        // Update the item with the new values
-        databaseRef.updateChildren(updates)
-            .addOnSuccessListener {}
-            .addOnFailureListener {}
+            val update = mapOf("rentStatus" to newRentStatus)
+            Firebase.database.reference.child("Rentals")
+                .child(rentalId)
+                .updateChildren(update)
+                .addOnSuccessListener {}
+                .addOnFailureListener {}
+        } ?: run {
+            Log.e("HomeFragDebug", "Cannot update - rentalId is null")
+        }
     }
 
     private fun populateReqList(filteredRequests: List<RentalModel>) {
@@ -278,7 +278,7 @@ class HomeFragment : Fragment() {
             binding.notiAlert.visibility = View.VISIBLE
         } else {
             binding.notiAlert.visibility = View.GONE // Hide if no empty status requests
-            if (bottomSheetDialog != null && bottomSheetDialog!!.isVisible) {
+            if (bottomSheetDialog != null && bottomSheetDialog?.isVisible == true) {
                 bottomSheetDialog?.dismiss() // Dismiss if open
             }
             Log.d("HomeFragDebug", "observeRentalReqLiveData: No empty status requests")
@@ -314,13 +314,13 @@ class HomeFragment : Fragment() {
         binder.rentalDurationTo.text = currentReq.endDuration
 
         // Regular quantities (just numbers)
-        setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
-        setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)
-        setViewVisibilityAndText(binder.wench, currentReq.wench, binder.entry11)
-        setViewVisibilityAndText(binder.slugPumps, currentReq.pumps, binder.entry12)
-        setViewVisibilityAndText(binder.motors, currentReq.motors, binder.entry13)
-        setViewVisibilityAndText(binder.generators, currentReq.generators, binder.entry14)
-        setViewVisibilityAndText(binder.wheel, currentReq.wheel, binder.entry15)
+        currentReq.pipes?.let { setViewVisibilityAndText(binder.pipes, it, binder.entry8) }
+        currentReq.joints?.let { setViewVisibilityAndText(binder.joints, it, binder.entry10) }
+        currentReq.wench?.let { setViewVisibilityAndText(binder.wench, it, binder.entry11) }
+        currentReq.pumps?.let { setViewVisibilityAndText(binder.slugPumps, it, binder.entry12) }
+        currentReq.motors?.let { setViewVisibilityAndText(binder.motors, it, binder.entry13) }
+        currentReq.generators?.let { setViewVisibilityAndText(binder.generators, it, binder.entry14) }
+        currentReq.wheel?.let { setViewVisibilityAndText(binder.wheel, it, binder.entry15) }
 
         // Special case for pipe length (with "feet" unit)
         if (currentReq.pipesLength != 0) {
@@ -340,7 +340,7 @@ class HomeFragment : Fragment() {
             .setPositiveButton("Approve") { dialog, _ ->
                 approveRentalReq(currentReq)
                 notifyClient(currentReq, true)
-                smartContract!!.createScaffoldingContractPdf(
+                smartContract?.createScaffoldingContractPdf(
                     requireActivity(), true, name, company, email, phone, address, currentReq.clientName, currentReq.clientPhone,
                     currentReq.clientEmail, currentReq.clientCnic, currentReq.clientAddress, currentReq.rentalAddress, currentReq.startDuration,
                     currentReq.endDuration, currentReq.pipes.toString(), currentReq.pipesLength.toString(), currentReq.joints.toString(),
@@ -391,122 +391,109 @@ class HomeFragment : Fragment() {
 
     private fun approveRentalReq(currentReq: RentalModel) {
         // Reference to the specific req in Firebase
-        val databaseRef = Firebase.database.reference.child("Rentals")
-            .child(currentReq.rentalId) // Reference to the specific req using reqId
+        currentReq.rentalId?.let { reqId ->
 
-        // Update the status
-        val newStatus = "approved"
+            // Update the status
+            val newStatus = "approved"
 
-        // Determine the rent status
-        val isOverdue = DateFormater.compareDateWithCurrentDate(currentReq.endDuration)
-        val newRentStatus = if (isOverdue) {
-            "overdue"
-        } else {
-            "ongoing"
+            // Determine the rent status
+            val isOverdue = DateFormater.compareDateWithCurrentDate(currentReq.endDuration)
+            val newRentStatus = if (isOverdue) {
+                "overdue"
+            } else {
+                "ongoing"
+            }
+
+            val updates = hashMapOf<String, Any>(
+                "status" to newStatus,
+                "rentStatus" to newRentStatus
+            )
+
+            Firebase.database.reference.child("Rentals")
+                .child(reqId) // Reference to the specific req using reqId
+                .updateChildren(updates)
+                .addOnSuccessListener {
+                    Toast.makeText(requireActivity(), "Request Approved", Toast.LENGTH_SHORT).show()
+                    // Remove the item from the list
+                    reqList.remove(currentReq)
+                    adapter.notifyDataSetChanged()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(requireActivity(), "Failed to approve request", Toast.LENGTH_SHORT).show()
+                }
+        } ?: run {
+            Log.e("HomeFragDebug", "Cannot Approve - reqId is null")
         }
-
-        val updates = hashMapOf<String, Any>(
-            "status" to newStatus,
-            "rentStatus" to newRentStatus
-        )
-
-        // Update the item with the new values
-        databaseRef.updateChildren(updates)
-            .addOnSuccessListener {
-                Toast.makeText(requireActivity(), "Request Approved", Toast.LENGTH_SHORT).show()
-                // Remove the item from the list
-                reqList.remove(currentReq)
-                adapter.notifyDataSetChanged()
-            }
-            .addOnFailureListener {
-                Toast.makeText(requireActivity(), "Failed to approve request", Toast.LENGTH_SHORT).show()
-            }
     }
 
     private fun delRentalReq(currentReq: RentalModel) {
-        // Reference to the specific req in Firebase
-        val databaseRef = Firebase.database.reference.child("Rentals")
-            .child(currentReq.rentalId) // Reference to the specific req using reqId
-        databaseRef.removeValue()
-            .addOnSuccessListener {
-                Toast.makeText(requireActivity(), "Request rejected from ${currentReq.clientName}", Toast.LENGTH_SHORT).show()
-                // Remove the item from the list
-                reqList.remove(currentReq)
-                adapter.notifyDataSetChanged()
-            }
-            .addOnFailureListener {
-                Toast.makeText(requireActivity(), "Failed to reject request", Toast.LENGTH_SHORT).show()
-            }
+        currentReq.rentalId?.let { reqId ->
+            Firebase.database.reference.child("Rentals")
+                .child(reqId) // Reference to the specific req using reqId
+                .removeValue()
+                .addOnSuccessListener {
+                    Toast.makeText(requireActivity(), "Request rejected from ${currentReq.clientName}", Toast.LENGTH_SHORT).show()
+                    // Remove the item from the list
+                    reqList.remove(currentReq)
+                    adapter.notifyDataSetChanged()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(requireActivity(), "Failed to reject request", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 
     private fun notifyClient(currentReq: RentalModel, isApproved: Boolean) {
         if (isApproved) {
             val title = "Rental Request Alert"
             val message = "Your Rental Request Has Been Approved. Click to view rental details."
-            val externalId = listOf(currentReq.clientEmail)
-            onesignal.sendNotiByOneSignalToExternalId(title, message, externalId)
+            currentReq.clientEmail?.let { email ->
+                val externalId = listOf(email)
+                onesignal.sendNotiByOneSignalToExternalId(title, message, externalId)
+            } ?: Toast.makeText(context, "Skipped notifying - client email is null", Toast.LENGTH_SHORT).show()
         } else {
             val title = "Rental Request Alert"
             val message = "Your Rental Request Has Been Rejected."
-            val externalId = listOf(currentReq.clientEmail)
-            onesignal.sendNotiByOneSignalToExternalId(title, message, externalId)
+            currentReq.clientEmail?.let { email ->
+                val externalId = listOf(email)
+                onesignal.sendNotiByOneSignalToExternalId(title, message, externalId)
+            } ?: Toast.makeText(context, "Skipped notifying - client email is null", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun updateInventory(
-        pipeQuantity: Int,
-        jointsQuantity: Int,
-        wenchQuantity: Int,
-        pumpsQuantity: Int,
-        motorsQuantity: Int,
-        generatorsQuantity: Int,
-        wheelQuantity: Int
+        pipeQuantity: Int?,
+        jointsQuantity: Int?,
+        wenchQuantity: Int?,
+        pumpsQuantity: Int?,
+        motorsQuantity: Int?,
+        generatorsQuantity: Int?,
+        wheelQuantity: Int?
     ) {
-        itemList.forEach { item ->
-            val lowerName = item.itemName.lowercase()
-            val databaseRef = Firebase.database.reference.child("Inventory").child(item.itemId)
+        // Define quantities in a map (key = keyword, value = quantity to deduct)
+        val quantitiesToDeduct = mapOf(
+            "pipe" to pipeQuantity,
+            "joint" to jointsQuantity,
+            "wench" to wenchQuantity,
+            "pump" to pumpsQuantity,
+            "motor" to motorsQuantity,
+            "generator" to generatorsQuantity,
+            "wheel" to wheelQuantity
+        )
 
-            when {
-                lowerName.contains("pipe") && pipeQuantity.toString().isNotEmpty() -> {
-                    if (item.quantity >= pipeQuantity) {
-                        val remaining = (item.quantity - pipeQuantity)
-                        databaseRef.updateChildren(mapOf("quantity" to remaining))
-                    }
-                }
-                lowerName.contains("joint") && jointsQuantity.toString().isNotEmpty() -> {
-                    if (item.quantity >= jointsQuantity) {
-                        val remaining = (item.quantity - jointsQuantity)
-                        databaseRef.updateChildren(mapOf("quantity" to remaining))
-                    }
-                }
-                lowerName.contains("wench") && wenchQuantity.toString().isNotEmpty() -> {
-                    if (item.quantity >= wenchQuantity) {
-                        val remaining = (item.quantity - wenchQuantity)
-                        databaseRef.updateChildren(mapOf("quantity" to remaining))
-                    }
-                }
-                lowerName.contains("pump") && pumpsQuantity.toString().isNotEmpty() -> {
-                    if (item.quantity >= pumpsQuantity) {
-                        val remaining = (item.quantity - pumpsQuantity)
-                        databaseRef.updateChildren(mapOf("quantity" to remaining))
-                    }
-                }
-                lowerName.contains("motor") && motorsQuantity.toString().isNotEmpty() -> {
-                    if (item.quantity >= motorsQuantity) {
-                        val remaining = (item.quantity - motorsQuantity)
-                        databaseRef.updateChildren(mapOf("quantity" to remaining))
-                    }
-                }
-                lowerName.contains("generator") && generatorsQuantity.toString().isNotEmpty() -> {
-                    if (item.quantity >= generatorsQuantity) {
-                        val remaining = (item.quantity - generatorsQuantity)
-                        databaseRef.updateChildren(mapOf("quantity" to remaining))
-                    }
-                }
-                lowerName.contains("wheel") && wheelQuantity.toString().isNotEmpty() -> {
-                    if (item.quantity >= wheelQuantity) {
-                        val remaining = (item.quantity - wheelQuantity)
-                        databaseRef.updateChildren(mapOf("quantity" to remaining))
+        itemList.forEach { item ->
+            val lowerName = item.itemName?.lowercase()
+            val databaseRef = item.itemId?.let { Firebase.database.reference.child("Inventory").child(it) }
+
+            quantitiesToDeduct.forEach { (keyword, deductQuantity) ->
+                if (deductQuantity != null) {
+                    if (lowerName?.contains(keyword) == true && deductQuantity > 0) {
+                        item.quantity?.let {
+                            if (it >= deductQuantity) {
+                                val remaining = item.quantity?.minus(deductQuantity)
+                                databaseRef?.updateChildren(mapOf("quantity" to remaining))
+                            }
+                        }
                     }
                 }
             }
@@ -514,14 +501,14 @@ class HomeFragment : Fragment() {
     }
 
     private fun showBottomSheet() {
-        bottomSheetDialog = AdminRentalReqFragment.newInstance(reqList)
+        bottomSheetDialog = ShowRentalReq.newInstance(reqList)
         bottomSheetDialog?.show(requireActivity().supportFragmentManager, "Request")
     }
 
     private fun totalPaymentReceived(filteredRentals: ArrayList<RentalModel>): Int {
         var total = 0
         for (rental in filteredRentals) {
-            total += rental.rent.toInt()
+            rental.rent?.let { total += it }
         }
         return total
     }

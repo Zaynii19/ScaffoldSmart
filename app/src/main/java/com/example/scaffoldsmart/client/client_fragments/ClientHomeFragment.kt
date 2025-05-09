@@ -98,15 +98,15 @@ class ClientHomeFragment : Fragment() {
         viewModel.observeClientLiveData().observe(viewLifecycleOwner) { client ->
             binding.loading.visibility = View.GONE
             if (client != null) {
-                clientID = client.id
-                name = client.name
-                email = client.email
-                role = client.userType
+                client.id?.let { clientID = it }
+                client.name?.let { name = it }
+                client.email?.let { email = it }
+                client.userType?.let { role = it }
+
                 binding.welcomeTxt.text = buildString {
                     append("Welcome, ")
                     append(name)
                 }
-
 
                 onesignal.oneSignalLogin(email, role)
 
@@ -127,7 +127,7 @@ class ClientHomeFragment : Fragment() {
                 val filteredRentals = rentals.filter { it.clientID == clientID && it.status == "approved"}
                 populateInfoList(filteredRentals)
 
-                dueRequests = rentals.filter { it.clientID == clientID && it.status.isEmpty()} as ArrayList<RentalModel>
+                dueRequests = rentals.filter { it.clientID == clientID && it.status?.isEmpty() == true } as ArrayList<RentalModel>
                 binding.totalPaymentDue.text = buildString {
                     append(totalDueRent(dueRequests))
                     append(" .Rs")
@@ -152,7 +152,7 @@ class ClientHomeFragment : Fragment() {
             val durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
 
             // Create a ScaffoldInfoModel instance and add to infoList
-            infoList.add(ClientScaffoldInfoModel(rental.rent, durationInMonths, status))
+            rental.rent?.let { infoList.add(ClientScaffoldInfoModel(it, durationInMonths, status)) }
             adapter.updateList(infoList)
 
             updateRentalStatus(rental, status)
@@ -160,23 +160,23 @@ class ClientHomeFragment : Fragment() {
     }
 
     private fun updateRentalStatus(currentRental: RentalModel, newRentStatus: String) {
-        val databaseRef = Firebase.database.reference.child("Rentals")
-            .child(currentRental.rentalId) // Reference to the specific rental using rentalId
+        currentRental.rentalId?.let { rentalId ->
 
-        val updates = hashMapOf<String, Any>(
-            "rentStatus" to newRentStatus
-        )
-
-        // Update the item with the new values
-        databaseRef.updateChildren(updates)
-            .addOnSuccessListener {}
-            .addOnFailureListener {}
+            val update = mapOf("rentStatus" to newRentStatus)
+            Firebase.database.reference.child("Rentals")
+                .child(rentalId)
+                .updateChildren(update)
+                .addOnSuccessListener {}
+                .addOnFailureListener {}
+        } ?: run {
+            Log.e("ClientHomeFragDebug", "Cannot update - rentalId is null")
+        }
     }
 
     private fun totalDueRent(dueRequests: ArrayList<RentalModel>): Int {
         var total = 0
         for (request in dueRequests) {
-            total += request.rent
+            request.rent?.let { total += it }
         }
         return total
     }

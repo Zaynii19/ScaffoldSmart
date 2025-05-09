@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".admin.admin_fragments.AddInventoryFragment"
+    tools:context=".admin.admin_bottomsheets.AddInventory"
     android:background="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout

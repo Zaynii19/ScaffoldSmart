@@ -17,16 +17,16 @@ class AdminMsgNotification {
     // Method to handle notification creation
     fun handleNotification(
         context: Context,
-        senderName: String,
-        message: String,
+        senderName: String?,
+        message: String?,
         receiverName: String?,
         receiverUid: String?
     ) {
-        val name = senderName.split("\\s".toRegex()).firstOrNull()
+        val name = senderName?.split("\\s".toRegex())?.firstOrNull()
         val title = "Message from Client $name"
         val notificationId = message.hashCode() // Unique ID based on item name
         createNotificationChannel(context)
-        showNotificationWithData(context, title, message, receiverName, receiverUid, notificationId)
+        message?.let { showNotificationWithData(context, title, it, receiverName, receiverUid, notificationId) }
     }
 
     // Create notification channel

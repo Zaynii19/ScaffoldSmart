@@ -22,13 +22,13 @@ class SignupActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivitySignupBinding.inflate(layoutInflater)
     }
-    private var id: String = ""
-    private var name: String = ""
-    private var email: String = ""
-    private var pass: String = ""
-    private var confirmPass: String = ""
-    private var userType: String = ""
-    private var encryptedPassword: String = ""
+    private var id: String? = null
+    private var name: String? = null
+    private var email: String? = null
+    private var pass: String? = null
+    private var confirmPass: String? = null
+    private var userType: String? = null
+    private var encryptedPassword: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +68,7 @@ class SignupActivity : AppCompatActivity() {
             email = ""
         }
         pass = binding.pass.text.toString()
-        encryptedPassword = Security.encrypt(pass)
+        encryptedPassword = pass?.let { Security.encrypt(it) }
         if (binding.confrmPass.text.toString() != pass) {
             Toast.makeText(this@SignupActivity, "Confirm password not matched", Toast.LENGTH_SHORT).show()
             binding.confrmPass.setText("")
@@ -80,41 +80,44 @@ class SignupActivity : AppCompatActivity() {
 
     private fun signupClient() {
         //Checks if fields are empty or not
-        if (binding.clientName.text.toString() == "" &&
-            binding.email.text.toString() == "" &&
-            binding.pass.text.toString() == "" &&
-            binding.confrmPass.text.toString() == ""
-        )
-        {
+        if (binding.clientName.text.toString().isEmpty() &&
+            binding.email.text.toString().isEmpty() &&
+            binding.pass.text.toString().isEmpty() &&
+            binding.confrmPass.text.toString().isEmpty()
+        ) {
             Toast.makeText(this@SignupActivity, "Please fill all the details first", Toast.LENGTH_SHORT).show()
-        }else{
+        } else{
             binding.loading.visibility = View.VISIBLE
-            Firebase.auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
-                binding.loading.visibility = View.GONE
-                if (task.isSuccessful) {
-                    val userId = Firebase.auth.currentUser?.uid
-                    if (userId != null) {
-                        // Create client model with generated Firebase key
-                        val clientRef = Firebase.database.reference.child("Client").child(userId)
-                        id = clientRef.push().key ?: return@addOnCompleteListener // Safely handle null keys
-                        userType = "Client"
-                        val client = ClientModel(userType, id, name, email, encryptedPassword, "", "", "")
+            email?.let { e ->
+                pass?.let { p ->
+                    Firebase.auth.createUserWithEmailAndPassword(e, p).addOnCompleteListener { task ->
+                        binding.loading.visibility = View.GONE
+                        if (task.isSuccessful) {
+                            val userId = Firebase.auth.currentUser?.uid
+                            if (userId != null) {
+                                // Create client model with generated Firebase key
+                                val clientRef = Firebase.database.reference.child("Client").child(userId)
+                                id = clientRef.push().key ?: return@addOnCompleteListener // Safely handle null keys
+                                userType = "Client"
+                                val client = ClientModel(userType, id, name, e, encryptedPassword)
 
-                        // Store user data in Firebase Database
-                        clientRef.setValue(client).addOnCompleteListener { storeTask ->
-                            if (storeTask.isSuccessful) {
-                                Toast.makeText(this, "SignUp Successful", Toast.LENGTH_SHORT).show()
-                                startActivity(Intent(this, ClientMainActivity::class.java))
-                                finish()
+                                // Store user data in Firebase Database
+                                clientRef.setValue(client).addOnCompleteListener { storeTask ->
+                                    if (storeTask.isSuccessful) {
+                                        Toast.makeText(this, "SignUp Successful", Toast.LENGTH_SHORT).show()
+                                        startActivity(Intent(this, ClientMainActivity::class.java))
+                                        finish()
+                                    } else {
+                                        handleError("Failed to save client data: ${storeTask.exception?.localizedMessage}")
+                                    }
+                                }
                             } else {
-                                handleError("Failed to save client data: ${storeTask.exception?.localizedMessage}")
+                                handleError("Failed to retrieve user ID after signup.")
                             }
+                        } else {
+                            handleError("SignUp Failed: ${task.exception?.localizedMessage}")
                         }
-                    } else {
-                        handleError("Failed to retrieve user ID after signup.")
                     }
-                } else {
-                    handleError("SignUp Failed: ${task.exception?.localizedMessage}")
                 }
             }
         }

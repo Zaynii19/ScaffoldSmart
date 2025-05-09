@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.admin.admin_fragments
+package com.example.scaffoldsmart.admin.admin_bottomsheets
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -11,27 +11,26 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
-import com.example.scaffoldsmart.databinding.FragmentAddInventoryBinding
+import com.example.scaffoldsmart.databinding.AddInventoryBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class AddInventoryFragment : BottomSheetDialogFragment() {
+class AddInventory : BottomSheetDialogFragment() {
 
     private val binding by lazy {
-        FragmentAddInventoryBinding.inflate(layoutInflater)
+        AddInventoryBinding.inflate(layoutInflater)
     }
 
     private lateinit var availabilityAdapter: ArrayAdapter<String>
-    private var selectedAvailability = ""
+    private var selectedAvailability: String? = null
     private lateinit var availabilityOptions: List<String>
     private lateinit var inventoryPreferences: SharedPreferences
     private var isUpdate = false
-    private var itemId: String = ""
-
+    private var itemId: String? = null
     private var onInventoryUpdatedListener: OnInventoryUpdatedListener? = null
 
     interface OnInventoryUpdatedListener {
-        fun onInventoryAdded(itemName: String, price: Int, quantity: Int, availability: String)
-        fun onInventoryUpdated(itemId: String, itemName: String, price: Int, quantity: Int, availability: String)
+        fun onInventoryAdded(itemName: String?, price: Int?, quantity: Int?, availability: String?)
+        fun onInventoryUpdated(itemId: String?, itemName: String?, price: Int?, quantity: Int?, availability: String?)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,9 +62,9 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
             val quantity = binding.itemQuantity.text.toString()
             val statusValue = selectedAvailability
 
-            if (itemName.isNotEmpty() && price.isNotEmpty() && quantity.isNotEmpty() && statusValue.isNotEmpty()) {
+            if (itemName.isNotEmpty() && price.isNotEmpty() && quantity.isNotEmpty() && statusValue?.isNotEmpty() == true) {
                 if (isUpdate) {
-                    onInventoryUpdatedListener?.onInventoryUpdated(itemId, itemName, price.toInt(), quantity.toInt(), statusValue)
+                    itemId?.let { itID -> onInventoryUpdatedListener?.onInventoryUpdated(itID, itemName, price.toInt(), quantity.toInt(), statusValue) }
                 } else{
                     onInventoryUpdatedListener?.onInventoryAdded(itemName, price.toInt(), quantity.toInt(), statusValue)
                 }
@@ -106,7 +105,7 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
     private fun setValuesForUpdate() {
         val item: InventoryModel = arguments?.getSerializable(ARG_ITEM) as InventoryModel
         binding.title.text = getString(R.string.update_inventory)
-        itemId = item.itemId
+        item.itemId ?.let { itemId = it }
         binding.itemName.setText(item.itemName)
         binding.itemPrice.setText("${item.price}")
         binding.itemQuantity.setText("${item.quantity}")
@@ -116,8 +115,8 @@ class AddInventoryFragment : BottomSheetDialogFragment() {
 
     companion object {
         private const val ARG_ITEM = "arg_item"
-        fun newInstance(listener: OnInventoryUpdatedListener, item: InventoryModel): AddInventoryFragment {
-            val fragment = AddInventoryFragment()
+        fun newInstance(listener: OnInventoryUpdatedListener, item: InventoryModel): AddInventory {
+            val fragment = AddInventory()
 
             fragment.onInventoryUpdatedListener = listener
 

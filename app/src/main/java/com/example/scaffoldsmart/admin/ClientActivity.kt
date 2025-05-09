@@ -101,7 +101,7 @@ class ClientActivity : AppCompatActivity() {
 
                 // Filter the itemList based on the search text (case-insensitive)
                 val filteredList = clientList.filter { client ->
-                    client.name.lowercase().contains(newText!!.lowercase())
+                    client.name?.lowercase()?.contains(newText!!.lowercase()) == true
                 }
 
                 // Update the adapter with the filtered list
@@ -139,7 +139,7 @@ class ClientActivity : AppCompatActivity() {
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Online"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 
     override fun onPause() {
@@ -149,6 +149,6 @@ class ClientActivity : AppCompatActivity() {
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Offline"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 }

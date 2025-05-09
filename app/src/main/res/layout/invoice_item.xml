@@ -90,7 +90,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/companyPhone" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- "Invoice To:" Label -->
+        <!-- "ShowInvoice To:" Label -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout2"
             android:layout_width="wrap_content"
@@ -136,7 +136,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- Invoice Title and Info -->
+        <!-- ShowInvoice Title and Info -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout3"
             android:layout_width="wrap_content"
@@ -156,7 +156,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Invoice No -->
+            <!-- ShowInvoice No -->
             <TextView
                 android:id="@+id/invoiceNumber"
                 android:layout_width="wrap_content"

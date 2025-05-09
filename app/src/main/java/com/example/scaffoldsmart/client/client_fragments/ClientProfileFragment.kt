@@ -17,20 +17,14 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.ChatActivity
-import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
-import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.client.ClientChatActivity
 import com.example.scaffoldsmart.client.ClientCostComparisonActivity
 import com.example.scaffoldsmart.client.ClientSettingActivity
-import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ClientDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentClientProfileBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
 import com.example.scaffoldsmart.util.CheckNetConnectvity
-import com.example.scaffoldsmart.util.OnesignalService
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -39,18 +33,15 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import androidx.core.content.edit
-import com.example.scaffoldsmart.admin.admin_fragments.InvoiceFragment
+import com.example.scaffoldsmart.admin.admin_bottomsheets.ShowInvoice
 import com.example.scaffoldsmart.admin.admin_models.AdminModel
+import com.example.scaffoldsmart.client.client_models.ClientModel
 
 class ClientProfileFragment : Fragment() {
     private val binding by lazy {
         FragmentClientProfileBinding.inflate(layoutInflater)
     }
-    private var email: String = ""
-    private var name: String = ""
-    private var cnic: String = ""
-    private var address: String = ""
-    private var phone: String = ""
+    private var clientObj: ClientModel? = null
     private lateinit var viewModel: ClientViewModel
     private lateinit var chatPreferences: SharedPreferences
     private lateinit var invoicePreferences: SharedPreferences
@@ -111,7 +102,7 @@ class ClientProfileFragment : Fragment() {
                     val presenceMap = HashMap<String, Any>()
                     presenceMap["status"] = "Offline"
                     presenceMap["lastSeen"] = currentTime
-                    Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+                    senderUid?.let { Firebase.database.reference.child("ChatUser").child(it) }?.updateChildren(presenceMap)
                 }
                 Toast.makeText(requireActivity(), "Logout Successful", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(requireActivity(), LoginActivity::class.java))
@@ -129,14 +120,11 @@ class ClientProfileFragment : Fragment() {
     private fun observeClientLiveData() {
         viewModel.observeClientLiveData().observe(viewLifecycleOwner) { client ->
             if (client != null) {
-                name = client.name
-                email = client.email
-                cnic = client.cnic
-                address = client.address
-                phone = client.phone
 
-                binding.userName.text = name
-                binding.email.text = email
+                clientObj = client
+
+                binding.userName.text = client.name
+                binding.email.text = client.email
             }
         }
     }
@@ -145,11 +133,11 @@ class ClientProfileFragment : Fragment() {
         val customDialog = LayoutInflater.from(requireActivity()).inflate(R.layout.client_details_dialog, null)
         val binder = ClientDetailsDialogBinding.bind(customDialog)
 
-        binder.clientName.text = name
-        binder.email.text = email
-        binder.cnic.text = cnic
-        binder.address.text = address
-        binder.phoneNum.text = phone
+        binder.clientName.text = clientObj?.name
+        binder.email.text = clientObj?.email
+        binder.cnic.text = clientObj?.cnic
+        binder.address.text = clientObj?.address
+        binder.phoneNum.text = clientObj?.phone
 
         val builder = MaterialAlertDialogBuilder(requireActivity())
         builder.setView(customDialog)
@@ -213,7 +201,7 @@ class ClientProfileFragment : Fragment() {
     }
 
     private fun showInvoiceBottomSheet() {
-        val bottomSheetDialog = InvoiceFragment()
-        bottomSheetDialog.show(requireActivity().supportFragmentManager, "Invoice")
+        val bottomSheetDialog = ShowInvoice()
+        bottomSheetDialog.show(requireActivity().supportFragmentManager, "ShowInvoice")
     }
 }

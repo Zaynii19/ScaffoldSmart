@@ -17,8 +17,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.util.Security
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.databinding.ActivitySettingBinding
-import com.example.scaffoldsmart.admin.admin_fragments.AdminUpdateFragment
-import com.example.scaffoldsmart.admin.admin_fragments.InventoryThresholdFragment
+import com.example.scaffoldsmart.admin.admin_bottomsheets.UpdateAdmin
+import com.example.scaffoldsmart.admin.admin_bottomsheets.InventoryThreshold
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -73,8 +73,8 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun showUpdateBottomSheet() {
-        val bottomSheetDialog: BottomSheetDialogFragment = AdminUpdateFragment.newInstance(object : AdminUpdateFragment.OnAdminUpdatedListener {
-            override fun onAdminUpdated(name: String, email: String, pass: String, company: String, phone: String, address: String) {
+        val bottomSheetDialog: BottomSheetDialogFragment = UpdateAdmin.newInstance(object : UpdateAdmin.OnAdminUpdatedListener {
+            override fun onAdminUpdated(name: String?, email: String?, pass: String?, company: String?, phone: String?, address: String?) {
                 updateAdminData(name, email, pass, company, address, phone)
             }
         })
@@ -82,19 +82,17 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun updateAdminData(
-        name: String,
-        email: String,
-        pass: String,
-        company: String,
-        address: String,
-        phone: String
+        name: String?,
+        email: String?,
+        pass: String?,
+        company: String?,
+        address: String?,
+        phone: String?
     ) {
         val currentUser = Firebase.auth.currentUser
 
         viewModel.observeAdminLiveData().observe(this) { admin ->
-            if (admin != null) {
-                currentDecryptedPassword = Security.decrypt(admin.pass)
-            }
+            admin?.pass?.let { currentDecryptedPassword = Security.decrypt(it) }
         }
 
         if (currentUser != null) {
@@ -103,21 +101,21 @@ class SettingActivity : AppCompatActivity() {
             currentUser.reauthenticate(credential)
                 .addOnSuccessListener {
                     // Step 2: Verify before updating email
-                    currentUser.verifyBeforeUpdateEmail(email)
+                    email?.let { e -> currentUser.verifyBeforeUpdateEmail(e)
                         .addOnSuccessListener {
 
                             showEmailVerificationDialog()
 
                             // Step 3: Update password
-                            currentUser.updatePassword(pass)
+                            pass?.let { p -> currentUser.updatePassword(p)
                                 .addOnSuccessListener {
                                     // Step 4: Update other admin data in Firebase Database
                                     val databaseRef = Firebase.database.reference.child("Admin")
                                         .child(currentUser.uid)
 
-                                    val encryptedPassword = Security.encrypt(pass)
+                                    val encryptedPassword = Security.encrypt(p)
 
-                                    val updates = hashMapOf<String, Any>(
+                                    val updates = hashMapOf<String, Any?>(
                                         "name" to name,
                                         "email" to email,
                                         "pass" to encryptedPassword, // Storing encrypted password
@@ -162,6 +160,8 @@ class SettingActivity : AppCompatActivity() {
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
+                            }
+
                         }
                         .addOnFailureListener { verificationException ->
                             Toast.makeText(
@@ -170,6 +170,7 @@ class SettingActivity : AppCompatActivity() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+                    }
                 }
                 .addOnFailureListener { reAuthException ->
                     Toast.makeText(
@@ -204,7 +205,7 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun showInventoryThresholdBottomSheet() {
-        val bottomSheetDialog = InventoryThresholdFragment()
+        val bottomSheetDialog = InventoryThreshold()
         bottomSheetDialog.show(this.supportFragmentManager, "InventoryThreshold")
     }
 
@@ -215,7 +216,7 @@ class SettingActivity : AppCompatActivity() {
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Online"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 
     override fun onPause() {
@@ -225,6 +226,6 @@ class SettingActivity : AppCompatActivity() {
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Offline"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 }

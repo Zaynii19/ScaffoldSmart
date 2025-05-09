@@ -21,13 +21,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_adapters.InventoryRcvAdapter
 import com.example.scaffoldsmart.databinding.ActivityInventoryBinding
-import com.example.scaffoldsmart.admin.admin_fragments.AddInventoryFragment
-import com.example.scaffoldsmart.admin.admin_fragments.AddInventoryFragment.OnInventoryUpdatedListener
+import com.example.scaffoldsmart.admin.admin_bottomsheets.AddInventory
+import com.example.scaffoldsmart.admin.admin_bottomsheets.AddInventory.OnInventoryUpdatedListener
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
+import androidx.core.content.edit
 
 class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionListener {
     private val binding by lazy {
@@ -76,9 +77,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
 
         binding.addInventoryItem.setOnClickListener {
             isUpdate = false
-            val editor = inventoryPreferences.edit()
-            editor.putBoolean("Update", isUpdate)
-            editor.apply()
+            inventoryPreferences.edit { putBoolean("Update", isUpdate) }
             // Dummy item
             val item = InventoryModel()
             showBottomSheet(item)
@@ -125,7 +124,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
 
                 // Filter the itemList based on the search text (case-insensitive)
                 val filteredList = itemList.filter { item ->
-                    item.itemName.lowercase().contains(newText!!.lowercase())
+                    item.itemName?.lowercase()?.contains(newText?.lowercase() ?: "") == true
                 }
 
                 // Update the adapter with the filtered list
@@ -136,13 +135,13 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     }
 
     private fun showBottomSheet(item: InventoryModel) {
-        val bottomSheetDialog: BottomSheetDialogFragment = AddInventoryFragment.newInstance(
+        val bottomSheetDialog: BottomSheetDialogFragment = AddInventory.newInstance(
             object : OnInventoryUpdatedListener {
-                override fun onInventoryUpdated(itemId: String, itemName: String, price: Int, quantity: Int, availability: String) {
-                    updateInventoryItem(item.itemId, itemName, price, quantity, availability)
+                override fun onInventoryUpdated(itemId: String?, itemName: String?, price: Int?, quantity: Int?, availability: String?) {
+                    item.itemId?.let { updateInventoryItem(it, itemName, price, quantity, availability) }
                 }
 
-                override fun onInventoryAdded(itemName: String, price: Int, quantity: Int, availability: String) {
+                override fun onInventoryAdded(itemName: String?, price: Int?, quantity: Int?, availability: String?) {
                     storeInventoryItem(itemName, price, quantity, availability)
                 }
             }
@@ -164,7 +163,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
     }
 
     // Store inventory in common node accessible by both admin and client
-    private fun storeInventoryItem(itemName: String, price: Int, quantity: Int, availability: String) {
+    private fun storeInventoryItem(itemName: String?, price: Int?, quantity: Int?, availability: String?) {
         // Reference to the inventory in Firebase
         val databaseRef = Firebase.database.reference.child("Inventory")
         val newItemRef = databaseRef.push()
@@ -188,21 +187,19 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         }
     }
 
-    private fun updateInventoryItem(itemId: String, itemName: String, price: Int, quantity: Int, availability: String) {
-        // Reference to the specific item in Firebase
-        val databaseRef = Firebase.database.reference.child("Inventory")
-            .child(itemId) // Reference to the specific item using itemId
+    private fun updateInventoryItem(itemId: String?, itemName: String?, price: Int?, quantity: Int?, availability: String?) {
 
         // Create a map of the fields you want to update
-        val updates = hashMapOf<String, Any>(
+        val updates = hashMapOf<String, Any?>(
             "itemName" to itemName,
             "price" to price,
             "quantity" to quantity,
             "availability" to availability
         )
 
-        // Update the item with the new values
-        databaseRef.updateChildren(updates)
+        // Reference to the specific item in Firebase
+        itemId?.let { Firebase.database.reference.child("Inventory").child(it) // Reference to the specific item using itemId
+            .updateChildren(updates)
             .addOnSuccessListener {
                 Toast.makeText(this@InventoryActivity, "Item updated successfully", Toast.LENGTH_SHORT).show()
                 viewModel.retrieveInventory() // Refresh to reflect changes
@@ -210,13 +207,12 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
             .addOnFailureListener {
                 Toast.makeText(this@InventoryActivity, "Failed to update item", Toast.LENGTH_SHORT).show()
             }
+        }
     }
 
     override fun onEditButtonClick(item: InventoryModel) {
         isUpdate = true
-        val editor = inventoryPreferences.edit()
-        editor.putBoolean("Update", isUpdate)
-        editor.apply()
+        inventoryPreferences.edit { putBoolean("Update", isUpdate) }
         showBottomSheet(item)
     }
 
@@ -227,7 +223,7 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Online"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 
     override fun onPause() {
@@ -237,6 +233,6 @@ class InventoryActivity : AppCompatActivity(), InventoryRcvAdapter.OnItemActionL
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Offline"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 }

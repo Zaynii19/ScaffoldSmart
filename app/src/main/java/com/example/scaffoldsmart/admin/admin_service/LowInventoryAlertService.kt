@@ -59,13 +59,15 @@ class LowInventoryAlertService : Service() {
 
     private fun checkInventoryThresholds(items: List<InventoryModel>) {
         items.forEach { item ->
-            if (item.quantity < item.threshold) {
-                notifyLowInventory(item.itemName, item.quantity, item.threshold)
+            item.threshold?.takeIf { threshold ->
+                item.quantity?.let { it < threshold } == true
+            }?.let { threshold ->
+                notifyLowInventory(item.itemName, item.quantity, threshold)
             }
         }
     }
 
-    private fun notifyLowInventory(itemName: String, qty: Int, threshold: Int) {
+    private fun notifyLowInventory(itemName: String?, qty: Int?, threshold: Int?) {
         val title = "Low Inventory Alert"
         val message = "$itemName is running low!. Current Quantity: $qty, Threshold Value: $threshold)"
         val notificationId = itemName.hashCode() // Unique ID based on item name

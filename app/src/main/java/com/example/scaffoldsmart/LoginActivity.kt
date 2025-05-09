@@ -27,15 +27,16 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.FirebaseDatabase
 import com.onesignal.OneSignal
+import androidx.core.content.edit
 
 
 class LoginActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityLoginBinding.inflate(layoutInflater)
     }
-    private var userType: String = ""
-    private var userEmail: String = ""
-    private var userPass: String = ""
+    private var userType: String? = null
+    private var userEmail: String? = null
+    private var userPass: String? = null
     private var permissionRequestCount = 0  // Tracks permission request count
     private lateinit var userPreferences: SharedPreferences
 
@@ -98,48 +99,52 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUser() {
-        if (userEmail.isEmpty() || userPass.isEmpty()) {
+        if (userEmail.isNullOrEmpty() || userPass.isNullOrEmpty()) {
             Toast.makeText(this, "Please fill all the details", Toast.LENGTH_LONG).show()
         } else {
             binding.loading.visibility = View.VISIBLE
-            Firebase.auth.signInWithEmailAndPassword(userEmail, userPass)
-                .addOnCompleteListener { task ->
-                    binding.loading.visibility = View.GONE
-                    if (task.isSuccessful) {
-                        // Sign in success, now get the user role
-                        val userId = Firebase.auth.currentUser?.uid
-                        if (userId != null) {
-                            // Check both Admin and Client nodes
-                            val database = FirebaseDatabase.getInstance()
-                            val adminRef = database.getReference("Admin/$userId")
-                            val clientRef = database.getReference("Client/$userId")
-                            // Check Admin node
-                            adminRef.child("userType").get().addOnSuccessListener { snapshot ->
-                                if (snapshot.exists()) {
-                                    val actualUserType = snapshot.getValue(String::class.java)
-                                    handleUserType(actualUserType, userType)
-                                } else {
-                                    // Check Client node if Admin not found
-                                    clientRef.child("userType").get().addOnSuccessListener { clientSnapshot ->
-                                        if (clientSnapshot.exists()) {
-                                            val actualUserType = clientSnapshot.getValue(String::class.java)
-                                            handleUserType(actualUserType, userType)
+            userEmail?.let { uEmail ->
+                userPass?.let { uPass ->
+                    Firebase.auth.signInWithEmailAndPassword(uEmail, uPass)
+                        .addOnCompleteListener { task ->
+                            binding.loading.visibility = View.GONE
+                            if (task.isSuccessful) {
+                                // Sign in success, now get the user role
+                                val userId = Firebase.auth.currentUser?.uid
+                                if (userId != null) {
+                                    // Check both Admin and Client nodes
+                                    val database = FirebaseDatabase.getInstance()
+                                    val adminRef = database.getReference("Admin/$userId")
+                                    val clientRef = database.getReference("Client/$userId")
+                                    // Check Admin node
+                                    adminRef.child("userType").get().addOnSuccessListener { snapshot ->
+                                        if (snapshot.exists()) {
+                                            val actualUserType = snapshot.getValue(String::class.java)
+                                            userType?.let { handleUserType(actualUserType, it) }
                                         } else {
-                                            Toast.makeText(this, "User type not found.", Toast.LENGTH_SHORT).show()
+                                            // Check Client node if Admin not found
+                                            clientRef.child("userType").get().addOnSuccessListener { clientSnapshot ->
+                                                if (clientSnapshot.exists()) {
+                                                    val actualUserType = clientSnapshot.getValue(String::class.java)
+                                                    userType?.let { handleUserType(actualUserType, it) }
+                                                } else {
+                                                    Toast.makeText(this, "User type not found.", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }.addOnFailureListener {
+                                                Toast.makeText(this, "Failed to retrieve user role.", Toast.LENGTH_SHORT).show()
+                                            }
                                         }
                                     }.addOnFailureListener {
                                         Toast.makeText(this, "Failed to retrieve user role.", Toast.LENGTH_SHORT).show()
                                     }
                                 }
-                            }.addOnFailureListener {
-                                Toast.makeText(this, "Failed to retrieve user role.", Toast.LENGTH_SHORT).show()
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                Toast.makeText(this, "SignIn Failed", Toast.LENGTH_SHORT).show()
                             }
                         }
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Toast.makeText(this, "SignIn Failed", Toast.LENGTH_SHORT).show()
-                    }
                 }
+            }
         }
     }
 
@@ -148,7 +153,7 @@ class LoginActivity : AppCompatActivity() {
         if (actualUserType == expectedUserType) {
             Toast.makeText(this, "SignIn successful", Toast.LENGTH_SHORT).show()
             // Store user type in SharedPreferences
-            userPreferences.edit().putString("USERTYPE", expectedUserType).apply()
+            userPreferences.edit { putString("USERTYPE", expectedUserType) }
 
             // Navigate to the correct dashboard
             when (expectedUserType) {

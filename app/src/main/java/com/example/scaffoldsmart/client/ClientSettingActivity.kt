@@ -24,7 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
-import com.example.scaffoldsmart.client.client_fragments.ClientUpdateFragment
+import com.example.scaffoldsmart.client.client_bottomsheets.UpdateClient
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ActivityClientSettingBinding
 import com.example.scaffoldsmart.util.DueDateAlarm
@@ -116,7 +116,7 @@ class ClientSettingActivity : AppCompatActivity() {
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Online"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 
     override fun onPause() {
@@ -126,7 +126,7 @@ class ClientSettingActivity : AppCompatActivity() {
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Offline"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 
     private fun checkAndUpdateSwitches() {
@@ -299,7 +299,7 @@ class ClientSettingActivity : AppCompatActivity() {
     private fun checkOngoingRentalList(callback: (Boolean) -> Unit) {
         viewModelR.observeRentalReqLiveData().observe(this) { rentals ->
             val filteredRentals = rentals?.filter {
-                it.status.isNotEmpty() && it.clientID == senderUid && it.rentStatus == "ongoing"
+                it.status?.isNotEmpty() == true && it.clientID == senderUid && it.rentStatus == "ongoing"
             } ?: emptyList()
 
             dueRentalList.clear()
@@ -311,7 +311,7 @@ class ClientSettingActivity : AppCompatActivity() {
     private fun checkOverdueRentalList(callback: (Boolean) -> Unit) {
         viewModelR.observeRentalReqLiveData().observe(this) { rentals ->
             val filteredRentals = rentals?.filter {
-                it.status.isNotEmpty() && it.clientID == senderUid && it.rentStatus == "overdue"
+                it.status?.isNotEmpty() == true && it.clientID == senderUid && it.rentStatus == "overdue"
             } ?: emptyList()
 
             overDueRentalList.clear()
@@ -326,45 +326,49 @@ class ClientSettingActivity : AppCompatActivity() {
     }
 
     private fun showBottomSheet() {
-        val bottomSheetDialog: BottomSheetDialogFragment = ClientUpdateFragment.newInstance(object : ClientUpdateFragment.OnClientUpdatedListener {
-            override fun onClientUpdated(name: String, email: String, pass: String, cnic: String, phone: String, address: String) {
+        val bottomSheetDialog: BottomSheetDialogFragment = UpdateClient.newInstance(object : UpdateClient.OnClientUpdatedListener {
+            override fun onClientUpdated(name: String?, email: String?, pass: String?, cnic: String?, phone: String?, address: String?) {
                 viewModelC.observeClientLiveData().observe(this@ClientSettingActivity) { client ->
                     if (client != null) {
-                        val currentDecryptedPassword = Security.decrypt(client.pass)
+                        val currentDecryptedPassword = client.pass?.let { Security.decrypt(it) }
                         updateClientData(name, email, pass, cnic, address, phone, currentDecryptedPassword)
                     }
                 }
             }
 
-            override fun onClientVerified(cnic: String, phone: String, address: String) {}
+            override fun onClientVerified(cnic: String?, phone: String?, address: String?) {}
         }, false)
         bottomSheetDialog.show(this.supportFragmentManager, "Client")
     }
 
     private fun updateClientData(
-        name: String,
-        email: String,
-        pass: String,
-        cnic: String,
-        address: String,
-        phone: String,
-        currentDecryptedPassword: String
+        name: String?,
+        email: String?,
+        pass: String?,
+        cnic: String?,
+        address: String?,
+        phone: String?,
+        currentDecryptedPassword: String?
     ) {
         val currentUser = Firebase.auth.currentUser
 
         if (currentUser != null) {
             // Step 1: Re-authenticate the user
-            val credential = EmailAuthProvider.getCredential(currentUser.email!!, currentDecryptedPassword)
-            currentUser.reauthenticate(credential)
+            val credential = currentUser.email?.let { e ->
+                currentDecryptedPassword?.let { dP ->
+                    EmailAuthProvider.getCredential(e, dP)
+                }
+            }
+            credential?.let { currentUser.reauthenticate(it)
                 .addOnSuccessListener {
                     // Step 2: Verify before updating email
-                    currentUser.verifyBeforeUpdateEmail(email)
+                    email?.let { e -> currentUser.verifyBeforeUpdateEmail(e)
                         .addOnSuccessListener {
 
                             showEmailVerificationDialog()
 
                             // Step 3: Update password
-                            currentUser.updatePassword(pass)
+                            pass?.let { p -> currentUser.updatePassword(p)
                                 .addOnSuccessListener {
                                     // Step 4: Update other admin data in Firebase Database
                                     val databaseRef = Firebase.database.reference.child("Client")
@@ -372,7 +376,7 @@ class ClientSettingActivity : AppCompatActivity() {
 
                                     val encryptedPassword = Security.encrypt(pass)
 
-                                    val updates = hashMapOf<String, Any>(
+                                    val updates = hashMapOf<String, Any?>(
                                         "name" to name,
                                         "email" to email,
                                         "pass" to encryptedPassword, // Storing encrypted password
@@ -417,6 +421,8 @@ class ClientSettingActivity : AppCompatActivity() {
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
+                            }
+
                         }
                         .addOnFailureListener { verificationException ->
                             Toast.makeText(
@@ -425,6 +431,8 @@ class ClientSettingActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG
                             ).show()
                         }
+                    }
+
                 }
                 .addOnFailureListener { reAuthException ->
                     Toast.makeText(
@@ -433,6 +441,8 @@ class ClientSettingActivity : AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
                 }
+            }
+
         } else {
             Toast.makeText(this@ClientSettingActivity, "User not logged in", Toast.LENGTH_SHORT).show()
         }
@@ -461,24 +471,28 @@ class ClientSettingActivity : AppCompatActivity() {
     companion object {
 
         fun verifyClient(
-            cnic: String,
-            address: String,
-            phone: String,
-            currentDecryptedPassword: String,
+            cnic: String?,
+            address: String?,
+            phone: String?,
+            currentDecryptedPassword: String?,
             context: Context
         ) {
             val currentUser = Firebase.auth.currentUser
 
             if (currentUser != null) {
                 // Step 1: Re-authenticate the user
-                val credential = EmailAuthProvider.getCredential(currentUser.email!!, currentDecryptedPassword)
-                currentUser.reauthenticate(credential)
+                val credential = currentUser.email?.let { e ->
+                    currentDecryptedPassword?.let { dP ->
+                        EmailAuthProvider.getCredential(e, dP)
+                    }
+                }
+                credential?.let { currentUser.reauthenticate(it)
                     .addOnSuccessListener {
                         // Step 2: Update client data in Firebase Database
                         val databaseRef = Firebase.database.reference.child("Client")
                             .child(currentUser.uid)
 
-                        val updates = hashMapOf<String, Any>(
+                        val updates = hashMapOf<String, Any?>(
                             "cnic" to cnic,
                             "address" to address,
                             "phone" to phone
@@ -507,6 +521,7 @@ class ClientSettingActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                }
             } else {
                 Toast.makeText(context, "User not logged in", Toast.LENGTH_SHORT).show()
             }

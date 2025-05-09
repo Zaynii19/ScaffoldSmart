@@ -1,6 +1,5 @@
 package com.example.scaffoldsmart.admin.admin_adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -100,13 +99,13 @@ class RentalRcvAdapter(
         binder.rentalDurationTo.text = currentReq.endDuration
 
         // Regular quantities (just numbers)
-        setViewVisibilityAndText(binder.pipes, currentReq.pipes, binder.entry8)
-        setViewVisibilityAndText(binder.joints, currentReq.joints, binder.entry10)
-        setViewVisibilityAndText(binder.wench, currentReq.wench, binder.entry11)
-        setViewVisibilityAndText(binder.slugPumps, currentReq.pumps, binder.entry12)
-        setViewVisibilityAndText(binder.motors, currentReq.motors, binder.entry13)
-        setViewVisibilityAndText(binder.generators, currentReq.generators, binder.entry14)
-        setViewVisibilityAndText(binder.wheel, currentReq.wheel, binder.entry15)
+        currentReq.pipes?.let { setViewVisibilityAndText(binder.pipes, it, binder.entry8) }
+        currentReq.joints?.let { setViewVisibilityAndText(binder.joints, it, binder.entry10) }
+        currentReq.wench?.let { setViewVisibilityAndText(binder.wench, it, binder.entry11) }
+        currentReq.pumps?.let { setViewVisibilityAndText(binder.slugPumps, it, binder.entry12) }
+        currentReq.motors?.let { setViewVisibilityAndText(binder.motors, it, binder.entry13) }
+        currentReq.generators?.let { setViewVisibilityAndText(binder.generators, it, binder.entry14) }
+        currentReq.wheel?.let { setViewVisibilityAndText(binder.wheel, it, binder.entry15) }
 
         // Special case for pipe length (with "feet" unit)
         if (currentReq.pipesLength != 0) {

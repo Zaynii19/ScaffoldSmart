@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_adapters.RentalRcvAdapter
+import com.example.scaffoldsmart.admin.admin_models.AdminModel
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.FragmentRentBinding
@@ -33,11 +34,7 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
     private lateinit var viewModel: RentalViewModel
     private lateinit var viewModelA: AdminViewModel
     private var smartContract: SmartContract? = null
-    private var name: String = ""
-    private var email: String = ""
-    private var company: String = ""
-    private var address: String = ""
-    private var phone: String = ""
+    private var adminObj: AdminModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +79,7 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
         binding.loading.visibility = View.VISIBLE
         viewModel.observeRentalReqLiveData().observe(viewLifecycleOwner) { rentals ->
             binding.loading.visibility = View.GONE
-            val filteredRentals = rentals?.filter { it.status.isNotEmpty() } // Get only approved rentals
+            val filteredRentals = rentals?.filter { it.status?.isNotEmpty() == true } // Get only approved rentals
             rentalList.clear()
             filteredRentals?.let {
                 rentalList.addAll(it)
@@ -97,11 +94,7 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
         viewModelA.observeAdminLiveData().observe(viewLifecycleOwner) { admin ->
             binding.loading.visibility = View.GONE
             if (admin != null) {
-                name = admin.name
-                email = admin.email
-                company = admin.company
-                phone = admin.phone
-                address = admin.address
+                adminObj = admin
             }
         }
     }
@@ -125,7 +118,7 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
             override fun onQueryTextChange(newText: String?): Boolean {
                 // Filter the itemList based on the search text (case-insensitive)
                 val filteredList = rentalList.filter { item ->
-                    item.clientName.lowercase().contains(newText!!.lowercase())
+                    item.clientName?.lowercase()?.contains(newText?.lowercase() ?: "") == true
                 }
 
                 // Update the adapter with the filtered list
@@ -136,10 +129,10 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
     }
 
     override fun onDownloadButtonClick(rental: RentalModel) {
-        smartContract!!.createScaffoldingContractPdf(
-            requireActivity(), false, name, company, email, phone, address, rental.clientName, rental.clientPhone,
-            rental.clientEmail, rental.clientCnic, rental.clientAddress, rental.rentalAddress, rental.startDuration,
-            rental.endDuration, rental.pipes.toString(), rental.pipesLength.toString(), rental.joints.toString(),
+        smartContract?.createScaffoldingContractPdf(
+            requireActivity(), false, adminObj?.name, adminObj?.company, adminObj?.email, adminObj?.phone, adminObj?.address,
+            rental.clientName, rental.clientPhone, rental.clientEmail, rental.clientCnic, rental.clientAddress, rental.rentalAddress,
+            rental.startDuration, rental.endDuration, rental.pipes.toString(), rental.pipesLength.toString(), rental.joints.toString(),
             rental.wench.toString(), rental.motors.toString(), rental.pumps.toString(), rental.generators.toString(), rental.wheel.toString()
         )
     }

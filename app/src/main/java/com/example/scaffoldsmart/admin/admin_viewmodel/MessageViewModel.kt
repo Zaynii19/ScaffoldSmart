@@ -3,7 +3,6 @@ package com.example.scaffoldsmart.admin.admin_viewmodel
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
 import com.example.scaffoldsmart.admin.admin_models.MessageModel
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot

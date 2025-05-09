@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.client.client_fragments
+package com.example.scaffoldsmart.client.client_bottomsheets
 
 import android.app.DatePickerDialog
 import androidx.appcompat.app.AlertDialog
@@ -22,42 +22,43 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
+import com.example.scaffoldsmart.client.ClientCostComparisonActivity
 import com.example.scaffoldsmart.client.client_models.ClientModel
-import com.example.scaffoldsmart.databinding.FragmentRentalReqBinding
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
+import com.example.scaffoldsmart.databinding.SendRentalReqBinding
 import com.example.scaffoldsmart.util.CheckNetConnectvity
 import com.example.scaffoldsmart.util.DateFormater
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.Calendar
 
-class RentalReqFragment : BottomSheetDialogFragment() {
+class SendRentalReq : BottomSheetDialogFragment() {
     private val binding by lazy {
-        FragmentRentalReqBinding.inflate(layoutInflater)
+        SendRentalReqBinding.inflate(layoutInflater)
     }
-    private var clientName: String = ""
-    private var rentalAddress: String = ""
-    private var clientPhone: String = ""
-    private var clientEmail: String = ""
-    private var clientCnic: String = ""
-    private var clientAddress: String = ""
-    private var year: Int = 0
-    private var month: Int = 0
-    private var day: Int = 0
+    private var clientName: String? = null
+    private var rentalAddress: String? = null
+    private var clientPhone: String? = null
+    private var clientEmail: String? = null
+    private var clientCnic: String? = null
+    private var clientAddress: String? = null
+    private var year: Int? = null
+    private var month: Int? = null
+    private var day: Int? = null
     private var fromDate: Calendar? = null
     private var toDate: Calendar? = null
-    private var durationStart: String = ""
-    private var durationEnd: String = ""
-    private var diffInDays: Int = 0
-    private var pipeQuantity: Int = 0
-    private var selectedPipeLength: Int = 0
-    private var pipeLength: Int = 0
-    private var wenchQuantity : Int = 0
-    private var jointsQuantity : Int = 0
-    private var pumpsQuantity : Int = 0
-    private var motorsQuantity : Int = 0
-    private var generatorsQuantity : Int = 0
-    private var wheelQuantity : Int = 0
+    private var durationStart: String? = null
+    private var durationEnd: String? = null
+    private var diffInDays: Int? = null
+    private var pipeQuantity: Int? = null
+    private var selectedPipeLength: Int? = null
+    private var pipeLength: Int? = null
+    private var wenchQuantity : Int? = null
+    private var jointsQuantity : Int? = null
+    private var pumpsQuantity : Int? = null
+    private var motorsQuantity : Int? = null
+    private var generatorsQuantity : Int? = null
+    private var wheelQuantity : Int? = null
     private lateinit var dialog: AlertDialog
     private var datePickerDialog: DatePickerDialog? = null
     private var onSendReqListener: OnSendReqListener? = null
@@ -66,18 +67,18 @@ class RentalReqFragment : BottomSheetDialogFragment() {
 
     interface OnSendReqListener {
         fun onReqSendUpdated(
-            rentalAddress: String,
-            startDuration: String,
-            endDuration: String,
-            pipes: Int,
-            pipesLength: Int,
-            joints: Int,
-            wench: Int,
-            pumps: Int,
-            motors: Int,
-            generators: Int,
-            wheel: Int,
-            rent: Int
+            rentalAddress: String?,
+            startDuration: String?,
+            endDuration: String?,
+            pipes: Int?,
+            pipesLength: Int?,
+            joints: Int?,
+            wench: Int?,
+            pumps: Int?,
+            motors: Int?,
+            generators: Int?,
+            wheel: Int?,
+            rent: Int?
         )
     }
     
@@ -118,7 +119,7 @@ class RentalReqFragment : BottomSheetDialogFragment() {
                     0
                 }
 
-                if (rentalAddress.isEmpty()) {
+                if (rentalAddress.isNullOrEmpty()) {
                     Toast.makeText(context, "Please add rental Address", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
@@ -154,10 +155,12 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     private fun getRentalInfo() {
         getRentalDuration()
 
-        if (binding.pipesQuantity.text!!.isEmpty()) {
-            binding.pipesLength.setOnClickListener {
-                // Display a message when trying to select pipe length without valid quantity
-                Toast.makeText(requireContext(), "Please enter pipe quantity first.", Toast.LENGTH_SHORT).show()
+        binding.pipesQuantity.text?.let {
+            if (it.isEmpty()) {
+                binding.pipesLength.setOnClickListener {
+                    // Display a message when trying to select pipe length without valid quantity
+                    Toast.makeText(requireContext(), "Please enter pipe quantity first.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -179,14 +182,18 @@ class RentalReqFragment : BottomSheetDialogFragment() {
                     0
                 }
 
-                if (binding.pipesQuantity.text!!.isNotEmpty()) {
-                    binding.pipesLength.setOnClickListener {
-                        getPipesLength()
+                binding.pipesQuantity.text?.let {
+                    if (it.isNotEmpty()) {
+                        binding.pipesLength.setOnClickListener {
+                            getPipesLength()
+                        }
+                    } else binding.pipesLength.text?.let { it1 ->
+                        if (it1.isNotEmpty()) {
+                            // Clear pipe length if pipe quantity is empty and pipe length is not empty
+                            binding.pipesLength.setText("")
+                            binding.pipesLength.setOnClickListener(null) // Remove click listener
+                        }
                     }
-                } else if (binding.pipesLength.text!!.isNotEmpty()) {
-                    // Clear pipe length if pipe quantity is empty and pipe length is not empty
-                    binding.pipesLength.setText("")
-                    binding.pipesLength.setOnClickListener(null) // Remove click listener
                 }
             }
 
@@ -205,34 +212,40 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             month = c[Calendar.MONTH]
             day = c[Calendar.DAY_OF_MONTH]
 
-            datePickerDialog = DatePickerDialog(
-                requireActivity(),
-                { _: DatePicker?, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
-                    fromDate = Calendar.getInstance().apply {
-                        set(selectedYear, selectedMonth, selectedDay)
+            datePickerDialog = year?.let { y ->
+                month?.let { m ->
+                    day?.let { d ->
+                        DatePickerDialog(
+                            requireActivity(),
+                            { _: DatePicker?, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
+                                fromDate = Calendar.getInstance().apply {
+                                    set(selectedYear, selectedMonth, selectedDay)
+                                }
+
+                                durationStart = DateFormater.formatRentDuration(fromDate)
+
+                                binding.rentalDurationFrom.setText(buildString {
+                                    append(selectedDay.toString())
+                                    append("-")
+                                    append((selectedMonth + 1))
+                                    append("-")
+                                    append(selectedYear)
+                                })
+                                datePickerDialog?.dismiss()
+
+                                // Only call calculateDateDifference here if toDate is already set
+                                toDate?.let { calculateDateDifference() }
+                            }, y, m, d
+                        )
                     }
+                }
+            }
 
-                    durationStart = DateFormater.formatRentDuration(fromDate!!)
-
-                    binding.rentalDurationFrom.setText(buildString {
-                        append(selectedDay.toString())
-                        append("-")
-                        append((selectedMonth + 1))
-                        append("-")
-                        append(selectedYear)
-                    })
-                    datePickerDialog!!.dismiss()
-
-                    // Only call calculateDateDifference here if toDate is already set
-                    toDate?.let { calculateDateDifference() }
-                }, year, month, day
-            )
-
-            datePickerDialog!!.datePicker.minDate = System.currentTimeMillis() - 1000
-            datePickerDialog!!.show()
+            datePickerDialog?.datePicker?.minDate = System.currentTimeMillis() - 1000
+            datePickerDialog?.show()
             // Customize button colors after the dialog is shown
-            datePickerDialog!!.getButton(DatePickerDialog.BUTTON_POSITIVE)?.setTextColor(Color.BLUE)
-            datePickerDialog!!.getButton(DatePickerDialog.BUTTON_NEGATIVE)?.setTextColor(Color.BLUE)
+            datePickerDialog?.getButton(DatePickerDialog.BUTTON_POSITIVE)?.setTextColor(Color.BLUE)
+            datePickerDialog?.getButton(DatePickerDialog.BUTTON_NEGATIVE)?.setTextColor(Color.BLUE)
         }
 
         binding.rentalDurationTo.setOnClickListener {
@@ -241,46 +254,52 @@ class RentalReqFragment : BottomSheetDialogFragment() {
             month = c[Calendar.MONTH]
             day = c[Calendar.DAY_OF_MONTH]
 
-            datePickerDialog = DatePickerDialog(
-                requireActivity(),
-                { _: DatePicker?, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
-                    toDate = Calendar.getInstance().apply {
-                        set(selectedYear, selectedMonth, selectedDay)
+            datePickerDialog = year?.let { y ->
+                month?.let { m ->
+                    day?.let { d ->
+                        DatePickerDialog(
+                            requireActivity(),
+                            { _: DatePicker?, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
+                                toDate = Calendar.getInstance().apply {
+                                    set(selectedYear, selectedMonth, selectedDay)
+                                }
+
+                                durationEnd = DateFormater.formatRentDuration(toDate)
+
+                                binding.rentalDurationTo.setText(buildString {
+                                    append(selectedDay.toString())
+                                    append("-")
+                                    append((selectedMonth + 1))
+                                    append("-")
+                                    append(selectedYear)
+                                })
+                                datePickerDialog?.dismiss()
+
+                                // Now that both dates are set, calculate the difference
+                                fromDate?.let { calculateDateDifference() }
+                            }, y, m, d
+                        )
                     }
+                }
+            }
 
-                    durationEnd = DateFormater.formatRentDuration(toDate!!)
-
-                    binding.rentalDurationTo.setText(buildString {
-                        append(selectedDay.toString())
-                        append("-")
-                        append((selectedMonth + 1))
-                        append("-")
-                        append(selectedYear)
-                    })
-                    datePickerDialog!!.dismiss()
-
-                    // Now that both dates are set, calculate the difference
-                    fromDate?.let { calculateDateDifference() }
-                }, year, month, day
-            )
-
-            datePickerDialog!!.datePicker.minDate = System.currentTimeMillis() - 1000
-            datePickerDialog!!.show()
+            datePickerDialog?.datePicker?.minDate = System.currentTimeMillis() - 1000
+            datePickerDialog?.show()
 
             // Customize button colors after the dialog is shown
-            datePickerDialog!!.getButton(DatePickerDialog.BUTTON_POSITIVE)?.setTextColor(Color.BLUE)
-            datePickerDialog!!.getButton(DatePickerDialog.BUTTON_NEGATIVE)?.setTextColor(Color.BLUE)
+            datePickerDialog?.getButton(DatePickerDialog.BUTTON_POSITIVE)?.setTextColor(Color.BLUE)
+            datePickerDialog?.getButton(DatePickerDialog.BUTTON_NEGATIVE)?.setTextColor(Color.BLUE)
         }
     }
 
     private fun calculateDateDifference() {
         // Ensure both dates are available
-        if (fromDate != null && toDate != null) {
-            val diffInMillis = toDate!!.timeInMillis - fromDate!!.timeInMillis
-            diffInDays = (diffInMillis / (1000 * 60 * 60 * 24)).toInt()
-
-            // Display the difference
-            Toast.makeText(requireActivity(), "Difference: $diffInDays days", Toast.LENGTH_SHORT).show()
+        fromDate?.let { from ->
+            toDate?.let { to ->
+                val diffInMillis = to.timeInMillis - from.timeInMillis
+                diffInDays = (diffInMillis / (1000 * 60 * 60 * 24)).toInt()
+                Toast.makeText(requireActivity(), "Difference: $diffInDays days", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -325,93 +344,57 @@ class RentalReqFragment : BottomSheetDialogFragment() {
 
     private fun setEditTest() {
         itemList.forEach { item ->
-            val lowerName = item.itemName.lowercase()
+            val lowerName = item.itemName?.lowercase() ?: return@forEach
             when {
-                lowerName.contains("pipe") -> {
-                    binding.pipes.hint = "${item.itemName} Quantity"
-                }
-            }
-        }
-
-        itemList.forEach { item ->
-            val lowerName = item.itemName.lowercase()
-            when {
-                lowerName.contains("joint") -> {
-                    binding.joints.hint = "${item.itemName} Quantity"
-                }
+                lowerName.contains("pipe") -> binding.pipes.hint = "${item.itemName} Quantity"
+                lowerName.contains("joint") -> binding.joints.hint = "${item.itemName} Quantity"
             }
         }
     }
 
     private fun setSpinner() {
-        if (itemList.isNotEmpty()) {
-
-            itemList.forEach { item ->
-                val lowerName = item.itemName.lowercase()
-                when {
-                    lowerName.contains("wench") -> {
-                        binding.wench.text = item.itemName
-                        val wenchOptions = generateSpinnerOptions(item.quantity)
-                        val wenchAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, wenchOptions)
-                        wenchAdapter.setDropDownViewResource(R.layout.spinner_item)
-                        binding.wenchQuantitySpinner.adapter = wenchAdapter
-                    }
-                }
-            }
-
-            itemList.forEach { item ->
-                val lowerName = item.itemName.lowercase()
-                when {
-                    lowerName.contains("pump") -> {
-                        binding.slugPumps.text = item.itemName
-                        val pumpsOptions = generateSpinnerOptions(item.quantity)
-                        val pumpsAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, pumpsOptions)
-                        pumpsAdapter.setDropDownViewResource(R.layout.spinner_item)
-                        binding.slugPumpsQuantitySpinner.adapter = pumpsAdapter
-                    }
-                }
-            }
-
-            itemList.forEach { item ->
-                val lowerName = item.itemName.lowercase()
-                when {
-                    lowerName.contains("motor") -> {
-                        binding.motors.text = item.itemName
-                        val motorOptions = generateSpinnerOptions(item.quantity)
-                        val motorAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, motorOptions)
-                        motorAdapter.setDropDownViewResource(R.layout.spinner_item)
-                        binding.motorsQuantitySpinner.adapter = motorAdapter
-                    }
-                }
-            }
-
-            itemList.forEach { item ->
-                val lowerName = item.itemName.lowercase()
-                when {
-                    lowerName.contains("generator") -> {
-                        binding.generators.text = item.itemName
-                        val generatorsOptions = generateSpinnerOptions(item.quantity)
-                        val generatorsAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, generatorsOptions)
-                        generatorsAdapter.setDropDownViewResource(R.layout.spinner_item)
-                        binding.generatorsQuantitySpinner.adapter = generatorsAdapter
-                    }
-                }
-            }
-
-            itemList.forEach { item ->
-                val lowerName = item.itemName.lowercase()
-                when {
-                    lowerName.contains("wheel") -> {
-                        binding.wheel.text = item.itemName
-                        val wheelOptions = generateSpinnerOptions(item.quantity)
-                        val wheelAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_item, wheelOptions)
-                        wheelAdapter.setDropDownViewResource(R.layout.spinner_item)
-                        binding.wheelQuantitySpinner.adapter = wheelAdapter
-                    }
-                }
-            }
-        } else {
+        if (itemList.isEmpty()) {
             Log.d("RentReqDebug", "itemList is empty")
+            return
+        }
+
+        // Map of item keywords to their corresponding UI components
+        val spinnerConfigs = mapOf(
+            "wench" to Triple(binding.wench, binding.wenchQuantitySpinner, ::generateSpinnerOptions),
+            "pump" to Triple(binding.slugPumps, binding.slugPumpsQuantitySpinner, ::generateSpinnerOptions),
+            "motor" to Triple(binding.motors, binding.motorsQuantitySpinner, ::generateSpinnerOptions),
+            "generator" to Triple(binding.generators, binding.generatorsQuantitySpinner, ::generateSpinnerOptions),
+            "wheel" to Triple(binding.wheel, binding.wheelQuantitySpinner, ::generateSpinnerOptions)
+        )
+
+        itemList.forEach { item ->
+            val lowerName = item.itemName?.lowercase() ?: run {
+                Log.w("SpinnerSetup", "Skipped item with null name")
+                return@forEach
+            }
+
+            val quantity = item.quantity ?: run {
+                Log.w("SpinnerSetup", "Skipped ${item.itemName} with null quantity")
+                return@forEach
+            }
+
+            spinnerConfigs.forEach { (keyword, config) ->
+                if (lowerName.contains(keyword)) {
+                    val (textView, spinner, optionsGenerator) = config
+
+                    textView.text = item.itemName
+                    val options = optionsGenerator(quantity)
+                    val adapter = ArrayAdapter(
+                        requireActivity(),
+                        R.layout.spinner_item,
+                        options
+                    ).apply {
+                        setDropDownViewResource(R.layout.spinner_item)
+                    }
+                    spinner.adapter = adapter
+                    return@forEach  // Exit after first match
+                }
+            }
         }
     }
 
@@ -472,106 +455,54 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     }
 
     private fun isDurationValid(): Boolean {
-        return durationStart.isNotEmpty() && durationEnd.isNotEmpty()
+        return durationStart.isNullOrEmpty() && durationEnd.isNullOrEmpty()
     }
 
     private fun isRentalItemSelected(): Boolean {
-        return pipeQuantity > 0 || jointsQuantity > 0 ||
-                wenchQuantity > 0 || pumpsQuantity > 0 ||
-                motorsQuantity > 0 || generatorsQuantity > 0 ||
-                wheelQuantity > 0
+        return (pipeQuantity ?: 0) > 0 ||
+                (jointsQuantity ?: 0) > 0 ||
+                (wenchQuantity ?: 0) > 0 ||
+                (pumpsQuantity ?: 0) > 0 ||
+                (motorsQuantity ?: 0) > 0 ||
+                (generatorsQuantity ?: 0) > 0 ||
+                (wheelQuantity ?: 0) > 0
     }
 
     private fun calculateTotalPrice(): Int {
         totalPrice = 0 // Reset total price before calculation
 
-        // Calculate price for pipes
-        if (pipeQuantity.toString().isNotEmpty()) {
-            itemList.forEach {
-                val lowerName = it.itemName.lowercase()
-                when {
-                    lowerName.contains("pipe") -> {
-                    totalPrice += it.price * pipeQuantity.toInt() * diffInDays
-                    Log.d("RentReqDebug", "Pipes: ${it.price} * $pipeQuantity * $diffInDays = ${it.price * pipeQuantity.toInt() * diffInDays}")
-                    }
-                }
-            }
-        }
+        val itemQuantities = mapOf(
+            "pipe" to pipeQuantity,
+            "joint" to jointsQuantity,
+            "wench" to wenchQuantity,
+            "pump" to pumpsQuantity,
+            "motor" to motorsQuantity,
+            "generator" to generatorsQuantity,
+            "wheel" to wheelQuantity
+        ).filterValues { it != 0 } // Filter empty quantities
 
-        // Calculate price for joints
-        if (jointsQuantity.toString().isNotEmpty()) {
-            itemList.forEach {
-                val lowerName = it.itemName.lowercase()
-                when {
-                    lowerName.contains("joint") -> {
-                    totalPrice += it.price * jointsQuantity.toInt() * diffInDays
-                    Log.d("RentReqDebug", "Joints: ${it.price} * $jointsQuantity * $diffInDays = ${it.price * jointsQuantity.toInt() * diffInDays}")
-                    }
-                }
+        itemList.forEach { item ->
+            val lowerName = item.itemName?.lowercase() ?: run {
+                Log.w("PriceCalc", "Skipped item with null name")
+                return@forEach
             }
-        }
 
-        // Calculate price for wench
-        if (wenchQuantity.toString().isNotEmpty()) {
-            itemList.forEach {
-                val lowerName = it.itemName.lowercase()
-                when {
-                    lowerName.contains("wench") -> {
-                    totalPrice += it.price * wenchQuantity.toInt() * diffInDays
-                    Log.d("RentReqDebug", "Wench: ${it.price} * $wenchQuantity * $diffInDays = ${it.price * wenchQuantity.toInt() * diffInDays}")
-                    }
-                }
+            val price = item.price ?: run {
+                Log.w("PriceCalc", "Skipped $lowerName with null price")
+                return@forEach
             }
-        }
 
-        // Calculate price for pumps
-        if (pumpsQuantity.toString().isNotEmpty()) {
-            itemList.forEach {
-                val lowerName = it.itemName.lowercase()
-                when {
-                    lowerName.contains("pump") -> {
-                    totalPrice += it.price * pumpsQuantity.toInt() * diffInDays
-                    Log.d("RentReqDebug", "Pumps: ${it.price} * $pumpsQuantity * $diffInDays = ${it.price * pumpsQuantity.toInt() * diffInDays}");
+            itemQuantities.forEach { (keyword, quantity) ->
+                if (lowerName.contains(keyword)) {
+                    val itemTotal = quantity?.let { it ->
+                        diffInDays?.let { q ->
+                            price * it * q
+                        }
                     }
-                }
-            }
-        }
-
-        // Calculate price for generators
-        if (generatorsQuantity.toString().isNotEmpty()) {
-            itemList.forEach {
-                val lowerName = it.itemName.lowercase()
-                when {
-                    lowerName.contains("generator") -> {
-                    totalPrice += it.price * generatorsQuantity.toInt() * diffInDays
-                    Log.d("RentReqDebug", "Generators: ${it.price} * $generatorsQuantity * $diffInDays = ${it.price * generatorsQuantity.toInt() * diffInDays}");
-                    }
-                }
-            }
-        }
-
-        // Calculate price for motors
-        if (motorsQuantity.toString().isNotEmpty()) {
-            itemList.forEach {
-                val lowerName = it.itemName.lowercase()
-                when {
-                    lowerName.contains("motor") -> {
-                    totalPrice += it.price * motorsQuantity.toInt() * diffInDays
-                    Log.d("RentReqDebug", "Motors: ${it.price} * $motorsQuantity * $diffInDays = ${it.price * motorsQuantity.toInt() * diffInDays}");
-                    }
-                }
-            }
-        }
-
-        // Calculate price for wheels
-        if (wheelQuantity.toString().isNotEmpty()) {
-            itemList.forEach {
-                val lowerName = it.itemName.lowercase()
-                when {
-                    lowerName.contains("wheel") -> {
-                    totalPrice += it.price * wheelQuantity.toInt() * diffInDays
-                    Log.d("RentReqDebug", "Wheels: ${it.price} * $wheelQuantity * $diffInDays = ${it.price * wheelQuantity.toInt() * diffInDays}");
-                    }
+                    itemTotal?.let { totalPrice += it }
+                    Log.d("RentReqDebug",
+                        "${item.itemName}: $price * $quantity * $diffInDays = $itemTotal")
+                    return@forEach // Exit after first match
                 }
             }
         }
@@ -598,13 +529,13 @@ class RentalReqFragment : BottomSheetDialogFragment() {
         binder.rentalDurationTo.text = durationEnd
 
         // Regular quantities (just numbers)
-        setViewVisibilityAndText(binder.pipes, pipeQuantity, binder.entry8)
-        setViewVisibilityAndText(binder.joints, jointsQuantity, binder.entry10)
-        setViewVisibilityAndText(binder.wench, wenchQuantity, binder.entry11)
-        setViewVisibilityAndText(binder.slugPumps, pumpsQuantity, binder.entry12)
-        setViewVisibilityAndText(binder.motors, motorsQuantity, binder.entry13)
-        setViewVisibilityAndText(binder.generators, generatorsQuantity, binder.entry14)
-        setViewVisibilityAndText(binder.wheel, wheelQuantity, binder.entry15)
+        pipeQuantity?.let { setViewVisibilityAndText(binder.pipes, it, binder.entry8) }
+        jointsQuantity?.let { setViewVisibilityAndText(binder.joints, it, binder.entry10) }
+        wenchQuantity?.let { setViewVisibilityAndText(binder.wench, it, binder.entry11) }
+        pumpsQuantity?.let { setViewVisibilityAndText(binder.slugPumps, it, binder.entry12) }
+        motorsQuantity?.let { setViewVisibilityAndText(binder.motors, it, binder.entry13) }
+        generatorsQuantity?.let { setViewVisibilityAndText(binder.generators, it, binder.entry14) }
+        wheelQuantity?.let { setViewVisibilityAndText(binder.wheel, it, binder.entry15) }
 
         // Special case for pipe length (with "feet" unit)
         if (pipeLength != 0) {
@@ -656,8 +587,8 @@ class RentalReqFragment : BottomSheetDialogFragment() {
     companion object {
         private const val ARG_CLIENT = "arg_client"
         private const val ARG_LIST = "arg_list"
-        fun newInstance(listener: OnSendReqListener, client: ClientModel, itemList: List<InventoryModel>): RentalReqFragment {
-            val fragment = RentalReqFragment()
+        fun newInstance(listener: OnSendReqListener, client: ClientModel?, itemList: List<InventoryModel>): SendRentalReq {
+            val fragment = SendRentalReq()
             fragment.onSendReqListener = listener
 
             val args = Bundle()

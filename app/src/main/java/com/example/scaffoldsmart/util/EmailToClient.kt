@@ -17,18 +17,18 @@ import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 
 class EmailToClient {
-    fun sendEmailWithPdfWithCoroutine(pdfFile: File, clientEmail: String) {
+    fun sendEmailWithPdfWithCoroutine(pdfFile: File?, clientEmail: String?) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                if (!pdfFile.exists() || pdfFile.length() == 0L) {
+                if (!pdfFile!!.exists() || pdfFile.length() == 0L) {
                     Log.e("EmailToClient", "PDF file doesn't exist or is empty: ${pdfFile.absolutePath}")
                     return@launch
                 }
-                sendEmailWithPdf(pdfFile, clientEmail)
+                sendEmailWithPdf(pdfFile, clientEmail!!)
             } finally {
                 // Delete the temporary file after sending
                 try {
-                    pdfFile.delete()
+                    pdfFile!!.delete()
                 } catch (e: Exception) {
                     Log.w("EmailToClient", "Could not delete temp file", e)
                 }

@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.client.client_fragments
+package com.example.scaffoldsmart.client.client_bottomsheets
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,21 +8,21 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
-import com.example.scaffoldsmart.databinding.FragmentClientUpdateBinding
+import com.example.scaffoldsmart.databinding.UpdateClientBinding
 import com.example.scaffoldsmart.util.Security
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class ClientUpdateFragment : BottomSheetDialogFragment() {
+class UpdateClient : BottomSheetDialogFragment() {
     private val binding by lazy {
-        FragmentClientUpdateBinding.inflate(layoutInflater)
+        UpdateClientBinding.inflate(layoutInflater)
     }
     private var onClientUpdatedListener: OnClientUpdatedListener? = null
     private lateinit var viewModel: ClientViewModel
     private var isVerify: Boolean = false
 
     interface OnClientUpdatedListener {
-        fun onClientUpdated(name: String, email: String, pass: String, cnic: String, phone: String, address: String)
-        fun onClientVerified(cnic: String, phone: String, address: String)
+        fun onClientUpdated(name: String?, email: String?, pass: String?, cnic: String?, phone: String?, address: String?)
+        fun onClientVerified(cnic: String?, phone: String?, address: String?)
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,7 +91,7 @@ class ClientUpdateFragment : BottomSheetDialogFragment() {
             if (client != null) {
                 binding.clientName.setText(client.name)
                 binding.email.setText(client.email)
-                val decryptedPassword = Security.decrypt(client.pass)
+                val decryptedPassword = client.pass?.let { Security.decrypt(it) }
                 binding.password.setText(decryptedPassword)
                 binding.cnic.setText(client.cnic)
                 binding.phoneNum.setText(client.phone)
@@ -102,8 +102,8 @@ class ClientUpdateFragment : BottomSheetDialogFragment() {
 
     companion object {
         private const val ARG_IS_VERIFY = "is_verify"
-        fun newInstance(listener: OnClientUpdatedListener, isVerify: Boolean): ClientUpdateFragment {
-            val fragment = ClientUpdateFragment()
+        fun newInstance(listener: OnClientUpdatedListener, isVerify: Boolean): UpdateClient {
+            val fragment = UpdateClient()
             fragment.onClientUpdatedListener = listener
 
             // Bundle to pass arguments

@@ -138,14 +138,14 @@ class ChatFragment : Fragment() {
     private fun performSearch(searchText: String) {
         // Filter the list based on the search text (case-insensitive)
         val filteredListU = profilesList.filter { item ->
-            item.userName!!.lowercase().contains(searchText.lowercase())
+            item.userName?.lowercase()?.contains(searchText.lowercase()) == true
         }
         // Update the adapter with the filtered list
         adapterU.updateList(filteredListU as ArrayList<ChatUserModel>)
 
         // Filter the list based on the search text (case-insensitive)
         val filteredListC = recentChatList.filter { item ->
-            item.userName!!.lowercase().contains(searchText.lowercase())
+            item.userName?.lowercase()?.contains(searchText.lowercase()) == true
         }
         // Update the adapter with the filtered list
         adapterC.updateList(filteredListC as ArrayList<ChatUserModel>)
@@ -185,13 +185,15 @@ class ChatFragment : Fragment() {
                 "userName" to user.userName,
             )
 
-            Firebase.database.reference.child("ChatUser").child(user.uid!!).updateChildren(updates)
+            user.uid?.let { Firebase.database.reference.child("ChatUser").child(it)
+                .updateChildren(updates)
                 .addOnSuccessListener {
                     Log.d("ChatFragDebug", "User data added to Firebase successfully!")
                 }
                 .addOnFailureListener { error ->
                     Log.e("ChatFragDebug", "Failed to add user data to Firebase: ${error.message}")
                 }
+            }
         }
 
         // store Admin data
@@ -199,13 +201,15 @@ class ChatFragment : Fragment() {
             "uid" to senderUid,
             "userName" to senderName,
         )
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(updates)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it)
+            .updateChildren(updates)
             .addOnSuccessListener {
                 Log.d("ChatFragDebug", "User data added to Firebase successfully!")
             }
             .addOnFailureListener { error ->
                 Log.e("ChatFragDebug", "Failed to add user data to Firebase: ${error.message}")
             }
+        }
     }
 
     private fun getChatsData(profilesList: ArrayList<ChatUserModel>) {
@@ -228,7 +232,7 @@ class ChatFragment : Fragment() {
                             }
 
                             // Call getUnseenMsgCount with current profile instance
-                            getUnseenMsgCount(profile, lastMsg!!, lastMsgTime!!)
+                            getUnseenMsgCount(profile, lastMsg, lastMsgTime)
                         }
                     }
 
@@ -239,7 +243,7 @@ class ChatFragment : Fragment() {
         }
     }
 
-    private fun getUnseenMsgCount(profile: ChatUserModel, lastMsg: String, lastMsgTime: Long) {
+    private fun getUnseenMsgCount(profile: ChatUserModel, lastMsg: String?, lastMsgTime: Long?) {
         val receiverUid = profile.uid
         val senderRoom = senderUid + receiverUid
 

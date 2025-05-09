@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.admin.admin_fragments
+package com.example.scaffoldsmart.admin.admin_bottomsheets
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,19 +8,19 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.util.Security
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
-import com.example.scaffoldsmart.databinding.FragmentAdminUpdateBinding
+import com.example.scaffoldsmart.databinding.UpdateAdminBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class AdminUpdateFragment : BottomSheetDialogFragment() {
+class UpdateAdmin : BottomSheetDialogFragment() {
 
     private val binding by lazy {
-        FragmentAdminUpdateBinding.inflate(layoutInflater)
+        UpdateAdminBinding.inflate(layoutInflater)
     }
     private lateinit var viewModel: AdminViewModel
     private var onAdminUpdatedListener: OnAdminUpdatedListener? = null
 
     interface OnAdminUpdatedListener {
-        fun onAdminUpdated(name: String, email: String, pass: String, company: String, phone: String, address: String)
+        fun onAdminUpdated(name: String?, email: String?, pass: String?, company: String?, phone: String?, address: String?)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +42,7 @@ class AdminUpdateFragment : BottomSheetDialogFragment() {
             if (admin != null) {
                 binding.adminName.setText(admin.name)
                 binding.email.setText(admin.email)
-                val decryptedPassword = Security.decrypt(admin.pass)
+                val decryptedPassword = admin.pass?.let { Security.decrypt(it) }
                 binding.password.setText(decryptedPassword)
                 binding.companyName.setText(admin.company)
                 binding.phoneNum.setText(admin.phone)
@@ -72,8 +72,8 @@ class AdminUpdateFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
-        fun newInstance(listener: OnAdminUpdatedListener): AdminUpdateFragment {
-            val fragment = AdminUpdateFragment()
+        fun newInstance(listener: OnAdminUpdatedListener): UpdateAdmin {
+            val fragment = UpdateAdmin()
             fragment.onAdminUpdatedListener = listener
             return fragment
         }

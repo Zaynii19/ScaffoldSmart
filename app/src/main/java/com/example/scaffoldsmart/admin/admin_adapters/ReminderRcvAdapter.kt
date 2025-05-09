@@ -1,6 +1,7 @@
 package com.example.scaffoldsmart.admin.admin_adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -43,8 +44,10 @@ class ReminderRcvAdapter(
                 val dueDate = DateFormater.formatDateString(currentRent.endDuration)
                 val title = "Scaffold Rental Reminder"
                 val msg = "Your scaffold rental is about to expire. Due date is $dueDate"
-                val externalId = listOf(currentRent.clientEmail)
-                oneSignal.sendNotiByOneSignalToExternalId(title, msg, externalId)
+                currentRent.clientEmail?.let { email ->
+                    val externalId = listOf(email)
+                    oneSignal.sendNotiByOneSignalToExternalId(title, msg, externalId)
+                } ?: Toast.makeText(context, "Skipped sending notification - client email is null", Toast.LENGTH_SHORT).show()
                 Toast.makeText(context, "Rental Reminder Send to ${currentRent.clientName}", Toast.LENGTH_SHORT).show()
                 // Disable the button if clientObj is null
                 holder.binding.sendBtn.isEnabled = false

@@ -73,7 +73,7 @@ class ClientRentFragment : Fragment() {
         binding.loading.visibility = View.VISIBLE
         viewModel.observeRentalReqLiveData().observe(viewLifecycleOwner) { rentals ->
             binding.loading.visibility = View.GONE
-            val filteredRentals = rentals?.filter { it.status.isNotEmpty() && it.clientID == clientUid } // Get only approved rentals
+            val filteredRentals = rentals?.filter { it.status?.isNotEmpty() == true && it.clientID == clientUid } // Get only approved rentals
             rentalList.clear()
             filteredRentals?.let {
                 rentalList.addAll(it)
@@ -102,7 +102,7 @@ class ClientRentFragment : Fragment() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 // Filter the itemList based on the search text (case-insensitive)
                 val filteredList = rentalList.filter { item ->
-                    item.clientName.lowercase().contains(newText!!.lowercase())
+                    item.clientName?.lowercase()?.contains(newText?.lowercase() ?: "") == true
                 }
 
                 // Update the adapter with the filtered list

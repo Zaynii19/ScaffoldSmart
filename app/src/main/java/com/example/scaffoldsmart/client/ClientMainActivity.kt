@@ -89,7 +89,7 @@ class ClientMainActivity : AppCompatActivity() {
             val presenceMap = HashMap<String, Any>()
             presenceMap["status"] = "Online"
             presenceMap["lastSeen"] = currentTime
-            Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+            senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
         }
     }
 
@@ -101,7 +101,7 @@ class ClientMainActivity : AppCompatActivity() {
             val presenceMap = HashMap<String, Any>()
             presenceMap["status"] = "Offline"
             presenceMap["lastSeen"] = currentTime
-            Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+            senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
         }
     }
 

@@ -18,10 +18,12 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.SettingActivity
+import com.example.scaffoldsmart.admin.admin_bottomsheets.ShowInvoice
+import com.example.scaffoldsmart.admin.admin_bottomsheets.SendReminder
+import com.example.scaffoldsmart.admin.admin_models.AdminModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.AdminDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.FragmentProfileBinding
-import com.example.scaffoldsmart.databinding.InvoiceItemBinding
 import com.example.scaffoldsmart.databinding.SocialPlatformDialogBinding
 import com.example.scaffoldsmart.util.CheckNetConnectvity
 import com.example.scaffoldsmart.util.OnesignalService
@@ -34,16 +36,12 @@ class ProfileFragment : Fragment() {
     private val binding by lazy {
         FragmentProfileBinding.inflate(layoutInflater)
     }
-    private var name: String = ""
-    private var email: String = ""
-    private var company: String = ""
-    private var address: String = ""
-    private var phone: String = ""
     private lateinit var onesignal: OnesignalService
     private lateinit var chatPreferences: SharedPreferences
     private lateinit var invoicePreferences: SharedPreferences
     private var senderUid: String? = null
     private lateinit var viewModel: AdminViewModel
+    private var adminObj: AdminModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,7 +98,7 @@ class ProfileFragment : Fragment() {
                     val presenceMap = HashMap<String, Any>()
                     presenceMap["status"] = "Offline"
                     presenceMap["lastSeen"] = currentTime
-                    Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+                    senderUid?.let { Firebase.database.reference.child("ChatUser").child(it) }?.updateChildren(presenceMap)
                 }
                 Toast.makeText(requireActivity(), "Logout Successful", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(requireActivity(), LoginActivity::class.java))
@@ -113,14 +111,10 @@ class ProfileFragment : Fragment() {
     private fun observeAdminLiveData() {
         viewModel.observeAdminLiveData().observe(viewLifecycleOwner) { admin ->
             if (admin != null) {
-                name = admin.name
-                email = admin.email
-                company = admin.company
-                phone = admin.phone
-                address = admin.address
+                adminObj = admin
 
-                binding.userName.text = name
-                binding.companyName.text = company
+                binding.userName.text = admin.name
+                binding.companyName.text = admin.company
             }
         }
     }
@@ -129,11 +123,11 @@ class ProfileFragment : Fragment() {
         val customDialog = LayoutInflater.from(requireActivity()).inflate(R.layout.admin_details_dialog, null)
         val binder = AdminDetailsDialogBinding.bind(customDialog)
 
-        binder.adminName.text = name
-        binder.email.text = email
-        binder.address.text = address
-        binder.companyName.text = company
-        binder.phoneNum.text = phone
+        adminObj?.let { binder.adminName.text = it.name }
+        adminObj?.let { binder.email.text = it.email }
+        adminObj?.let { binder.address.text = it.address }
+        adminObj?.let { binder.companyName.text = it.company }
+        adminObj?.let { binder.phoneNum.text = it.phone }
 
         val builder = MaterialAlertDialogBuilder(requireActivity())
         builder.setView(customDialog)
@@ -178,12 +172,12 @@ class ProfileFragment : Fragment() {
     }
 
     private fun showReminderBottomSheet() {
-        val bottomSheetDialog = ReminderSendFragment()
+        val bottomSheetDialog = SendReminder()
         bottomSheetDialog.show(requireActivity().supportFragmentManager, "Reminder")
     }
 
     private fun showInvoiceBottomSheet() {
-        val bottomSheetDialog = InvoiceFragment()
-        bottomSheetDialog.show(requireActivity().supportFragmentManager, "Invoice")
+        val bottomSheetDialog = ShowInvoice()
+        bottomSheetDialog.show(requireActivity().supportFragmentManager, "ShowInvoice")
     }
 }

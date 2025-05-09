@@ -20,12 +20,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavOptions
-import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.admin.AdminMainActivity
-import com.example.scaffoldsmart.admin.ChatActivity
 import com.example.scaffoldsmart.admin.admin_adapters.MessageRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.DateHeader
 import com.example.scaffoldsmart.admin.admin_models.MessageModel
@@ -38,10 +34,9 @@ import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.firebase.Firebase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import java.util.Calendar
 import java.util.Date
 
@@ -49,12 +44,10 @@ class ClientChatActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityClientChatBinding.inflate(layoutInflater)
     }
-    private var adapter: MessageRcvAdapter? = null
+    private lateinit var adapter: MessageRcvAdapter
     private var messages: ArrayList<Any>? = ArrayList() // Hold both Message and DateHeader
     private var senderRoom: String? = null
     private var receiverRoom: String? = null
-    private var database: FirebaseDatabase? = null
-    private var storage: FirebaseStorage? = null
     private var dialog: ProgressDialog? = null
     private var senderUid: String? = null
     private var receiverUid: String? = null
@@ -87,8 +80,6 @@ class ClientChatActivity : AppCompatActivity() {
         viewModelA = ViewModelProvider(this)[AdminViewModel::class.java]
         viewModelA.retrieveAdminData()
 
-        database = FirebaseDatabase.getInstance()
-        storage = FirebaseStorage.getInstance()
         dialog = ProgressDialog(this@ClientChatActivity)
         messages = ArrayList()
         chatPreferences = getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
@@ -100,7 +91,7 @@ class ClientChatActivity : AppCompatActivity() {
         setupKeyboardVisibilityListener()
 
         initializeChatDetails()
-        setupRecyclerView()
+        setRcv()
         setUpPresenceListener()
         getChatsData()
         setupSendButton()
@@ -115,10 +106,10 @@ class ClientChatActivity : AppCompatActivity() {
         WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
     }
 
-    private fun setupRecyclerView() {
+    private fun setRcv() {
         val layoutManager = LinearLayoutManager(this@ClientChatActivity, LinearLayoutManager.VERTICAL, false)
         binding.rcv.layoutManager = layoutManager
-        adapter = MessageRcvAdapter(this, messages!!, senderRoom!!, receiverRoom!!, senderUid!!)
+        adapter = MessageRcvAdapter(this, messages, senderRoom, receiverRoom, senderUid)
         binding.rcv.adapter = adapter
         layoutManager.stackFromEnd = true
         binding.rcv.setHasFixedSize(true)
@@ -136,7 +127,7 @@ class ClientChatActivity : AppCompatActivity() {
         receiverRoom = receiverUid + senderUid
 
         // Create the ViewModel using the factory
-        viewModel = ViewModelProvider(this, MessageViewModelFactory(senderRoom!!))[MessageViewModel::class.java]
+        senderRoom?.let { viewModel = ViewModelProvider(this, MessageViewModelFactory(it))[MessageViewModel::class.java] }
         viewModel.retrieveMessage()
 
         observeMsgLiveData(viewModel)
@@ -144,50 +135,65 @@ class ClientChatActivity : AppCompatActivity() {
 
     private fun observeMsgLiveData(viewModel: MessageViewModel) {
         viewModel.observeMessageLiveData().observe(this@ClientChatActivity) { msgs ->
-            messages!!.clear()
-            var previousDate: String? = null
-            for (msg in msgs!!) {
-                val currentDate = DateFormater.formatDateHeader(msg.timestamp)
-                if (currentDate != previousDate) {
-                    messages!!.add(DateHeader(currentDate))
-                    previousDate = currentDate
-                }
-                messages!!.add(msg)
+            messages?.let { messageList ->
+                messageList.clear()
+                var previousDate: String? = null
 
-                // Mark messages as seen if they are sent by the other user and the activity is visible
-                if (msg.senderId == receiverUid && !msg.seen!! && isActivityVisible!!) {
-                    markMessageAsSeen(msg.messageId)
-                }
-            }
-            adapter!!.notifyDataSetChanged()
-        }
-    }
+                msgs?.forEach { msg ->
+                    // Safe handling of message and timestamp
+                    msg.timestamp?.let { timestamp ->
+                        val currentDate = DateFormater.formatDateHeader(timestamp)
 
-    private fun setUpPresenceListener() {
-        Firebase.database.reference.child("ChatUser").child(receiverUid!!)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.exists()) {
-                        val status = snapshot.child("status").getValue(String::class.java)
-                        val lastSeen = snapshot.child("lastSeen").getValue(Long::class.java)
-                        if (!status.isNullOrEmpty() && lastSeen != null) {
-                            if (status == "Offline") {
-                                binding.status.visibility = View.VISIBLE
-                                binding.status.text = DateFormater.formatTimestampForLastSeen(lastSeen)
-                            } else {
-                                binding.status.text = status.toString()
-                                binding.status.visibility = View.VISIBLE
-                            }
-                        } else {
-                            binding.status.visibility = View.GONE
+                        // Add date header if date changed
+                        if (currentDate != previousDate) {
+                            messageList.add(DateHeader(currentDate))
+                            previousDate = currentDate
+                        }
+
+                        // Add the message
+                        messageList.add(msg)
+
+                        // Mark as seen if conditions met
+                        if (msg.senderId == receiverUid &&
+                            msg.seen == false &&
+                            isActivityVisible == true) {
+                            msg.messageId?.let { markMessageAsSeen(it) }
                         }
                     }
                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("ClientChatDebug", "Database error: ${error.message}")
-                }
-            })
+                adapter.notifyDataSetChanged()
+            } ?: Log.w("ClientChatDebug", "Messages list is null - cannot update UI")
+        }
+    }
+
+    private fun setUpPresenceListener() {
+        receiverUid?.let {
+            Firebase.database.reference.child("ChatUser").child(it)
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        if (snapshot.exists()) {
+                            val status = snapshot.child("status").getValue(String::class.java)
+                            val lastSeen = snapshot.child("lastSeen").getValue(Long::class.java)
+                            if (!status.isNullOrEmpty() && lastSeen != null) {
+                                if (status == "Offline") {
+                                    binding.status.visibility = View.VISIBLE
+                                    binding.status.text = DateFormater.formatTimestampForLastSeen(lastSeen)
+                                } else {
+                                    binding.status.text = status.toString()
+                                    binding.status.visibility = View.VISIBLE
+                                }
+                            } else {
+                                binding.status.visibility = View.GONE
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.e("ChatActivityDebug", "Database error: ${error.message}")
+                    }
+                })
+        }
     }
 
     private fun setupSendButton() {
@@ -204,14 +210,23 @@ class ClientChatActivity : AppCompatActivity() {
     private fun sendMessage(messageText: String) {
         binding.typedMessage.setText("")
         val date = Date()
-        val messageId = database!!.reference.push().key
+        val messageId = Firebase.database.reference.push().key
         val messageModelObject = MessageModel(senderUid, messageText, date.time, senderName, messageId, false)
-        database!!.reference.child("Chat").child(senderRoom!!).child("Messages").child(messageId!!)
-            .setValue(messageModelObject).addOnSuccessListener {
-                database!!.reference.child("Chat").child(receiverRoom!!).child("Messages").child(messageId)
+        senderRoom?.let { sr ->
+            messageId?.let { msgId ->
+                Firebase.database.reference.child("Chat").child(sr).child("Messages").child(msgId)
                     .setValue(messageModelObject)
-                    .addOnCompleteListener { }
+                    .addOnSuccessListener {
+                        receiverRoom?.let { rr ->
+                            Firebase.database.reference.child("Chat").child(rr).child("Messages").child(msgId)
+                                .setValue(messageModelObject)
+                                .addOnSuccessListener{}
+                                .addOnFailureListener {}
+                        }
+                    }
+                    .addOnFailureListener {}
             }
+        }
     }
 
     private fun setupAttachmentButton() {
@@ -233,15 +248,16 @@ class ClientChatActivity : AppCompatActivity() {
             val selectedImage = data.data
 
             // Upload image to Firebase
-            uploadImage(selectedImage!!)
+            uploadImage(selectedImage)
 
         } else {
             Log.d("ClientChatDebug", "onActivityResult: uri not found or no image selected ${data?.data}")
         }
     }
 
-    private fun uploadImage(selectedImage: Uri) {
-        val reference = storage!!.reference.child("Chats").child(Calendar.getInstance().timeInMillis.toString())
+    private fun uploadImage(selectedImage: Uri?) {
+        val reference = Firebase.storage.reference.child("Chats").child(Calendar.getInstance().timeInMillis.toString())
+
         dialog?.show()
 
         // Handler to dismiss the dialog after 1 minute
@@ -255,7 +271,7 @@ class ClientChatActivity : AppCompatActivity() {
         handler.postDelayed(runnable, 60000)
 
         // Upload the image
-        reference.putFile(selectedImage).addOnCompleteListener {
+        selectedImage?.let { reference.putFile(it).addOnCompleteListener {
             // Remove the handler as the upload completed
             handler.removeCallbacks(runnable)
 
@@ -269,24 +285,33 @@ class ClientChatActivity : AppCompatActivity() {
                 Toast.makeText(this@ClientChatActivity, "Upload failed. Please try again.", Toast.LENGTH_SHORT).show()
                 dialog?.dismiss()
             }
-        }
+        }}
     }
 
     private fun sendMessageWithImage(uri: Uri) {
         binding.typedMessage.setText("")
         val filePath = uri.toString()
         val date = Date()
-        val messageId = database!!.reference.push().key
+        val messageId = Firebase.database.reference.push().key
         val messageText = binding.typedMessage.text.toString()
         val messageModelObject = MessageModel(senderUid, messageText, date.time, senderName, messageId, false)
         messageModelObject.message = "photo"
         messageModelObject.imageUri = filePath
-        database!!.reference.child("Chat").child(senderRoom!!).child("Messages").child(messageId!!)
-            .setValue(messageModelObject).addOnSuccessListener {
-                database!!.reference.child("Chat").child(receiverRoom!!).child("Messages").child(messageId)
+        senderRoom?.let { sr ->
+            messageId?.let { msgId ->
+                Firebase.database.reference.child("Chat").child(sr).child("Messages").child(msgId)
                     .setValue(messageModelObject)
-                    .addOnCompleteListener { }
+                    .addOnSuccessListener {
+                        receiverRoom?.let { rr ->
+                            Firebase.database.reference.child("Chat").child(rr).child("Messages").child(msgId)
+                                .setValue(messageModelObject)
+                                .addOnSuccessListener {  }
+                                .addOnFailureListener {  }
+                        }
+                    }
+                    .addOnFailureListener {  }
             }
+        }
     }
 
     private fun setupTypingStatus() {
@@ -297,35 +322,42 @@ class ClientChatActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                Firebase.database.reference.child("ChatUser").child(senderUid!!)
+                senderUid?.let { Firebase.database.reference.child("ChatUser").child(it)
                     .child("status").setValue("typing...")
+                }
+
                 handler.removeCallbacksAndMessages(null)
                 handler.postDelayed(userStoppedTyping, 1000)
             }
 
             var userStoppedTyping = Runnable {
-                Firebase.database.reference.child("ChatUser").child(senderUid!!)
+                senderUid?.let { Firebase.database.reference.child("ChatUser").child(it)
                     .child("status").setValue("Online")
+                }
             }
         })
     }
 
     private fun markMessageAsSeen(messageId: String?) {
-        if (messageId == null || !isActivityVisible!!) return
+        if (messageId == null || isActivityVisible != true) return
 
         // Update the seen status in both sender and receiver rooms
         val updates = HashMap<String, Any>()
         updates["seen"] = true
 
-        database!!.reference.child("Chat").child(senderRoom!!)
+        senderRoom?.let { Firebase.database.reference.child("Chat").child(it)
             .child("Messages").child(messageId).updateChildren(updates)
+        }
 
-        database!!.reference.child("Chat").child(receiverRoom!!)
+
+        receiverRoom?.let { Firebase.database.reference.child("Chat").child(it)
             .child("Messages").child(messageId).updateChildren(updates)
+        }
     }
 
     private fun getChatsData() {
-        Firebase.database.reference.child("Chat").child(senderRoom!!)
+        senderRoom?.let {
+            Firebase.database.reference.child("Chat").child(it)
             .child("Messages")
             .orderByChild("timestamp")
             .limitToLast(1)
@@ -345,10 +377,11 @@ class ClientChatActivity : AppCompatActivity() {
                     Log.e("ClientChatDebug", "Database error: ${error.message}")
                 }
             })
+        }
     }
 
     private fun getUnseenMsgCount(lastMsg: String, lastMsgTime: Long) {
-        Firebase.database.reference.child("Chat").child(senderRoom!!)
+        senderRoom?.let { Firebase.database.reference.child("Chat").child(it)
             .child("Messages")
             .orderByChild("seen")
             .equalTo(false)  // Only retrieve messages where seen == false
@@ -372,6 +405,7 @@ class ClientChatActivity : AppCompatActivity() {
                     Log.e("ClientChatDebug", "Database error: ${error.message}")
                 }
             })
+        }
     }
 
     private fun updateLastMsg(lastMsg: String?, lastMsgTime: Long?, unseenCount: Int?) {
@@ -386,7 +420,7 @@ class ClientChatActivity : AppCompatActivity() {
             "adminNewMsgCount" to unseenCount
         )
 
-        Firebase.database.reference.child("ChatUser").child(senderUid!!)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it)
             .updateChildren(updates)
             .addOnSuccessListener {
                 Log.d("ClientChatDebug", "Last message updated successfully")
@@ -394,6 +428,7 @@ class ClientChatActivity : AppCompatActivity() {
             .addOnFailureListener { e ->
                 Log.e("ClientChatDebug", "Error updating last message: ${e.message}")
             }
+        }
     }
 
     override fun onResume() {
@@ -404,7 +439,7 @@ class ClientChatActivity : AppCompatActivity() {
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Online"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 
     override fun onPause() {
@@ -415,7 +450,7 @@ class ClientChatActivity : AppCompatActivity() {
         val presenceMap = HashMap<String, Any>()
         presenceMap["status"] = "Offline"
         presenceMap["lastSeen"] = currentTime
-        Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 
     private fun setupKeyboardVisibilityListener() {

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".admin.admin_fragments.AdminRentalReqFragment">
+    tools:context=".admin.admin_bottomsheets.SendReminder">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_20sdp"
-            android:text="@string/rental_requests"
+            android:text="@string/send_rental_reminder"
             android:textColor="@color/black"
             android:textSize="@dimen/_20ssp"
             android:textStyle="bold"
@@ -34,7 +34,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView"
-            tools:listitem="@layout/req_rcv_item" />
+            tools:listitem="@layout/send_reminder_rcv_item" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -18,7 +18,6 @@ import com.example.scaffoldsmart.databinding.InventoryDetailsDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import com.google.firebase.database.database
 
 class InventoryRcvAdapter(
@@ -114,20 +113,22 @@ class InventoryRcvAdapter(
             .setMessage("Do you want to delete the item?")
             .setPositiveButton("Yes") { dialog, _ ->
                 // Remove item from database
-                Firebase.database.reference.child("Inventory")
-                    .child(Firebase.auth.currentUser!!.uid)
-                    .child(itemToDelete.itemId)
-                    .removeValue()
-                    .addOnSuccessListener {
-                        // Remove the item from the list
-                        itemList.remove(itemToDelete)
-                        notifyDataSetChanged()
+                itemToDelete.itemId?.let {
+                    Firebase.database.reference.child("Inventory")
+                        .child(it)
+                        .removeValue()
+                        .addOnSuccessListener {
+                            // Remove the item from the list
+                            itemList.remove(itemToDelete)
+                            //notifyDataSetChanged()
+                            notifyItemRemoved(position)
 
-                        undoDeleteItem(position, itemToDelete)
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show()
-                    }
+                            undoDeleteItem(position, itemToDelete)
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show()
+                        }
+                }
                 dialog.dismiss()
             }
             .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
@@ -152,10 +153,11 @@ class InventoryRcvAdapter(
         snackbar.setAction("UNDO") {
             itemList.add(position, itemToDelete)
             notifyItemInserted(position)
-            Firebase.database.reference.child("Inventory")
-                .child(Firebase.auth.currentUser!!.uid)
-                .child(itemToDelete.itemId)
-                .setValue(itemToDelete) // Add it back to the database
+            itemToDelete.itemId?.let { pathString ->
+                Firebase.database.reference.child("Inventory")
+                    .child(pathString)
+                    .setValue(itemToDelete) // Add it back to the database
+            }
         }
         snackbar.show()
         snackbar.setTextColor(Color.BLACK)

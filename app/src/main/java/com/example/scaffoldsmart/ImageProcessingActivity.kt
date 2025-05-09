@@ -2,6 +2,7 @@ package com.example.scaffoldsmart
 
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -19,6 +20,8 @@ import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.databinding.ActivityImageProcessingBinding
 import com.example.scaffoldsmart.util.RoboflowObjectDetector
 import com.example.scaffoldsmart.util.TfliteObjectDetector
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,6 +36,8 @@ class ImageProcessingActivity : AppCompatActivity() {
     private var roboflowObjectDetector: RoboflowObjectDetector? = null
     private val TAG = "ImageProcessingDebug"
     private var progressDialog: ProgressDialog? = null
+    private var senderUid: String? = null
+    private lateinit var chatPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +48,9 @@ class ImageProcessingActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        chatPreferences = getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
+        senderUid = chatPreferences.getString("SenderUid", null)
 
         //tfliteObjectDetector = tfliteObjectDetector(this)
 
@@ -72,6 +80,26 @@ class ImageProcessingActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingActivity::class.java))
             finish()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Online"
+        presenceMap["lastSeen"] = currentTime
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        senderUid = chatPreferences.getString("SenderUid", null)
+        val currentTime = System.currentTimeMillis()
+        val presenceMap = HashMap<String, Any>()
+        presenceMap["status"] = "Offline"
+        presenceMap["lastSeen"] = currentTime
+        senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
     }
 
     private fun detectPipes() {

@@ -19,6 +19,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
+import androidx.core.content.edit
 
 class OnesignalService(val context: Context) {
 
@@ -42,23 +43,25 @@ class OnesignalService(val context: Context) {
     }
 
     // Login as OneSignal user
-    fun oneSignalLogin(email: String, role: String) {
-        val tags: Map<String, String> = mapOf("role" to role)
-        if (email.isNotEmpty()) {
-            Log.d("HomeFragDebug", "Admin Email: $email")
-            try {
-                OneSignal.login(email)
-                OneSignal.User.addTags(tags)
-            } catch (e: Exception) {
-                Log.e("HomeFragDebug", "Failed to log in to OneSignal: ${e.message}")
+    fun oneSignalLogin(email: String?, role: String?) {
+        if (email.isNullOrEmpty()) {
+            Log.e("OneSignalDebug", "User email is null or empty")
+            return
+        }
+        Log.d("OneSignalDebug", "Admin Email: $email")
+        try {
+            OneSignal.login(email)
+            // Create map with non-null values only
+            role?.let { nonNullRole ->
+                OneSignal.User.addTags(mapOf("role" to nonNullRole))
             }
-        } else {
-            Log.e("HomeFragDebug", "User email is null or empty")
+        } catch (e: Exception) {
+            Log.e("OneSignalDebug", "Failed to log in to OneSignal: ${e.message}")
         }
     }
 
     fun createOrUpdateOneSignalUserOnLogin(
-        externalId: String, // Unique user ID, e.g., email or UUID
+        externalId: String?, // Unique user ID, e.g., email or UUID
         tags: Map<String, String> = emptyMap()
     ) {
         val country = "PK"
@@ -113,9 +116,9 @@ class OnesignalService(val context: Context) {
     }
 
     fun sendNotiByOneSignalToExternalId(
-        title: String,
-        message: String,
-        externalId: List<String> // This can accept multiple IDs or a single in a list
+        title: String?,
+        message: String?,
+        externalId: List<String>? // This can accept multiple IDs or a single in a list
     ) {
         // Create the notification JSON object for include_aliases
         val notification = JSONObject().apply {
@@ -164,24 +167,24 @@ class OnesignalService(val context: Context) {
     }
 
     fun sendReqNotiByOneSignalToSegment(
-        clientID: String,
-        clientName: String,
-        clientAddress: String,
-        clientEmail: String,
-        clientPhone: String,
-        clientCnic: String,
-        rentalAddress: String,
-        startDuration: String,
-        endDuration: String,
-        pipes: Int,
-        pipesLength: Int,
-        joints: Int,
-        wench: Int,
-        pumps: Int,
-        motors: Int,
-        generators: Int,
-        wheel: Int,
-        rent: Int) {
+        clientID: String?,
+        clientName: String?,
+        clientAddress: String?,
+        clientEmail: String?,
+        clientPhone: String?,
+        clientCnic: String?,
+        rentalAddress: String?,
+        startDuration: String?,
+        endDuration: String?,
+        pipes: Int?,
+        pipesLength: Int?,
+        joints: Int?,
+        wench: Int?,
+        pumps: Int?,
+        motors: Int?,
+        generators: Int?,
+        wheel: Int?,
+        rent: Int?) {
         val message = "A new rental request has been submitted. Click to view rental details."
         val title = "Rental Request Alert"
 
@@ -255,7 +258,7 @@ class OnesignalService(val context: Context) {
         })
     }
 
-    fun getOneSignalNoti(prevNotiCompletedAt: String, prevNotificationId: String) {
+    fun getOneSignalNoti(prevNotiCompletedAt: String?, prevNotificationId: String?) {
         // Construct the URL for fetching the notification details
         val url = "https://api.onesignal.com/notifications/?app_id=$appId"
 
@@ -292,8 +295,8 @@ class OnesignalService(val context: Context) {
 
                                         val currentNotiCompletedAt = currentNotification.optString("completed_at")
                                         val currentNotificationId = currentNotification.optString("id")
-                                        reqPreferences.edit().putString("CompletedAt", currentNotiCompletedAt).apply()
-                                        reqPreferences.edit().putString("NotificationId", currentNotificationId).apply()
+                                        reqPreferences.edit { putString("CompletedAt", currentNotiCompletedAt) }
+                                        reqPreferences.edit { putString("NotificationId", currentNotificationId) }
 
                                         if (currentNotiCompletedAt != prevNotiCompletedAt && currentNotificationId != prevNotificationId) {
                                             AdminMainActivity.handleReqData(reqData, currentNotificationId)

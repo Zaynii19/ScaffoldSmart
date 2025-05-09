@@ -51,8 +51,8 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private lateinit var onesignal: OnesignalService
-    private var prevNotiCompletedAt: String = ""
-    private var prevNotificationId: String = ""
+    private var prevNotiCompletedAt: String? = null
+    private var prevNotificationId: String? = null
     private lateinit var reqPreferences: SharedPreferences
     private lateinit var chatPreferences: SharedPreferences
     private var senderUid: String? = null
@@ -72,8 +72,8 @@ class AdminMainActivity : AppCompatActivity() {
 
         chatPreferences = getSharedPreferences("CHATADMIN", MODE_PRIVATE)
         reqPreferences = getSharedPreferences("RENTALREQ", MODE_PRIVATE)
-        prevNotiCompletedAt = reqPreferences.getString("CompletedAt", "")!!
-        prevNotificationId = reqPreferences.getString("NotificationId", "")!!
+        prevNotiCompletedAt = reqPreferences.getString("CompletedAt", null)
+        prevNotificationId = reqPreferences.getString("NotificationId", null)
         senderUid = chatPreferences.getString("SenderUid", null)
 
         setStatusBarColor()
@@ -99,8 +99,8 @@ class AdminMainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Get rental notification data on when noti clicks
-        prevNotiCompletedAt = reqPreferences.getString("CompletedAt", "")!!
-        prevNotificationId = reqPreferences.getString("NotificationId", "")!!
+        prevNotiCompletedAt = reqPreferences.getString("CompletedAt", null)
+        prevNotificationId = reqPreferences.getString("NotificationId", null)
         onesignal.getOneSignalNoti(prevNotiCompletedAt, prevNotificationId)
 
         senderUid = chatPreferences.getString("SenderUid", null)
@@ -111,7 +111,7 @@ class AdminMainActivity : AppCompatActivity() {
             val presenceMap = HashMap<String, Any>()
             presenceMap["status"] = "Online"
             presenceMap["lastSeen"] = currentTime
-            Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+            senderUid?.let { it -> Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
         }
     }
 
@@ -123,7 +123,7 @@ class AdminMainActivity : AppCompatActivity() {
             val presenceMap = HashMap<String, Any>()
             presenceMap["status"] = "Offline"
             presenceMap["lastSeen"] = currentTime
-            Firebase.database.reference.child("ChatUser").child(senderUid!!).updateChildren(presenceMap)
+            senderUid?.let { it -> Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
         }
     }
 

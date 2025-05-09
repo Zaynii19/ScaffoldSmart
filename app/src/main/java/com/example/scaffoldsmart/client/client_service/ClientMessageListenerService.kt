@@ -12,6 +12,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import androidx.core.content.edit
 
 class ClientMessageListenerService : Service() {
 
@@ -78,30 +79,32 @@ class ClientMessageListenerService : Service() {
         receiverName = admin.name
         senderRoom = senderUid + receiverUid // Unique room ID for the chat
 
-        database.reference.child("Chat").child(senderRoom!!).child("Messages")
+        senderRoom?.let { database.reference.child("Chat").child(it).child("Messages")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (data in snapshot.children) {
                         val message = data.getValue(MessageModel::class.java)
-                        if (message?.messageId != null && !notifiedMessageIds.contains(message.messageId)) {
-                            // Check if the message is new and not from the sender
-                            if (message.senderId != senderUid && !message.seen!!) {
-                                Log.d("ClientMessageListenerService", "New message detected: ${message.messageId}")
-                                // Notify the user
-                                myNotification.handleNotification(
-                                    applicationContext,
-                                    message.message!!,
-                                    receiverName,
-                                    receiverUid
-                                )
-                                // Mark the message as notified
-                                notifiedMessageIds.add(message.messageId!!)
-                                saveNotifiedMessageIds() // Persist the updated set
+                        message?.messageId?.let { messageId ->
+                            if (!notifiedMessageIds.contains(message.messageId)) {
+                                // Check if the message is new and not from the sender
+                                if (message.senderId != senderUid && message.seen != true) {
+                                    Log.d("ClientMessageListenerService", "New message detected: ${message.messageId}")
+                                    // Notify the user
+                                    myNotification.handleNotification(
+                                        applicationContext,
+                                        message.message,
+                                        receiverName,
+                                        receiverUid
+                                    )
+                                    // Mark the message as notified
+                                    notifiedMessageIds.add(messageId)
+                                    saveNotifiedMessageIds() // Persist the updated set
+                                } else {
+                                    Log.d("ClientMessageListenerService", "Message already seen or from sender: ${message.messageId}")
+                                }
                             } else {
-                                Log.d("ClientMessageListenerService", "Message already seen or from sender: ${message.messageId}")
+                                Log.d("ClientMessageListenerService", "Message already notified or invalid: ${message?.messageId}")
                             }
-                        } else {
-                            Log.d("ClientMessageListenerService", "Message already notified or invalid: ${message?.messageId}")
                         }
                     }
                 }
@@ -110,6 +113,7 @@ class ClientMessageListenerService : Service() {
                     Log.e("ClientMessageListenerService", "Database error: ${error.message}")
                 }
             })
+        }
     }
 
     /**
@@ -117,9 +121,7 @@ class ClientMessageListenerService : Service() {
      */
     private fun saveNotifiedMessageIds() {
         val sharedPreferences = getSharedPreferences("NotifiedMessages", MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putStringSet("notifiedMessageIds", notifiedMessageIds)
-        editor.apply()
+        sharedPreferences.edit { putStringSet("notifiedMessageIds", notifiedMessageIds) }
         Log.d("ClientMessageListenerService", "Saved notifiedMessageIds: $notifiedMessageIds")
     }
 

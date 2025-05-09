@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.admin.admin_fragments
+package com.example.scaffoldsmart.admin.admin_bottomsheets
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,13 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.admin.admin_adapters.ReminderRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
-import com.example.scaffoldsmart.databinding.FragmentReminderSendBinding
+import com.example.scaffoldsmart.databinding.SendReminderBinding
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlin.getValue
 
-class ReminderSendFragment : BottomSheetDialogFragment() {
+class SendReminder : BottomSheetDialogFragment() {
     private val binding by lazy {
-        FragmentReminderSendBinding.inflate(layoutInflater)
+        SendReminderBinding.inflate(layoutInflater)
     }
     private lateinit var adapter: ReminderRcvAdapter
     private var rentalList = ArrayList<RentalModel>()
@@ -55,7 +56,7 @@ class ReminderSendFragment : BottomSheetDialogFragment() {
             if (rentals != null) {
                 rentalList.clear()
                 // Filter rentals where the status is not empty
-                val filteredRentals = rentals.filter { it.status.isNotEmpty() && it.rentStatus == "ongoing" } as ArrayList<RentalModel>
+                val filteredRentals = rentals.filter { it.status?.isNotEmpty() == true && it.rentStatus == "ongoing" } as ArrayList<RentalModel>
                 rentalList.addAll(filteredRentals)
                 if (rentalList.isEmpty()) {
                     Toast.makeText(requireActivity(), "No Ongoing Rental Found", Toast.LENGTH_SHORT).show()

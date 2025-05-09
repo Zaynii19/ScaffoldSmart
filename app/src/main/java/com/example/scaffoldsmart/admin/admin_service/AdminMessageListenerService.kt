@@ -19,6 +19,9 @@ class AdminMessageListenerService : Service() {
     private lateinit var database: FirebaseDatabase
     private lateinit var auth: FirebaseAuth
     private lateinit var myNotification: AdminMsgNotification
+    private var senderRoom: String? = null
+    private var receiverUid: String? = null
+    private var receiverName: String? = null
     private var senderUid: String? = null
     private val notifiedMessageIds = mutableSetOf<String>() // Tracks notified message IDs
     private var chatClientList = ArrayList<ChatUserModel>()
@@ -77,36 +80,38 @@ class AdminMessageListenerService : Service() {
     private fun setupMessageListener(chatClientList: ArrayList<ChatUserModel>) {
         Log.d("MessageListenerService", "Setting up message listeners for ${chatClientList.size} chats")
         chatClientList.forEach { chat ->
-            val receiverUid = chat.uid
-            val receiverName = chat.userName
-            val senderRoom = senderUid + receiverUid // Unique room ID for the chat
+            receiverUid = chat.uid
+            receiverName = chat.userName
+            senderRoom = senderUid + receiverUid // Unique room ID for the chat
 
             // Create a unique listener for each chat room
-            database.reference.child("Chat").child(senderRoom).child("Messages")
+            senderRoom?.let { database.reference.child("Chat").child(it).child("Messages")
                 .addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         for (data in snapshot.children) {
                             val message = data.getValue(MessageModel::class.java)
-                            if (message?.messageId != null && !notifiedMessageIds.contains(message.messageId)) {
-                                // Check if the message is new and not from the sender
-                                if (message.senderId != senderUid && !message.seen!!) {
-                                    Log.d("MessageListenerService", "New message detected: ${message.messageId}")
-                                    // Notify the user
-                                    myNotification.handleNotification(
-                                        applicationContext,
-                                        message.senderName!!,
-                                        message.message!!,
-                                        receiverName,
-                                        receiverUid
-                                    )
-                                    // Mark the message as notified
-                                    notifiedMessageIds.add(message.messageId!!)
-                                    saveNotifiedMessageIds() // Persist the updated set
+                            message?.messageId?.let { messageId ->
+                                if (!notifiedMessageIds.contains(message.messageId)) {
+                                    // Check if the message is new and not from the sender
+                                    if (message.senderId != senderUid && message.seen != true) {
+                                        Log.d("MessageListenerService", "New message detected: ${message.messageId}")
+                                        // Notify the user
+                                        myNotification.handleNotification(
+                                            applicationContext,
+                                            message.senderName,
+                                            message.message,
+                                            receiverName,
+                                            receiverUid
+                                        )
+                                        // Mark the message as notified
+                                        notifiedMessageIds.add(messageId)
+                                        saveNotifiedMessageIds() // Persist the updated set
+                                    } else {
+                                        Log.d("MessageListenerService", "Message already seen or from sender: ${message.messageId}")
+                                    }
                                 } else {
-                                    Log.d("MessageListenerService", "Message already seen or from sender: ${message.messageId}")
+                                    Log.d("MessageListenerService", "Message already notified or invalid: ${message?.messageId}")
                                 }
-                            } else {
-                                Log.d("MessageListenerService", "Message already notified or invalid: ${message?.messageId}")
                             }
                         }
                     }
@@ -115,6 +120,7 @@ class AdminMessageListenerService : Service() {
                         Log.e("MessageListenerService", "Database error: ${error.message}")
                     }
                 })
+            }
         }
     }
 
@@ -123,9 +129,7 @@ class AdminMessageListenerService : Service() {
      */
     private fun saveNotifiedMessageIds() {
         val sharedPreferences = getSharedPreferences("NotifiedMessages", MODE_PRIVATE)
-        sharedPreferences.edit {
-            putStringSet("notifiedMessageIds", notifiedMessageIds)
-        }
+        sharedPreferences.edit { putStringSet("notifiedMessageIds", notifiedMessageIds) }
         Log.d("MessageListenerService", "Saved notifiedMessageIds: $notifiedMessageIds")
     }
 

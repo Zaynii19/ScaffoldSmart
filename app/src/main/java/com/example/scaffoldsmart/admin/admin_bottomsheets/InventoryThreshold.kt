@@ -1,4 +1,4 @@
-package com.example.scaffoldsmart.admin.admin_fragments
+package com.example.scaffoldsmart.admin.admin_bottomsheets
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -16,23 +16,23 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
-import com.example.scaffoldsmart.databinding.FragmentInventoryThresholdBinding
+import com.example.scaffoldsmart.databinding.InventoryThresholdBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 
-class InventoryThresholdFragment : BottomSheetDialogFragment() {
+class InventoryThreshold : BottomSheetDialogFragment() {
     private val binding by lazy {
-        FragmentInventoryThresholdBinding.inflate(layoutInflater)
+        InventoryThresholdBinding.inflate(layoutInflater)
     }
-    private var pipeThreshold: Int = 0
-    private var jointsThreshold : Int = 0
-    private var wenchThreshold : Int = 0
-    private var pumpsThreshold : Int = 0
-    private var motorsThreshold : Int = 0
-    private var generatorsThreshold : Int = 0
-    private var wheelThreshold : Int = 0
+    private var pipeThreshold: Int? = null
+    private var jointsThreshold : Int? = null
+    private var wenchThreshold : Int? = null
+    private var pumpsThreshold : Int? = null
+    private var motorsThreshold : Int? = null
+    private var generatorsThreshold : Int? = null
+    private var wheelThreshold : Int? = null
     private var itemList = ArrayList<InventoryModel>()
     private lateinit var viewModel: InventoryViewModel
 
@@ -76,11 +76,7 @@ class InventoryThresholdFragment : BottomSheetDialogFragment() {
             wheelThreshold = binding.wheQuantityQuantity.text.toString().toIntOrNull() ?: 0
 
             // Check if at least one field has a non-zero value
-            if (pipeThreshold > 0 || jointsThreshold > 0 ||
-                wenchThreshold > 0 || pumpsThreshold > 0 ||
-                motorsThreshold > 0 || generatorsThreshold > 0 ||
-                wheelThreshold > 0) {
-
+            if (isItemThresholdSelected()) {
                 updateInventoryThreshold(
                     pipeThreshold, jointsThreshold, wenchThreshold, pumpsThreshold,
                     motorsThreshold, generatorsThreshold, wheelThreshold
@@ -91,6 +87,16 @@ class InventoryThresholdFragment : BottomSheetDialogFragment() {
                 Toast.makeText(requireActivity(), "Type at least one item threshold value", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun isItemThresholdSelected(): Boolean {
+        return (pipeThreshold ?: 0) > 0 ||
+                (jointsThreshold ?: 0) > 0 ||
+                (wenchThreshold ?: 0) > 0 ||
+                (pumpsThreshold ?: 0) > 0 ||
+                (motorsThreshold ?: 0) > 0 ||
+                (generatorsThreshold ?: 0) > 0 ||
+                (wheelThreshold ?: 0) > 0
     }
 
     private fun observeInventoryLiveData() {
@@ -109,57 +115,34 @@ class InventoryThresholdFragment : BottomSheetDialogFragment() {
     }
 
     private fun setThresholdValuesToEditTexts(itemList: ArrayList<InventoryModel>) {
-        itemList.forEach { item ->
-            val lowerName = item.itemName.lowercase()
+        if (itemList.isEmpty()) {
+            Toast.makeText(requireActivity(), "Item List is empty", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-            when {
-                lowerName.contains("pipe") && pipeThreshold.toString().isNotEmpty() -> {
-                    if (item.threshold.toString().isNotEmpty()) {
-                        binding.pipesQuantity.setText("${item.threshold}")
+        // Map of item keywords to their corresponding UI components and thresholds
+        val thresholdConfigs = mapOf(
+            "pipe" to Triple(binding.pipes, binding.pipesQuantity, pipeThreshold),
+            "joint" to Triple(binding.joints, binding.jointsQuantity, jointsThreshold),
+            "wench" to Triple(binding.wench, binding.wenchQuantity, wenchThreshold),
+            "pump" to Triple(binding.slugPumps, binding.slugPumpsQuantity, pumpsThreshold),
+            "motor" to Triple(binding.motors, binding.motorsQuantity, motorsThreshold),
+            "generator" to Triple(binding.generators, binding.generatorsQuantity, generatorsThreshold),
+            "wheel" to Triple(binding.wheel, binding.wheQuantityQuantity, wheelThreshold)
+        )
+
+        itemList.forEach { item ->
+            val lowerName = item.itemName?.lowercase() ?: return@forEach
+            val threshold = item.threshold ?: return@forEach
+
+            thresholdConfigs.forEach { (keyword, config) ->
+                if (lowerName.contains(keyword)) {
+                    val (itemView, quantityView, typeThreshold) = config
+
+                    if (threshold.toString().isNotEmpty() && typeThreshold.toString().isNotEmpty()) {
+                        quantityView.setText("$threshold")
                     } else {
-                        binding.pipes.visibility = View.GONE
-                    }
-                }
-                lowerName.contains("joint") && jointsThreshold.toString().isNotEmpty() -> {
-                    if (item.threshold.toString().isNotEmpty()) {
-                        binding.jointsQuantity.setText("${item.threshold}")
-                    } else {
-                        binding.joints.visibility = View.GONE
-                    }
-                }
-                lowerName.contains("wench") && wenchThreshold.toString().isNotEmpty() -> {
-                    if (item.threshold.toString().isNotEmpty()) {
-                        binding.wenchQuantity.setText("${item.threshold}")
-                    } else {
-                        binding.wench.visibility = View.GONE
-                    }
-                }
-                lowerName.contains("pump") && pumpsThreshold.toString().isNotEmpty() -> {
-                    if (item.threshold.toString().isNotEmpty()) {
-                        binding.slugPumpsQuantity.setText("${item.threshold}")
-                    } else {
-                        binding.slugPumps.visibility = View.GONE
-                    }
-                }
-                lowerName.contains("motor") && motorsThreshold.toString().isNotEmpty() -> {
-                    if (item.threshold.toString().isNotEmpty()) {
-                        binding.motorsQuantity.setText("${item.threshold}")
-                    } else {
-                        binding.motors.visibility = View.GONE
-                    }
-                }
-                lowerName.contains("generator") && generatorsThreshold.toString().isNotEmpty() -> {
-                    if (item.threshold.toString().isNotEmpty()) {
-                        binding.generatorsQuantity.setText("${item.threshold}")
-                    } else {
-                        binding.generators.visibility = View.GONE
-                    }
-                }
-                lowerName.contains("wheel") && wheelThreshold.toString().isNotEmpty() -> {
-                    if (item.threshold.toString().isNotEmpty()) {
-                        binding.wheQuantityQuantity.setText("${item.threshold}")
-                    } else {
-                        binding.wheel.visibility = View.GONE
+                        itemView.visibility = View.GONE
                     }
                 }
             }
@@ -245,52 +228,35 @@ class InventoryThresholdFragment : BottomSheetDialogFragment() {
     }
 
     private fun updateInventoryThreshold(
-        pipeThreshold: Int,
-        jointsThreshold: Int,
-        wenchThreshold: Int,
-        pumpsThreshold: Int,
-        motorsThreshold: Int,
-        generatorsThreshold: Int,
-        wheelThreshold: Int
+        pipeThreshold: Int?,
+        jointsThreshold: Int?,
+        wenchThreshold: Int?,
+        pumpsThreshold: Int?,
+        motorsThreshold: Int?,
+        generatorsThreshold: Int?,
+        wheelThreshold: Int?
     ) {
-        itemList.forEach { item ->
-            val lowerName = item.itemName.lowercase()
-            val databaseRef = Firebase.database.reference.child("Inventory").child(item.itemId)
+        // Define thresholds in a map (key = keyword, value = threshold)
+        val thresholds = mapOf(
+            "pipe" to pipeThreshold,
+            "joint" to jointsThreshold,
+            "wench" to wenchThreshold,
+            "pump" to pumpsThreshold,
+            "motor" to motorsThreshold,
+            "generator" to generatorsThreshold,
+            "wheel" to wheelThreshold
+        )
 
-            when {
-                lowerName.contains("pipe") && pipeThreshold.toString().isNotEmpty() -> {
-                    if (item.quantity >= pipeThreshold) {
-                        databaseRef.updateChildren(mapOf("threshold" to pipeThreshold))
-                    }
-                }
-                lowerName.contains("joint") && jointsThreshold.toString().isNotEmpty() -> {
-                    if (item.quantity >= jointsThreshold) {
-                        databaseRef.updateChildren(mapOf("threshold" to jointsThreshold))
-                    }
-                }
-                lowerName.contains("wench") && wenchThreshold.toString().isNotEmpty() -> {
-                    if (item.quantity >= wenchThreshold) {
-                        databaseRef.updateChildren(mapOf("threshold" to wenchThreshold))
-                    }
-                }
-                lowerName.contains("pump") && pumpsThreshold.toString().isNotEmpty() -> {
-                    if (item.quantity >= pumpsThreshold) {
-                        databaseRef.updateChildren(mapOf("threshold" to pumpsThreshold))
-                    }
-                }
-                lowerName.contains("motor") && motorsThreshold.toString().isNotEmpty() -> {
-                    if (item.quantity >= motorsThreshold) {
-                        databaseRef.updateChildren(mapOf("threshold" to motorsThreshold))
-                    }
-                }
-                lowerName.contains("generator") && generatorsThreshold.toString().isNotEmpty() -> {
-                    if (item.quantity >= generatorsThreshold) {
-                        databaseRef.updateChildren(mapOf("threshold" to generatorsThreshold))
-                    }
-                }
-                lowerName.contains("wheel") && wheelThreshold.toString().isNotEmpty() -> {
-                    if (item.quantity >= wheelThreshold) {
-                        databaseRef.updateChildren(mapOf("threshold" to wheelThreshold))
+        itemList.forEach { item ->
+            val lowerName = item.itemName?.lowercase()
+            val databaseRef = item.itemId?.let { Firebase.database.reference.child("Inventory").child(it) }
+
+            thresholds.forEach { (keyword, threshold) ->
+                threshold?.let { th ->
+                    if (lowerName?.contains(keyword) == true && th > 0) {
+                        item.quantity?.takeIf { it >= th }?.let {
+                            databaseRef?.updateChildren(mapOf("threshold" to th))
+                        }
                     }
                 }
             }
