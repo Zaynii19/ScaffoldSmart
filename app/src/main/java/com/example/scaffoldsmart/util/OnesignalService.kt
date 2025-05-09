@@ -184,7 +184,8 @@ class OnesignalService(val context: Context) {
         motors: Int?,
         generators: Int?,
         wheel: Int?,
-        rent: Int?) {
+        rent: Int?
+    ) {
         val message = "A new rental request has been submitted. Click to view rental details."
         val title = "Rental Request Alert"
 

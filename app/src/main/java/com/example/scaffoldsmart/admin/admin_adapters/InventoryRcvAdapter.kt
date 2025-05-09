@@ -30,11 +30,7 @@ class InventoryRcvAdapter(
         fun onEditButtonClick(item: InventoryModel)
     }
 
-    class MyItemViewHolder(val binding: InventoryRcvItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(inventory: InventoryModel) {
-            binding.itemName.text = inventory.itemName
-        }
-    }
+    class MyItemViewHolder(val binding: InventoryRcvItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyItemViewHolder {
         return MyItemViewHolder(InventoryRcvItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))

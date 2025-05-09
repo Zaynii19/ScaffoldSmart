@@ -21,12 +21,7 @@ class RentalRcvAdapter(
     private var rentalList: ArrayList<RentalModel>,
     private val listener: OnItemActionListener
 ): RecyclerView.Adapter<RentalRcvAdapter.MyRentalViewHolder>() {
-    class MyRentalViewHolder(val binding: RentalRcvItemBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(rental: RentalModel) {
-            // Bind your chat item to UI elements here.
-            binding.rentalItems.text = rental.clientName
-        }
-    }
+    class MyRentalViewHolder(val binding: RentalRcvItemBinding): RecyclerView.ViewHolder(binding.root)
 
     interface OnItemActionListener {
         fun onDownloadButtonClick(rental: RentalModel)

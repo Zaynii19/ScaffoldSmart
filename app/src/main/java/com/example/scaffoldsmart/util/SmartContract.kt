@@ -69,7 +69,7 @@ class SmartContract {
         document.finishPage(page1)
 
         try {
-            if (isApproved!!) {
+            if (isApproved == true) {
                 // Create PDF in memory and send directly
                 val outputStream = ByteArrayOutputStream()
                 document.writeTo(outputStream)
@@ -88,7 +88,7 @@ class SmartContract {
             } else {
                 // Save to storage only if not approved
                 val documentsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
-                val filePath = File(documentsDirectory, "Scaffolding_Rental_Contract.pdf")
+                val filePath = File(documentsDirectory, "Contract_${System.currentTimeMillis()}.pdf")
                 document.writeTo(FileOutputStream(filePath))
                 Toast.makeText(context, "Smart Contract Downloaded", Toast.LENGTH_SHORT).show()
                 Log.d("SmartContract", "PDF saved successfully to storage")
@@ -126,8 +126,8 @@ class SmartContract {
         generators: String?,
         wheel: String?
     ) {
-        val formatedStartDate = DateFormater.formatDateString(startDuration!!)
-        val formatedEndDate = DateFormater.formatDateString(endDuration!!)
+        val formatedStartDate = DateFormater.formatDateString(startDuration)
+        val formatedEndDate = DateFormater.formatDateString(endDuration)
         val durationInMonths = DateFormater.calculateDurationInMonths(startDuration, endDuration)
 
         val titlePaint = TextPaint().apply {
@@ -212,27 +212,27 @@ class SmartContract {
 
         // Draw OWNER section
         canvas.drawText("OWNER:", 50f, 120f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, ownerName!!, 90f, 120f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, company!!, 50f, 140f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, companyAddress!!, 50f, 160f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, ownerPhone!!, 50f, 180f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, ownerEmail!!, 50f, 200f + staticLayout.height, textPaint)
+        ownerName?.let { drawUnderlinedText(canvas, it, 90f, 120f + staticLayout.height, textPaint) }
+        company?.let { drawUnderlinedText(canvas, it, 50f, 140f + staticLayout.height, textPaint) }
+        companyAddress?.let { drawUnderlinedText(canvas, it, 50f, 160f + staticLayout.height, textPaint) }
+        ownerPhone?.let { drawUnderlinedText(canvas, it, 50f, 180f + staticLayout.height, textPaint) }
+        ownerEmail?.let { drawUnderlinedText(canvas, it, 50f, 200f + staticLayout.height, textPaint) }
 
         // Draw RENTER section
         canvas.drawText("RENTER: ", 50f, 240f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientName!!, 93f, 240f + staticLayout.height, textPaint)
+        clientName?.let { drawUnderlinedText(canvas, it, 93f, 240f + staticLayout.height, textPaint) }
         canvas.drawText("Address: ", 50f, 260f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientAddress!!, 90f, 260f + staticLayout.height, textPaint)
+        clientAddress?.let { drawUnderlinedText(canvas, it, 90f, 260f + staticLayout.height, textPaint) }
         canvas.drawText("CNIC: ", 50f, 280f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientCnic!!, 75f, 280f + staticLayout.height, textPaint)
+        clientCnic?.let { drawUnderlinedText(canvas, it, 75f, 280f + staticLayout.height, textPaint) }
         canvas.drawText("Phone: ", 50f, 300f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientPhone!!, 85f, 300f + staticLayout.height, textPaint)
+        clientPhone?.let { drawUnderlinedText(canvas, it, 85f, 300f + staticLayout.height, textPaint) }
         canvas.drawText("Email: ", 50f, 320f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientEmail!!, 82f, 320f + staticLayout.height, textPaint)
+        clientEmail?.let { drawUnderlinedText(canvas, it, 82f, 320f + staticLayout.height, textPaint) }
 
         // Draw Place of Use & Rental Period
         canvas.drawText("Place of Use: ", 50f, 360f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, rentalAddress!!, 110f, 360f + staticLayout.height, textPaint)
+        rentalAddress?.let { drawUnderlinedText(canvas, it, 110f, 360f + staticLayout.height, textPaint) }
         canvas.drawText("Rental Period: ", 50f, 380f + staticLayout.height, textPaint)
         drawUnderlinedText(canvas, durationInMonths, 118f, 380f + staticLayout.height, textPaint)
 
@@ -240,20 +240,20 @@ class SmartContract {
         canvas.drawText("Equipment Rented", 230f, 420f + staticLayout.height, titlePaint)
         canvas.drawText("Item                           Quantity                            Length ", 160f, 460f + staticLayout.height, textPaint)
         canvas.drawText("1.Scaffolding Pipes", 140f, 480f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, pipes!!, 275f, 480f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, pipesLength!!, 390f, 480f + staticLayout.height, textPaint)
+        pipes?.let { drawUnderlinedText(canvas, it, 275f, 480f + staticLayout.height, textPaint) }
+        pipesLength?.let { drawUnderlinedText(canvas, it, 390f, 480f + staticLayout.height, textPaint) }
         canvas.drawText("2.Joints", 140f, 500f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, joints!!, 275f, 500f + staticLayout.height, textPaint)
+        joints?.let { drawUnderlinedText(canvas, it, 275f, 500f + staticLayout.height, textPaint) }
         canvas.drawText("3.Electric Motors", 140f, 520f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, motors!!, 275f, 520f + staticLayout.height, textPaint)
+        motors?.let { drawUnderlinedText(canvas, it, 275f, 520f + staticLayout.height, textPaint) }
         canvas.drawText("4.Generators", 140f, 540f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, generators!!, 275f, 540f + staticLayout.height, textPaint)
+        generators?.let { drawUnderlinedText(canvas, it, 275f, 540f + staticLayout.height, textPaint) }
         canvas.drawText("5.Slug Pumps", 140f, 560f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, pumps!!, 275f, 560f + staticLayout.height, textPaint)
+        pumps?.let { drawUnderlinedText(canvas, it, 275f, 560f + staticLayout.height, textPaint) }
         canvas.drawText("6.Wench", 140f, 580f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, wench!!, 275f, 580f + staticLayout.height, textPaint)
+        wench?.let { drawUnderlinedText(canvas, it, 275f, 580f + staticLayout.height, textPaint) }
         canvas.drawText("7.Wheel Barrows", 140f, 600f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, wheel!!, 275f, 600f + staticLayout.height, textPaint)
+        wheel?.let { drawUnderlinedText(canvas, it, 275f, 600f + staticLayout.height, textPaint) }
 
         // Draw Terms & Conditions
         canvas.drawText("TERMS & CONDITIONS", 50f, 640f + staticLayout.height, conditionTitlePaint)
@@ -263,9 +263,9 @@ class SmartContract {
 
         // Draw signature lines
         canvas.drawText("Owner Signature", 50f, 740f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, ownerName, 50f, 770f + staticLayout.height, textPaint)
+        ownerName?.let { drawUnderlinedText(canvas, it, 50f, 770f + staticLayout.height, textPaint) }
         canvas.drawText("Renter Signature", 400f, 740f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, clientName, 400f, 770f + staticLayout.height, textPaint)
+        clientName?.let { drawUnderlinedText(canvas, it, 400f, 770f + staticLayout.height, textPaint) }
     }
 
     private fun drawUnderlinedText(canvas: Canvas, text: String, x: Float, y: Float, paint: Paint) {

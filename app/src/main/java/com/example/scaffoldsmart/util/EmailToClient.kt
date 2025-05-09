@@ -24,7 +24,7 @@ class EmailToClient {
                     Log.e("EmailToClient", "PDF file doesn't exist or is empty: ${pdfFile.absolutePath}")
                     return@launch
                 }
-                sendEmailWithPdf(pdfFile, clientEmail!!)
+                sendEmailWithPdf(pdfFile, clientEmail)
             } finally {
                 // Delete the temporary file after sending
                 try {
@@ -36,7 +36,7 @@ class EmailToClient {
         }
     }
 
-    private fun sendEmailWithPdf(pdfFile: File, clientEmail: String) {
+    private fun sendEmailWithPdf(pdfFile: File, clientEmail: String?) {
         try {
             Log.d("EmailToClient", "Attempting to send email with PDF: ${pdfFile.name}")
             Log.d("EmailToClient", "PDF file size: ${pdfFile.length()} bytes, exists: ${pdfFile.exists()}")

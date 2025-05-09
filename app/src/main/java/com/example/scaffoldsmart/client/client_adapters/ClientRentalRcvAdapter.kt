@@ -17,12 +17,7 @@ import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ClientRentalRcvAdapter (val context: Context, private var rentalList: ArrayList<RentalModel>): RecyclerView.Adapter<ClientRentalRcvAdapter.MyRentalViewHolder>() {
-    class MyRentalViewHolder(val binding: ClientRentalRcvItemBinding): RecyclerView.ViewHolder(binding.root) {
-        fun bind(rental: RentalModel) {
-            // Bind your chat item to UI elements here.
-            binding.rentalItems.text = rental.clientName
-        }
-    }
+    class MyRentalViewHolder(val binding: ClientRentalRcvItemBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRentalViewHolder {
         return MyRentalViewHolder(ClientRentalRcvItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))

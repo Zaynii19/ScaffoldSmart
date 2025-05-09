@@ -16,7 +16,7 @@ object CheckNetConnectvity {
                     it.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                             it.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
                             it.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
-                } ?: false
+                } == true
             }
             // For older versions
             else {

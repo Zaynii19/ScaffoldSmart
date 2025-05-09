@@ -177,10 +177,10 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         binding.wheelQuantitySpinner.onItemSelectedListener = createSpinnerListener { wheelQuantity = it }
     }
 
-    private fun createSpinnerListener(onItemSelected: (Int) -> Unit): AdapterView.OnItemSelectedListener {
+    private fun createSpinnerListener(onItemSelected: (Int?) -> Unit): AdapterView.OnItemSelectedListener {
         return object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedValue = parent.getItemAtPosition(position) as Int
+                val selectedValue = parent.getItemAtPosition(position).toString().toIntOrNull()
                 onItemSelected(selectedValue)
                 updateTotalRent() // Update rent when spinner value changes
             }
@@ -202,8 +202,8 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         binding.pipesQuantity.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                pipeQuantity = binding.pipesQuantity.text.toString().toInt()
-                pipeLength = binding.pipesLength.text.toString().toInt()
+                pipeQuantity = binding.pipesQuantity.text.toString().toIntOrNull()
+                pipeLength = binding.pipesLength.text.toString().toIntOrNull()
 
                 if (pipeQuantity != 0) {
                     binding.pipesLength.setOnClickListener {
@@ -225,7 +225,7 @@ class ClientCostComparisonActivity : AppCompatActivity() {
         binding.jointsQuantity.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                jointsQuantity = binding.jointsQuantity.text.toString().toInt()
+                jointsQuantity = binding.jointsQuantity.text.toString().toIntOrNull()
             }
             override fun afterTextChanged(s: Editable?) {
                 updateTotalRent() // Update rent when joints quantity changes
