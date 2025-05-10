@@ -244,18 +244,19 @@ class HomeFragment : Fragment() {
 
             // Calculate the duration in months
             val durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
+            updateRentalStatus(rental, status)
 
             // Create a ScaffoldInfoModel instance and add to infoList
-            infoList.add(ScaffoldInfoModel(rental.clientName, durationInMonths, status))
+            infoList.add(ScaffoldInfoModel(rental.clientName, durationInMonths, rental.rentStatus))
             adapter.updateList(infoList)
-
-            updateRentalStatus(rental, status)
         }
     }
 
     private fun updateRentalStatus(currentRental: RentalModel, newRentStatus: String) {
+        if (currentRental.rentStatus == "returned") return // Exit if the status is already returned
+        if (currentRental.rentStatus == newRentStatus) return // Exit if the status is already the same
+        // Reference to the specific req in Firebase
         currentRental.rentalId?.let { rentalId ->
-
             val update = mapOf("rentStatus" to newRentStatus)
             Firebase.database.reference.child("Rentals")
                 .child(rentalId)
@@ -450,14 +451,14 @@ class HomeFragment : Fragment() {
             currentReq.clientEmail?.let { email ->
                 val externalId = listOf(email)
                 onesignal.sendNotiByOneSignalToExternalId(title, message, externalId)
-            } ?: Toast.makeText(context, "Skipped notifying - client email is null", Toast.LENGTH_SHORT).show()
+            } ?: Toast.makeText(requireActivity(), "Skipped notifying - client email is null", Toast.LENGTH_SHORT).show()
         } else {
             val title = "Rental Request Alert"
             val message = "Your Rental Request Has Been Rejected."
             currentReq.clientEmail?.let { email ->
                 val externalId = listOf(email)
                 onesignal.sendNotiByOneSignalToExternalId(title, message, externalId)
-            } ?: Toast.makeText(context, "Skipped notifying - client email is null", Toast.LENGTH_SHORT).show()
+            } ?: Toast.makeText(requireActivity(), "Skipped notifying - client email is null", Toast.LENGTH_SHORT).show()
         }
     }
 

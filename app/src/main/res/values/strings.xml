@@ -196,5 +196,7 @@
     <string name="days">Days</string>
     <string name="invoice_no">Invoice No#</string>
     <string name="issued_date">Issued Date:</string>
+    <string name="completed">Completed</string>
+    <string name="you_have_completed_a_rental">You have completed a rental</string>
 
 </resources>

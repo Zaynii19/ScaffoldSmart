@@ -10,10 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.SettingActivity
 import com.example.scaffoldsmart.admin.admin_adapters.RentalRcvAdapter
@@ -22,7 +26,13 @@ import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.FragmentRentBinding
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
+import com.example.scaffoldsmart.databinding.RentalsCompletionDialogBinding
+import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
+import com.example.scaffoldsmart.util.OnesignalService
 import com.example.scaffoldsmart.util.SmartContract
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 
 class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
     private val binding by lazy {
@@ -35,11 +45,13 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
     private lateinit var viewModelA: AdminViewModel
     private var smartContract: SmartContract? = null
     private var adminObj: AdminModel? = null
+    private lateinit var onesignal: OnesignalService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         smartContract = SmartContract()
+        onesignal = OnesignalService(requireActivity())
 
         viewModel = ViewModelProvider(this)[RentalViewModel::class.java]
         viewModel.retrieveRentalReq()
@@ -135,5 +147,76 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
             rental.startDuration, rental.endDuration, rental.pipes.toString(), rental.pipesLength.toString(), rental.joints.toString(),
             rental.wench.toString(), rental.motors.toString(), rental.pumps.toString(), rental.generators.toString(), rental.wheel.toString()
         )
+    }
+
+    override fun onDoneRentalButtonClick(currentRental: RentalModel) {
+        showConfirmationDialog(currentRental)
+    }
+
+    private fun showConfirmationDialog(currentRental: RentalModel) {
+        val builder = MaterialAlertDialogBuilder(requireActivity())
+        builder.setTitle("Complete Rental")
+            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
+            .setMessage("Do you want to complete this rental from ${currentRental.clientName}?")
+            .setPositiveButton("Complete") { _, _ -> updateRentalStatus(currentRental) }
+            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+
+        val alertDialog = builder.create()
+        alertDialog.apply {
+            show()
+            // Set title text color
+            val titleView = findViewById<TextView>(androidx.appcompat.R.id.alertTitle)
+            titleView?.setTextColor(Color.BLACK)
+            // Set message text color
+            findViewById<TextView>(android.R.id.message)?.setTextColor(Color.BLACK)
+            // Set button color
+            getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
+            getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLUE)
+        }
+    }
+
+    private fun updateRentalStatus(currentRental: RentalModel) {
+        currentRental.rentalId?.let { rentalId ->
+            val newRentStatus = "returned"
+            val update = mapOf("rentStatus" to newRentStatus)
+            Firebase.database.reference.child("Rentals")
+                .child(rentalId)
+                .updateChildren(update)
+                .addOnSuccessListener {
+                    showCompletionDialog()
+                    notifyClient(currentRental)
+                }
+                .addOnFailureListener {}
+        } ?: run {
+            Log.e("RentFragDebug", "Cannot update - rentalId is null")
+        }
+    }
+
+    private fun showCompletionDialog() {
+        val customDialog = LayoutInflater.from(requireActivity()).inflate(R.layout.rentals_completion_dialog, null)
+        val builder = MaterialAlertDialogBuilder(requireActivity())
+        val binder = RentalsCompletionDialogBinding.bind(customDialog)
+
+        Glide.with(this)
+            .load(R.drawable.done_rental)
+            .into(binder.completionGif)
+
+        // Create and show the dialog
+        val dialog = builder.setView(customDialog)
+            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
+            .show()
+
+        binder.dashboardBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+    }
+
+    private fun notifyClient(currentReq: RentalModel) {
+        val title = "Rental Return Confirmed!"
+        val message = "We’ve received your rental. Thank you for choosing us! Hope to see you again soon."
+        currentReq.clientEmail?.let { email ->
+            val externalId = listOf(email)
+            onesignal.sendNotiByOneSignalToExternalId(title, message, externalId)
+        } ?: Toast.makeText(requireActivity(), "Skipped notifying - client email is null", Toast.LENGTH_SHORT).show()
     }
 }

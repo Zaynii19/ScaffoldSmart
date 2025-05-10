@@ -25,6 +25,7 @@ class RentalRcvAdapter(
 
     interface OnItemActionListener {
         fun onDownloadButtonClick(rental: RentalModel)
+        fun onDoneRentalButtonClick(rental: RentalModel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRentalViewHolder {
@@ -68,6 +69,14 @@ class RentalRcvAdapter(
 
         holder.binding.downloadContract.setOnClickListener {
             listener.onDownloadButtonClick(currentItem)
+        }
+
+        holder.binding.doneRental.setOnClickListener {
+            listener.onDoneRentalButtonClick(currentItem)
+        }
+
+        if (currentItem.rentStatus == "returned") {
+            holder.binding.doneRental.visibility = View.GONE
         }
 
         holder.binding.root.setOnClickListener {

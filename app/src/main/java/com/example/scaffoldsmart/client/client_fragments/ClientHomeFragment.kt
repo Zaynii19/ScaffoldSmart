@@ -150,18 +150,19 @@ class ClientHomeFragment : Fragment() {
 
             // Calculate the duration in months
             val durationInMonths = DateFormater.calculateDurationInMonths(rental.startDuration, rental.endDuration)
+            updateRentalStatus(rental, status)
 
             // Create a ScaffoldInfoModel instance and add to infoList
-            rental.rent?.let { infoList.add(ClientScaffoldInfoModel(it, durationInMonths, status)) }
+            rental.rent?.let { infoList.add(ClientScaffoldInfoModel(it, durationInMonths, rental.rentStatus)) }
             adapter.updateList(infoList)
-
-            updateRentalStatus(rental, status)
         }
     }
 
     private fun updateRentalStatus(currentRental: RentalModel, newRentStatus: String) {
+        if (currentRental.rentStatus == "returned") return // Exit if the status is already returned
+        if (currentRental.rentStatus == newRentStatus) return // Exit if the status is already the same
+        // Reference to the specific req in Firebase
         currentRental.rentalId?.let { rentalId ->
-
             val update = mapOf("rentStatus" to newRentStatus)
             Firebase.database.reference.child("Rentals")
                 .child(rentalId)
