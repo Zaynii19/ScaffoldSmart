@@ -3,6 +3,7 @@ package com.example.scaffoldsmart.admin.admin_fragments
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -31,6 +32,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.database
+import androidx.core.net.toUri
 
 class ProfileFragment : Fragment() {
     private val binding by lazy {
@@ -151,9 +153,20 @@ class ProfileFragment : Fragment() {
         val customDialog = LayoutInflater.from(requireActivity()).inflate(R.layout.social_platform_dialog, null)
         val binder = SocialPlatformDialogBinding.bind(customDialog)
 
-        /*binder.facebook.setOnClickListener {
+        // WhatsApp click handler
+        binder.whatsapp.setOnClickListener {
+            openWhatsapp()
+        }
 
-        }*/
+        // Facebook click handler
+        binder.facebook.setOnClickListener {
+            openFacebook()
+        }
+
+        // Instagram click handler
+        binder.instagram.setOnClickListener {
+            Toast.makeText(requireActivity(), "Not Connected Yet", Toast.LENGTH_SHORT).show()
+        }
 
         val builder = MaterialAlertDialogBuilder(requireActivity())
         builder.setView(customDialog)
@@ -169,6 +182,52 @@ class ProfileFragment : Fragment() {
                 // Set button color
                 getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
             }
+    }
+
+    private fun openWhatsapp() {
+        val phoneNumber = "923125351971"
+        val url = "https://wa.me/$phoneNumber"
+        try {
+            val packageManager = context?.packageManager
+            val whatsappIntent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
+                setPackage("com.whatsapp") // Force open with WhatsApp if installed
+            }
+
+            packageManager?.let { pm ->
+                if (whatsappIntent.resolveActivity(pm) != null) {
+                    startActivity(whatsappIntent)
+                } else {
+                    // WhatsApp not installed, open in browser
+                    startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Fallback to browser
+            startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+        }
+    }
+
+    private fun openFacebook() {
+        val profileUrl = "https://www.facebook.com/share/15ar5ty5aK/?mibextid=wwXIfr"
+        try {
+            val packageManager = context?.packageManager
+            val facebookIntent = Intent(Intent.ACTION_VIEW,
+                "fb://facewebmodal/f?href=${Uri.encode(profileUrl)}".toUri())
+
+            packageManager?.let { pm ->
+                if (facebookIntent.resolveActivity(pm) != null) {
+                    startActivity(facebookIntent)
+                } else {
+                    // Facebook app not installed, open in browser
+                    startActivity(Intent(Intent.ACTION_VIEW, profileUrl.toUri()))
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // Fallback to browser
+            startActivity(Intent(Intent.ACTION_VIEW, profileUrl.toUri()))
+        }
     }
 
     private fun showReminderBottomSheet() {

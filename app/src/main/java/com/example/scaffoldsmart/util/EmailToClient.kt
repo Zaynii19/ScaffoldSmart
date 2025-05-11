@@ -56,9 +56,10 @@ class EmailToClient {
 
             val session = Session.getInstance(props, object : Authenticator() {
                 override fun getPasswordAuthentication(): PasswordAuthentication {
-                    val senderEmail = "zaynii1911491@gmail.com"
-                    val senderPassword = "eeyepbpiadbraobu"
-                    //val senderPassword = "frlipnsajtqlcqmu"
+                    //val senderEmail = "zaynii1911491@gmail.com"
+                    //val senderPassword = "eeyepbpiadbraobu"
+                    val senderEmail = "sallarmirza77@gmail.com"
+                    val senderPassword = "frlipnsajtqlcqmu"
                     return PasswordAuthentication(senderEmail, senderPassword)
                 }
             })

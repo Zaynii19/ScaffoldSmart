@@ -124,7 +124,7 @@ class SendRentalReq : BottomSheetDialogFragment() {
                     return@setOnClickListener
                 }
 
-                if (!isDurationValid()) {
+                if (isDurationNotValid()) {
                     Toast.makeText(context, "Please add start and end duration", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
@@ -454,7 +454,7 @@ class SendRentalReq : BottomSheetDialogFragment() {
         }
     }
 
-    private fun isDurationValid(): Boolean {
+    private fun isDurationNotValid(): Boolean {
         return durationStart.isNullOrEmpty() && durationEnd.isNullOrEmpty()
     }
 
