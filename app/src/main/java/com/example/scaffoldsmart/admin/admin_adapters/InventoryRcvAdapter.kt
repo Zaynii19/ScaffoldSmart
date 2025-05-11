@@ -116,7 +116,6 @@ class InventoryRcvAdapter(
                         .addOnSuccessListener {
                             // Remove the item from the list
                             itemList.remove(itemToDelete)
-                            //notifyDataSetChanged()
                             notifyItemRemoved(position)
 
                             undoDeleteItem(position, itemToDelete)
@@ -139,7 +138,7 @@ class InventoryRcvAdapter(
             findViewById<TextView>(android.R.id.message)?.setTextColor(Color.BLACK)
             // Set button color
             getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
-            getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLUE)
+            getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED)
         }
     }
 

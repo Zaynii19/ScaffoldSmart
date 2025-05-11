@@ -1,6 +1,5 @@
 package com.example.scaffoldsmart.client.client_adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -40,7 +39,6 @@ class ClientInventoryRcvAdapter (val context: Context, private var itemList: Arr
         }
     }
 
-    @SuppressLint("SetTextI18n")
     private fun inventoryDetailsDialog(item: InventoryModel) {
         val customDialog = LayoutInflater.from(context).inflate(R.layout.inventory_details_dialog, null)
         val builder = MaterialAlertDialogBuilder(context)

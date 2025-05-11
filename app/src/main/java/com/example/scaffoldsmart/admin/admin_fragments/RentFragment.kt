@@ -171,7 +171,7 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
             findViewById<TextView>(android.R.id.message)?.setTextColor(Color.BLACK)
             // Set button color
             getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
-            getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLUE)
+            getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED)
         }
     }
 

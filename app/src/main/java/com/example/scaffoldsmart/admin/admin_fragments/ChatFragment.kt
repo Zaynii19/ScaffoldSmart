@@ -102,7 +102,7 @@ class ChatFragment : Fragment() {
     private fun setRecentChatRcv() {
         val layoutManagerC = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         binding.chatRCV.layoutManager = layoutManagerC
-        adapterC = RecentChaRcvAdapter(requireActivity(), recentChatList)
+        adapterC = RecentChaRcvAdapter(requireActivity(), recentChatList, senderUid)
         binding.chatRCV.adapter = adapterC
         binding.chatRCV.setHasFixedSize(true)
     }

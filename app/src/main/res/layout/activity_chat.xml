@@ -80,7 +80,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/sendImageBtn"
@@ -123,8 +123,9 @@
                     android:id="@+id/typedMessage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapSentences"
+                    android:inputType="textMultiLine"
                     android:maxLines="3"
+                    android:minHeight="48dp"
                     android:textColor="@color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 

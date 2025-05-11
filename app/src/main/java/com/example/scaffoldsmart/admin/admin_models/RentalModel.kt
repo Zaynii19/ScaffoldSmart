@@ -47,6 +47,7 @@ class RentalModel : Serializable {
         generators: Int?,
         wheel: Int?,
         rent: Int?,
+        status: String?
     ) {
         this.clientID = clientID
         this.rentalId = rentalId
@@ -67,5 +68,6 @@ class RentalModel : Serializable {
         this.generators = generators
         this.wheel = wheel
         this.rent = rent
+        this.status = status
     }
 }

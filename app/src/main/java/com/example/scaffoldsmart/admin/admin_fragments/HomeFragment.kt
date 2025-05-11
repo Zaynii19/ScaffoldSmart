@@ -43,6 +43,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.database.database
 import androidx.core.content.edit
 import com.example.scaffoldsmart.admin.admin_bottomsheets.ShowRentalReq
+import kotlin.math.log10
 
 class HomeFragment : Fragment() {
 
@@ -203,7 +204,7 @@ class HomeFragment : Fragment() {
             binding.loading.visibility = View.GONE
             if (rentals != null) {
                 // Filter rentals where the status is not empty
-                val filteredRentals = rentals.filter { it.status?.isNotEmpty() == true } as ArrayList<RentalModel>
+                filteredRentals = rentals.filter { it.status?.isNotEmpty() == true } as ArrayList<RentalModel>
 
                 binding.totalPaymentReceived.text = buildString {
                     append(totalPaymentReceived(filteredRentals))
