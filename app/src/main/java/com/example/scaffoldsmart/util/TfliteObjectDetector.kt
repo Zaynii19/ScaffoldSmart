@@ -3,7 +3,6 @@ package com.example.scaffoldsmart.util
 import android.content.Context
 import android.graphics.*
 import android.util.Log
-import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -19,7 +18,7 @@ import androidx.core.graphics.createBitmap
 
 class TfliteObjectDetector(context: Context) {
 
-    private val TAG = "PipeDetectorDebug"
+    /*private val TAG = "PipeDetectorDebug"
     private var interpreter: Interpreter? = null
     private val modelFileName = "image_processing.tflite"
 
@@ -251,5 +250,5 @@ class TfliteObjectDetector(context: Context) {
         val detections: List<PipeDetection>,
         val overlayBitmap: Bitmap?,
         val pipeCount: Int
-    )
+    )*/
 }

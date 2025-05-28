@@ -29,6 +29,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.ImageProcessingActivity
+import com.example.scaffoldsmart.admin.AdminMainActivity
 import com.example.scaffoldsmart.databinding.ActivityClientMainBinding
 import com.example.scaffoldsmart.client.client_service.ClientMessageListenerService
 import com.example.scaffoldsmart.databinding.ChooseImgDialogBinding
@@ -227,10 +228,20 @@ class ClientMainActivity : AppCompatActivity() {
     }
 
     private fun checkStoragePermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-        } else {
-            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        return when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                // Android 15+ - check for either full or partial access
+                //ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                // Android 13-14
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+            }
+            else -> {
+                // Android 12 and below
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            }
         }
     }
 
@@ -239,21 +250,37 @@ class ClientMainActivity : AppCompatActivity() {
     }
 
     private fun requestStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_MEDIA_IMAGES), PERMISSION_REQUEST_CODE)
-        } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_REQUEST_CODE)
+        val permissionsToRequest = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                // Android 15+ - request both for better UX
+                arrayOf(
+                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
+                    Manifest.permission.READ_MEDIA_IMAGES
+                )
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                // Android 13-14
+                arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+            }
+            else -> {
+                // Android 12 and below
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
         }
+
+        ActivityCompat.requestPermissions(this, permissionsToRequest, PERMISSION_REQUEST_CODE
+        )
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.isNotEmpty() && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
                 when {
-                    permissions[0] == Manifest.permission.CAMERA -> launchCamera()
-                    permissions[0] == Manifest.permission.READ_MEDIA_IMAGES ||
-                            permissions[0] == Manifest.permission.READ_EXTERNAL_STORAGE -> launchGallery()
+                    permissions.contains(Manifest.permission.CAMERA) -> launchCamera()
+                    permissions.any { it == Manifest.permission.READ_MEDIA_IMAGES ||
+                            it == Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED ||
+                            it == Manifest.permission.READ_EXTERNAL_STORAGE } -> launchGallery()
                 }
             } else {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()

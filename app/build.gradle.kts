@@ -75,19 +75,28 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    // Firebase
     implementation(libs.firebase.auth)
     implementation(libs.firebase.database.ktx)
-    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.storage)
+
+    // Fragment Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+
+    // UI
     implementation (libs.ssp.android)
     implementation (libs.sdp.android)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation (libs.circleimageview)
+    implementation (libs.imagepicker)
+    implementation (libs.glide)
+
+    // Push Notification
     implementation (libs.onesignal)
 
     // define a BOM and its version
@@ -101,17 +110,17 @@ dependencies {
     // LiveData
     implementation (libs.androidx.lifecycle.livedata.ktx)
 
-    implementation (libs.circleimageview)
-    implementation (libs.imagepicker)
-    implementation (libs.glide)
-
+    // Kotlin Coroutines
     implementation(libs.kotlinx.coroutines.android)
     implementation (libs.androidx.lifecycle.runtime.ktx)
+
+    // Android Mail
     implementation(libs.android.mail)
     implementation(libs.android.activation)
 
-    implementation(libs.tensorflow.lite)
+    // TensorFlow Lite
+    /*implementation(libs.tensorflow.lite)
     implementation(libs.tensorflow.lite.task.vision)
-    implementation(libs.tensorflow.lite.gpu)
+    implementation(libs.tensorflow.lite.gpu)*/
 
 }
