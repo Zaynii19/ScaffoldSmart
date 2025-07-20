@@ -74,17 +74,23 @@
             app:layout_constraintTop_toBottomOf="@+id/toolBar" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/rentalRequestBtn"
+            android:id="@+id/viewCartBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_20sdp"
             android:backgroundTint="@color/buttons_color"
-            android:text="@string/send_rental_request"
+            android:text="@string/view_cart"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="@dimen/_18ssp"
+            android:padding="@dimen/_8sdp"
             app:cornerRadius="@dimen/_10sdp"
+            app:icon="@drawable/cart"
+            app:iconPadding="@dimen/_20sdp"
+            app:iconGravity="textStart"
+            app:iconSize="@dimen/_25sdp"
+            app:iconTint="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -96,13 +102,12 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rentalRequestBtn" >
+            app:layout_constraintTop_toBottomOf="@+id/viewCartBtn" >
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rcv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="@dimen/_10sdp"
                 app:stackFromEnd="false"
                 tools:listitem="@layout/client_inventory_rcv_item" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

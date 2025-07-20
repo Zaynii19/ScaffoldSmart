@@ -198,5 +198,30 @@
     <string name="issued_date">Issued Date:</string>
     <string name="completed">Completed</string>
     <string name="you_have_completed_a_rental">You have completed a rental</string>
+    <string name="view_cart">View Cart</string>
+    <string name="add_item_cart">Add Item Cart</string>
+    <string name="item_quantity">Item Quantity</string>
+    <string name="add_to_cart">Add to Cart</string>
+    <string name="cart">Cart</string>
+    <string name="cart_panel">Cart Panel</string>
+    <string name="cart_item">Cart Item</string>
+    <string name="length_15_feet">Length: 15 feet</string>
+    <string name="quantity_3000">Quantity: 3000</string>
+    <string name="rental_agreement_clause">This Rental Agreement (the <b>Agreement</b>) is made and entered into as of the <b>[Start Date]</b>. The rental period for the Equipment shall commence on <b>[Start Date]</b> and shall end on <b>[End Date]</b>, unless terminated earlier in accordance with this Agreement.</string>
+    <string name="agreement_title">Scaffolding Equipment Rental Contractual Agreement</string>
+    <string name="owner">OWNER: </string>
+    <string name="_company">Company: </string>
+    <string name="_phone">Phone:</string>
+    <string name="renter">RENTER:</string>
+    <string name="place_of_use">Place of Use:</string>
+    <string name="rental_period">Rental Period:</string>
+    <string name="equipment_rented">Equipment Rented</string>
+    <string name="terms_conditions"><![CDATA[TERMS & CONDITIONS]]></string>
+    <string name="agrement_condition_1">1. Late returns may incur additional charges at the rate of 1000 .Rs per day.</string>
+    <string name="agrement_condition_2">2. The Lessor shall not be liable for any direct or indirect damages resulting from the Equipment\'s use.</string>
+    <string name="agrement_condition_3">3. Any disputes arising from this Agreement shall be resolved through mediation before seeking legal recourse.</string>
+    <string name="owner_signature">Owner Signature</string>
+    <string name="renter_signature">Renter Signature</string>
+    <string name="item_threshold">Item Threshold</string>
 
 </resources>

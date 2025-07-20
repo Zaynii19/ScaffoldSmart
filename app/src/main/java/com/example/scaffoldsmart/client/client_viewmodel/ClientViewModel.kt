@@ -26,7 +26,7 @@ class ClientViewModel : ViewModel() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("ClientHomeDebug", "Failed to retrieve client data", error.toException())
+                    Log.e("ClientVMDebug", "Failed to retrieve client data", error.toException())
                 }
             })
     }

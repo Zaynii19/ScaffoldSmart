@@ -13,17 +13,11 @@ class RentalModel : Serializable {
     var rentalAddress: String? = null
     var startDuration: String? = null
     var endDuration: String? = null
-    var pipes: Int? = null
-    var pipesLength: Int? = null
-    var joints: Int? = null
-    var wench: Int? = null
-    var motors: Int? = null
-    var pumps: Int? = null
-    var generators: Int? = null
-    var wheel: Int? = null
     var status: String? = null
     var rent: Int? = null
     var rentStatus: String? = null
+    // List of Rental Items
+    var items: ArrayList<RentalItem>? = null
 
     constructor()
 
@@ -38,16 +32,9 @@ class RentalModel : Serializable {
         rentalAddress: String?,
         startDuration: String?,
         endDuration: String?,
-        pipes: Int?,
-        pipesLength: Int?,
-        joints: Int?,
-        wench: Int?,
-        motors: Int?,
-        pumps: Int?,
-        generators: Int?,
-        wheel: Int?,
         rent: Int?,
-        status: String?
+        status: String?,
+        items: ArrayList<RentalItem>?
     ) {
         this.clientID = clientID
         this.rentalId = rentalId
@@ -59,15 +46,29 @@ class RentalModel : Serializable {
         this.rentalAddress = rentalAddress
         this.startDuration = startDuration
         this.endDuration = endDuration
-        this.pipes = pipes
-        this.pipesLength = pipesLength
-        this.joints = joints
-        this.wench = wench
-        this.motors = motors
-        this.pumps = pumps
-        this.generators = generators
-        this.wheel = wheel
         this.rent = rent
         this.status = status
+        this.items = items
+    }
+}
+
+class RentalItem {
+    var itemName: String? = null
+    var itemQuantity: Int? = null
+    var itemPrice: Int? = null
+    var pipeLength: Int? = null
+
+    constructor()
+
+    constructor(
+        itemName: String?,
+        itemQuantity: Int?,
+        itemPrice: Int?,
+        pipeLength: Int?
+    ) {
+        this.itemName = itemName
+        this.itemQuantity = itemQuantity
+        this.itemPrice = itemPrice
+        this.pipeLength = pipeLength
     }
 }

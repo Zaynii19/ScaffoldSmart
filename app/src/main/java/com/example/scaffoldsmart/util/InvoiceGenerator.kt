@@ -19,7 +19,7 @@ import androidx.core.net.toUri
 
 object InvoiceGenerator {
 
-    // Convert view to bitmap
+    // Convert view to bitmap of view's dimensions
     /*fun createBitmapFromView(view: View): Bitmap {
         view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
         val bitmap = createBitmap(view.measuredWidth, view.measuredHeight)
@@ -29,11 +29,11 @@ object InvoiceGenerator {
         return bitmap
     }*/
 
+    // Convert view to bitmap of fixed dimensions e.g A4 size
     fun createBitmapFromView(view: View): Bitmap {
         // Use fixed dimensions that match your invoice design
         val width = 1080
         val height = 1220
-        //val height = 1920
 
         val bitmap = createBitmap(width, height)
         val canvas = Canvas(bitmap)

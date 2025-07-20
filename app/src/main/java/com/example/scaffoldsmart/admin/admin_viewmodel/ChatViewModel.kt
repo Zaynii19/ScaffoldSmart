@@ -29,7 +29,7 @@ class ChatViewModel: ViewModel() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("ChatDebug", "Failed to retrieve chat", error.toException())
+                    Log.e("ChatVMDebug", "Failed to retrieve chat", error.toException())
                 }
             })
     }

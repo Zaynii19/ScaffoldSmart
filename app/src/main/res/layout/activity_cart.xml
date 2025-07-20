@@ -5,9 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".admin.InventoryActivity"
-    android:background="@color/app_bg"
-    android:fitsSystemWindows="true">
+    android:background="@color/white"
+    tools:context=".client.CartActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/toolBar"
@@ -33,7 +32,7 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/inventory"
+            android:text="@string/cart"
             android:textSize="@dimen/_20ssp"
             android:textStyle="bold"
             android:textColor="@color/white"
@@ -58,7 +57,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/inventory_panel"
+        android:text="@string/cart_panel"
         android:textSize="@dimen/_24ssp"
         android:textStyle="bold"
         android:textColor="@color/black"
@@ -67,54 +66,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolBar" />
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/search"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/_35sdp"
-        android:layout_margin="@dimen/_10sdp"
-        android:background="@drawable/curved_searchview"
-        android:focusable="false"
-        android:textColor="@color/black"
-        app:iconifiedByDefault="false"
-        app:layout_constraintStart_toStartOf="@+id/textView2"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:queryHint="@string/search_inventory"
-        app:searchIcon="@drawable/search"
-        android:inputType="textCapSentences"/>
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefresh"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/_10sdp"
+        app:layout_constraintBottom_toTopOf="@+id/rentalReqBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:stackFromEnd="false"
-            tools:listitem="@layout/inventory_rcv_item"/>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/addInventoryItem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_200sdp"
-        android:layout_marginBottom="@dimen/_60sdp"
-        android:backgroundTint="@color/item_color"
-        app:icon="@drawable/add"
-        app:iconSize="@dimen/_20sdp"
-        app:iconTint="@color/white"
-        app:strokeWidth="2dp"
-        app:strokeColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        app:stackFromEnd="false"
+        tools:listitem="@layout/cart_rcv_item" />
 
     <ProgressBar
         android:id="@+id/loading"
@@ -127,5 +89,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/rentalReqBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/_10sdp"
+        android:layout_marginVertical="@dimen/_10sdp"
+        android:backgroundTint="@color/buttons_color"
+        android:text="@string/send_rental_request"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_18ssp"
+        app:cornerRadius="@dimen/_10sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

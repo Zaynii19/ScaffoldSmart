@@ -1,36 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".client.client_bottomsheets.SendRentalReq"
-    android:background="@color/white">
+    android:background="@color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".client.client_bottomsheets.AddToCart">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_20sdp"
-        android:text="@string/request_rental"
+        android:text="@string/add_item_cart"
         android:textColor="@color/black"
         android:textSize="@dimen/_20ssp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_50sdp">
+        <TextView
+            android:id="@+id/itemName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/scaffolding_pipes"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_18ssp"
+            android:layout_marginTop="@dimen/_20sdp"
+            app:layout_constraintStart_toStartOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout"
+            android:id="@+id/itemQty"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_10sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:hint="@string/rental_address"
+            android:layout_marginVertical="@dimen/_10sdp"
+            android:hint="@string/item_quantity"
             android:textColorHint="@color/dark_gray"
             app:boxBackgroundColor="@color/app_bg"
             app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
@@ -40,26 +52,27 @@
             app:boxStrokeColor="@color/app_bg"
             app:cursorColor="@color/dark_gray"
             app:hintTextColor="@color/light_gray"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/itemName">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/rentalAddress"
+                android:id="@+id/itemQuantity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/black"
-                android:inputType="textCapSentences"/>
+                android:inputType="number"
+                android:textColor="@color/black" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout2"
+            android:id="@+id/itemLength"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="@dimen/_140sdp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_10sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:hint="@string/duration_start"
+            android:layout_marginVertical="@dimen/_10sdp"
+            android:hint="@string/pipes_length"
             android:textColorHint="@color/dark_gray"
             app:boxBackgroundColor="@color/app_bg"
             app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
@@ -69,11 +82,13 @@
             app:boxStrokeColor="@color/app_bg"
             app:cursorColor="@color/dark_gray"
             app:hintTextColor="@color/light_gray"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+            app:layout_constraintTop_toBottomOf="@+id/itemQty">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/rentalDurationFrom"
+                android:id="@+id/pipesLength"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusable="false"
@@ -82,50 +97,34 @@
                 android:textColor="@color/black" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout3"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="@dimen/_140sdp"
+        <Spinner
+            android:id="@+id/itemQtySpinner"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/_10sdp"
-            android:layout_marginTop="@dimen/_10sdp"
-            android:hint="@string/duration_end"
-            android:textColorHint="@color/dark_gray"
-            app:boxBackgroundColor="@color/app_bg"
-            app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
-            app:boxCornerRadiusBottomStart="@dimen/_15sdp"
-            app:boxCornerRadiusTopEnd="@dimen/_15sdp"
-            app:boxCornerRadiusTopStart="@dimen/_15sdp"
-            app:boxStrokeColor="@color/app_bg"
-            app:cursorColor="@color/dark_gray"
-            app:hintTextColor="@color/light_gray"
+            android:layout_marginVertical="@dimen/_10sdp"
+            android:backgroundTint="@color/black"
+            android:minHeight="48dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/addToCartBtn"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/rentalDurationTo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:inputType="none"
-                android:textColor="@color/black" />
-        </com.google.android.material.textfield.TextInputLayout>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/itemName" />
 
         <Button
-            android:id="@+id/sendBtn"
+            android:id="@+id/addToCartBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginVertical="@dimen/_20sdp"
             android:backgroundTint="@color/buttons_color"
-            android:text="@string/send"
+            android:text="@string/add_to_cart"
             android:textAllCaps="false"
             android:textColor="@color/white"
             app:cornerRadius="@dimen/_10sdp"
+            app:layout_constraintTop_toBottomOf="@id/itemLength"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintStart_toStartOf="parent" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

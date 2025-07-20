@@ -31,7 +31,7 @@ class MessageViewModel(private val senderRoom: String) : ViewModel() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("ChatDebug", "Failed to retrieve chat", error.toException())
+                    Log.e("MsgVMDebug", "Failed to retrieve chat", error.toException())
                 }
             })
     }

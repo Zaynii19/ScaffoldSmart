@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+            android:id="@+id/itemName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:padding="8dp"
+            android:text="@string/item"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintEnd_toStartOf="@id/itemQty"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/itemQty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:padding="8dp"
+            android:text="@string/quantity"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintEnd_toStartOf="@id/itemUnitPrice"
+            app:layout_constraintStart_toEndOf="@id/itemName"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/itemUnitPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:padding="8dp"
+            android:text="@string/unit_rent"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintEnd_toStartOf="@id/rentDays"
+            app:layout_constraintStart_toEndOf="@id/itemQty"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/rentDays"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:padding="8dp"
+            android:text="@string/days"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintEnd_toStartOf="@id/itemRent"
+            app:layout_constraintStart_toEndOf="@id/itemUnitPrice"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/itemRent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:padding="8dp"
+            android:text="@string/rent"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_11ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/rentDays"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Divider Line -->
+    <View
+        android:id="@+id/rowDivider8"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#CCCCCC"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemRent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

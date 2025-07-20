@@ -138,8 +138,8 @@ class ClientMainActivity : AppCompatActivity() {
             }
 
         binder.cancel.setOnClickListener { dialog.dismiss() }
-        binder.camera.setOnClickListener {requestPermissionsAndLaunchCamera(dialog)}
-        binder.gallery.setOnClickListener {requestPermissionsAndLaunchGallery(dialog)}
+        binder.camera.setOnClickListener { requestPermissionsAndLaunchCamera(dialog) }
+        binder.gallery.setOnClickListener { requestPermissionsAndLaunchGallery(dialog) }
     }
 
     private fun setupCameraLauncher() {
@@ -231,8 +231,8 @@ class ClientMainActivity : AppCompatActivity() {
         return when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
                 // Android 15+ - check for either full or partial access
-                //ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
             }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                 // Android 13-14
@@ -268,8 +268,7 @@ class ClientMainActivity : AppCompatActivity() {
             }
         }
 
-        ActivityCompat.requestPermissions(this, permissionsToRequest, PERMISSION_REQUEST_CODE
-        )
+        ActivityCompat.requestPermissions(this, permissionsToRequest, PERMISSION_REQUEST_CODE)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

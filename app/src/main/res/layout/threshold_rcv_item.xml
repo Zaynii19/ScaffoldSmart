@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/_10sdp"
+    android:layout_marginTop="@dimen/_10sdp"
+    android:background="@color/white">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/item"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/item_threshold"
+        android:textColorHint="@color/dark_gray"
+        app:boxBackgroundColor="@color/app_bg"
+        app:boxCornerRadiusBottomEnd="@dimen/_15sdp"
+        app:boxCornerRadiusBottomStart="@dimen/_15sdp"
+        app:boxCornerRadiusTopEnd="@dimen/_15sdp"
+        app:boxCornerRadiusTopStart="@dimen/_15sdp"
+        app:boxStrokeColor="@color/app_bg"
+        app:cursorColor="@color/dark_gray"
+        app:hintTextColor="@color/light_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/itemThresholdQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textColor="@color/black" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

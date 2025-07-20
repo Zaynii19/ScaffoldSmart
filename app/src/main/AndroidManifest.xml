@@ -14,16 +14,14 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
-    <uses-permission android:name="android.permission.CAMERA" />
 
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <!-- Scoped Storage Permissions -->
+        android:maxSdkVersion="32" /> <!-- Scoped Storage Permissions -->
     <uses-permission
         android:name="android.permission.READ_MEDIA_IMAGES"
         android:maxSdkVersion="35" />
-
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
 
     <application
@@ -36,7 +34,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ScaffoldSmart"
         tools:targetApi="31">
-
+        <activity
+            android:name=".client.CartActivity"
+            android:exported="false" />
         <activity
             android:name=".ImageProcessingActivity"
             android:exported="false" />
@@ -100,14 +100,11 @@
         <receiver
             android:name=".client.client_receiver.DueDateAlarmReceiver"
             android:enabled="true"
-            android:exported="false">
-
-        </receiver>
+            android:exported="false"></receiver>
         <receiver
             android:name=".client.client_receiver.OverDueFeeAlarmReceiver"
             android:enabled="true"
-            android:exported="false">
-        </receiver> <!-- Boot Complete Receiver (for re-scheduling alarms after reboot) -->
+            android:exported="false"></receiver> <!-- Boot Complete Receiver (for re-scheduling alarms after reboot) -->
         <receiver
             android:name=".client.client_receiver.BootCompleteReceiver"
             android:enabled="true"

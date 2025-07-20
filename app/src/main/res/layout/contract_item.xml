@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="@dimen/_20sdp"
+    android:background="@color/white">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/titleText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agreement_title"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_16ssp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Agreement Text -->
+            <TextView
+                android:id="@+id/agreementClause"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:text="@string/rental_agreement_clause"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_12ssp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/titleText" />
+
+            <!-- OWNER Section -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ownerSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_30sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/agreementClause">
+
+                <TextView
+                    android:id="@+id/ownerLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/ownerName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Owner Name]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/ownerLabel"
+                    app:layout_constraintStart_toEndOf="@id/ownerLabel"
+                    app:layout_constraintTop_toTopOf="@+id/ownerLabel" />
+
+                <TextView
+                    android:id="@+id/companyLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/_company"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="@id/ownerLabel"
+                    app:layout_constraintTop_toBottomOf="@id/ownerLabel" />
+
+                <TextView
+                    android:id="@+id/companyValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Company Name]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/companyLabel"
+                    app:layout_constraintStart_toEndOf="@id/companyLabel"
+                    app:layout_constraintTop_toTopOf="@+id/companyLabel" />
+
+                <TextView
+                    android:id="@+id/addressLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/_address"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="@id/companyLabel"
+                    app:layout_constraintTop_toBottomOf="@id/companyLabel" />
+
+                <TextView
+                    android:id="@+id/addressValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Company Address]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/addressLabel"
+                    app:layout_constraintStart_toEndOf="@id/addressLabel"
+                    app:layout_constraintTop_toTopOf="@+id/addressLabel" />
+
+                <TextView
+                    android:id="@+id/phoneLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/_phone"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="@id/addressLabel"
+                    app:layout_constraintTop_toBottomOf="@id/addressLabel" />
+
+                <TextView
+                    android:id="@+id/phoneValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Owner Phone]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/phoneLabel"
+                    app:layout_constraintStart_toEndOf="@id/phoneLabel"
+                    app:layout_constraintTop_toTopOf="@+id/phoneLabel" />
+
+                <TextView
+                    android:id="@+id/emailLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/_email"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="@id/phoneLabel"
+                    app:layout_constraintTop_toBottomOf="@id/phoneLabel" />
+
+                <TextView
+                    android:id="@+id/emailValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Owner Email]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/emailLabel"
+                    app:layout_constraintStart_toEndOf="@id/emailLabel"
+                    app:layout_constraintTop_toTopOf="@+id/emailLabel" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- RENTER Section -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/renterSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_30sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ownerSection">
+
+                <TextView
+                    android:id="@+id/renterLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/renter"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/renterName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Client Name]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/renterLabel"
+                    app:layout_constraintStart_toEndOf="@id/renterLabel"
+                    app:layout_constraintTop_toTopOf="@+id/renterLabel" />
+
+                <TextView
+                    android:id="@+id/renterAddressLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/_address"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/renterLabel" />
+
+                <TextView
+                    android:id="@+id/renterAddressValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Client Address]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/renterAddressLabel"
+                    app:layout_constraintStart_toEndOf="@id/renterAddressLabel"
+                    app:layout_constraintTop_toTopOf="@+id/renterAddressLabel" />
+
+                <TextView
+                    android:id="@+id/renterCnicLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/_cnic"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/renterAddressLabel" />
+
+                <TextView
+                    android:id="@+id/renterCnicValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Client CNIC]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/renterCnicLabel"
+                    app:layout_constraintStart_toEndOf="@id/renterCnicLabel"
+                    app:layout_constraintTop_toTopOf="@+id/renterCnicLabel" />
+
+                <TextView
+                    android:id="@+id/renterPhoneLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/_phone"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/renterCnicLabel" />
+
+                <TextView
+                    android:id="@+id/renterPhoneValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Client Phone]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/renterPhoneLabel"
+                    app:layout_constraintStart_toEndOf="@id/renterPhoneLabel"
+                    app:layout_constraintTop_toTopOf="@+id/renterPhoneLabel" />
+
+                <TextView
+                    android:id="@+id/renterEmailLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/_email"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/renterPhoneLabel" />
+
+                <TextView
+                    android:id="@+id/renterEmailValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Client Email]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/renterEmailLabel"
+                    app:layout_constraintStart_toEndOf="@id/renterEmailLabel"
+                    app:layout_constraintTop_toTopOf="@+id/renterEmailLabel" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Place of Use & Rental Period -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/renterInfoSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_30sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@id/renterSection"
+                app:layout_constraintTop_toBottomOf="@id/renterSection">
+
+                <TextView
+                    android:id="@+id/placeOfUseLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/place_of_use"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/placeOfUseValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Rental Address]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/placeOfUseLabel"
+                    app:layout_constraintStart_toEndOf="@id/placeOfUseLabel"
+                    app:layout_constraintTop_toTopOf="@+id/placeOfUseLabel" />
+
+                <TextView
+                    android:id="@+id/rentalPeriodLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/rental_period"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/placeOfUseLabel" />
+
+                <TextView
+                    android:id="@+id/rentalPeriodValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Duration]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintBottom_toBottomOf="@+id/rentalPeriodLabel"
+                    app:layout_constraintStart_toEndOf="@id/rentalPeriodLabel"
+                    app:layout_constraintTop_toTopOf="@+id/rentalPeriodLabel" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Equipment Rented Table -->
+            <TextView
+                android:id="@+id/equipmentTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:text="@string/equipment_rented"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_16ssp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/renterInfoSection" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/EquipmentLabels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/equipmentTitle">
+
+                <TextView
+                    android:id="@+id/itemLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/item"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    android:layout_marginHorizontal="@dimen/_35sdp"
+                    app:layout_constraintEnd_toStartOf="@+id/quantityLabel"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/quantityLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/quantity"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    android:layout_marginHorizontal="@dimen/_35sdp"
+                    app:layout_constraintStart_toEndOf="@+id/itemLabel"
+                    app:layout_constraintEnd_toStartOf="@+id/LengthLabel"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+                <TextView
+                    android:id="@+id/LengthLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/length"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    android:layout_marginHorizontal="@dimen/_35sdp"
+                    app:layout_constraintStart_toEndOf="@+id/quantityLabel"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/_10sdp"
+                app:layout_constraintEnd_toEndOf="@+id/EquipmentLabels"
+                app:layout_constraintStart_toStartOf="@+id/EquipmentLabels"
+                app:layout_constraintTop_toBottomOf="@+id/EquipmentLabels"
+                app:stackFromEnd="false"
+                tools:listitem="@layout/contract_rcv_item" />
+
+            <!-- Terms & Conditions -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/termCondition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_20sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rcv" >
+
+                <TextView
+                    android:id="@+id/termsTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/terms_conditions"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_14ssp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <TextView
+                    android:id="@+id/term1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="@string/agrement_condition_1"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="@id/termsTitle"
+                    app:layout_constraintTop_toBottomOf="@id/termsTitle" />
+
+                <TextView
+                    android:id="@+id/term2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/agrement_condition_2"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="@id/term1"
+                    app:layout_constraintTop_toBottomOf="@id/term1" />
+
+                <TextView
+                    android:id="@+id/term3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/agrement_condition_3"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="@id/term2"
+                    app:layout_constraintTop_toBottomOf="@id/term2" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Signatures -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/signs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_30sdp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/termCondition" >
+
+                <TextView
+                    android:id="@+id/ownerSignatureLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_signature"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <TextView
+                    android:id="@+id/ownerSignature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:text="[Owner Name]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintStart_toStartOf="@+id/ownerSignatureLabel"
+                    app:layout_constraintEnd_toEndOf="@+id/ownerSignatureLabel"
+                    app:layout_constraintTop_toBottomOf="@+id/ownerSignatureLabel" />
+
+                <TextView
+                    android:id="@+id/renterSignatureLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/renter_signature"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <TextView
+                    android:id="@+id/renterSignature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="[Client Name]"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_10ssp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    app:layout_constraintStart_toStartOf="@+id/renterSignatureLabel"
+                    app:layout_constraintEnd_toEndOf="@+id/renterSignatureLabel"
+                    app:layout_constraintTop_toBottomOf="@+id/renterSignatureLabel" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>

@@ -9,8 +9,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.admin_models.RentalItem
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.ClientRentalRcvItemBinding
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
@@ -18,6 +20,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ClientRentalRcvAdapter (val context: Context, private var rentalList: ArrayList<RentalModel>): RecyclerView.Adapter<ClientRentalRcvAdapter.MyRentalViewHolder>() {
     class MyRentalViewHolder(val binding: ClientRentalRcvItemBinding): RecyclerView.ViewHolder(binding.root)
+
+    private lateinit var dialogRcvAdapter: RentalDetailRcvAdapter
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyRentalViewHolder {
         return MyRentalViewHolder(ClientRentalRcvItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
@@ -30,20 +34,11 @@ class ClientRentalRcvAdapter (val context: Context, private var rentalList: Arra
     override fun onBindViewHolder(holder: MyRentalViewHolder, position: Int) {
         val currentItem = rentalList[position]
 
-        val itemsList = mutableListOf<String>()
-        if (currentItem.pipes != 0) itemsList.add("Scaffolding Pipes")
-        if (currentItem.joints != 0) itemsList.add("Joints")
-        if (currentItem.wench != 0) itemsList.add("Wench")
-        if (currentItem.pumps != 0) itemsList.add("Pumps")
-        if (currentItem.generators != 0) itemsList.add("Generators")
-        if (currentItem.wheel != 0) itemsList.add("Wheel")
-        if (currentItem.motors != 0) itemsList.add("Motors")
-
-        if (itemsList.isNotEmpty()) {
-            holder.binding.rentalItems.text = itemsList.joinToString(", ")
-            holder.binding.rentalItems.isSelected = true
-        } else {
-            holder.binding.rentalItems.text = ""
+        currentItem.items?.let { items ->
+            // Join all item names with comma separation
+            val itemNames = items.mapNotNull { it.itemName } // Extract names and filter nulls
+            holder.binding.rentalItems.text = itemNames.joinToString(", ")
+            holder.binding.rentalItems.isSelected = true // For marquee effect
         }
 
         holder.binding.status.setBackgroundResource(
@@ -83,16 +78,15 @@ class ClientRentalRcvAdapter (val context: Context, private var rentalList: Arra
         binder.textView6.visibility = View.GONE
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
-        binder.rent.text = "${currentReq.rent}"
+        binder.rent.text = buildString {
+            append(currentReq.rent)
+            append(" .Rs")
+        }
         binder.rentalAddress.text = currentReq.rentalAddress
-        currentReq.pipes?.let { setViewVisibilityAndText(binder.pipes, it, binder.entry8) }
-        currentReq.pipesLength?.let { setViewVisibilityAndText(binder.pipesLength, it, binder.entry9) }
-        currentReq.joints?.let { setViewVisibilityAndText(binder.joints, it, binder.entry10) }
-        currentReq.wench?.let { setViewVisibilityAndText(binder.wench, it, binder.entry11) }
-        currentReq.pumps?.let { setViewVisibilityAndText(binder.slugPumps, it, binder.entry12) }
-        currentReq.motors?.let { setViewVisibilityAndText(binder.motors, it, binder.entry13) }
-        currentReq.generators?.let { setViewVisibilityAndText(binder.generators, it, binder.entry14) }
-        currentReq.wheel?.let { setViewVisibilityAndText(binder.wheel, it, binder.entry15) }
+        binder.rentalDurationFrom.text = currentReq.startDuration
+        binder.rentalDurationTo.text = currentReq.endDuration
+
+        setDialogRcv(binder, currentReq.items)
 
         builder.setView(customDialog)
             .setTitle("Rental Details")
@@ -109,12 +103,12 @@ class ClientRentalRcvAdapter (val context: Context, private var rentalList: Arra
             }
     }
 
-    private fun setViewVisibilityAndText(view: TextView, quantity: Int, entry: ConstraintLayout) {
-        if (quantity !=0 ) {
-            view.text = "$quantity"
-        } else {
-            entry.visibility = View.GONE
-        }
+    private fun setDialogRcv(binder: RentalsDetailsDialogBinding, items: ArrayList<RentalItem>?) {
+        binder.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        // Provide empty list if items is null
+        dialogRcvAdapter = RentalDetailRcvAdapter(context, items ?: ArrayList())
+        binder.rcv.adapter = dialogRcvAdapter
+        binder.rcv.setHasFixedSize(true)
     }
 
     fun updateList(newItems: ArrayList<RentalModel>) {

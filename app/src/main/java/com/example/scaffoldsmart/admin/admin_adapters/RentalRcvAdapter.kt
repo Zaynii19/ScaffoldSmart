@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.admin_models.RentalItem
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
+import com.example.scaffoldsmart.client.client_adapters.RentalDetailRcvAdapter
 import com.example.scaffoldsmart.databinding.RentalRcvItemBinding
 import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -22,6 +24,8 @@ class RentalRcvAdapter(
     private val listener: OnItemActionListener
 ): RecyclerView.Adapter<RentalRcvAdapter.MyRentalViewHolder>() {
     class MyRentalViewHolder(val binding: RentalRcvItemBinding): RecyclerView.ViewHolder(binding.root)
+
+    private lateinit var dialogRcvAdapter: RentalDetailRcvAdapter
 
     interface OnItemActionListener {
         fun onDownloadButtonClick(rental: RentalModel)
@@ -40,20 +44,11 @@ class RentalRcvAdapter(
         val currentItem = rentalList[position]
         holder.binding.clientName.text = currentItem.clientName
 
-        val itemsList = mutableListOf<String>()
-        if (currentItem.pipes != 0) itemsList.add("Scaffolding Pipes")
-        if (currentItem.joints != 0) itemsList.add("Joints")
-        if (currentItem.wench != 0) itemsList.add("Wench")
-        if (currentItem.pumps != 0) itemsList.add("Pumps")
-        if (currentItem.generators != 0) itemsList.add("Generators")
-        if (currentItem.wheel != 0) itemsList.add("Wheel")
-        if (currentItem.motors != 0) itemsList.add("Motors")
-
-        if (itemsList.isNotEmpty()) {
-            holder.binding.rentalItems.text = itemsList.joinToString(", ")
-            holder.binding.rentalItems.isSelected = true
-        } else {
-            holder.binding.rentalItems.text = ""
+        currentItem.items?.let { items ->
+            // Join all item names with comma separation
+            val itemNames = items.mapNotNull { it.itemName } // Extract names and filter nulls
+            holder.binding.rentalItems.text = itemNames.joinToString(", ")
+            holder.binding.rentalItems.isSelected = true // For marquee effect
         }
 
         holder.binding.status.setBackgroundResource(
@@ -102,25 +97,7 @@ class RentalRcvAdapter(
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
 
-        // Regular quantities (just numbers)
-        currentReq.pipes?.let { setViewVisibilityAndText(binder.pipes, it, binder.entry8) }
-        currentReq.joints?.let { setViewVisibilityAndText(binder.joints, it, binder.entry10) }
-        currentReq.wench?.let { setViewVisibilityAndText(binder.wench, it, binder.entry11) }
-        currentReq.pumps?.let { setViewVisibilityAndText(binder.slugPumps, it, binder.entry12) }
-        currentReq.motors?.let { setViewVisibilityAndText(binder.motors, it, binder.entry13) }
-        currentReq.generators?.let { setViewVisibilityAndText(binder.generators, it, binder.entry14) }
-        currentReq.wheel?.let { setViewVisibilityAndText(binder.wheel, it, binder.entry15) }
-
-        // Special case for pipe length (with "feet" unit)
-        if (currentReq.pipesLength != 0) {
-            binder.pipesLength.text = buildString {
-                append(currentReq.pipesLength)
-                append(" feet")
-            }
-            binder.entry9.visibility = View.VISIBLE
-        } else {
-            binder.entry9.visibility = View.GONE
-        }
+        setDialogRcv(binder, currentReq.items)
 
         builder.setView(customDialog)
             .setTitle("Rental Details")
@@ -137,12 +114,12 @@ class RentalRcvAdapter(
             }
     }
 
-    private fun setViewVisibilityAndText(view: TextView, quantity: Int, entry: ConstraintLayout) {
-        if (quantity != 0) {
-            view.text = "$quantity"
-        } else {
-            entry.visibility = View.GONE
-        }
+    private fun setDialogRcv(binder: RentalsDetailsDialogBinding, items: ArrayList<RentalItem>?) {
+        binder.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        // Provide empty list if items is null
+        dialogRcvAdapter = RentalDetailRcvAdapter(context, items ?: ArrayList())
+        binder.rcv.adapter = dialogRcvAdapter
+        binder.rcv.setHasFixedSize(true)
     }
 
     fun updateList(newItems: ArrayList<RentalModel>) {

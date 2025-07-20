@@ -1,6 +1,8 @@
 package com.example.scaffoldsmart.client.client_fragments
 
+import android.content.Context.MODE_PRIVATE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -15,12 +17,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.InventoryActivity
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.InventoryViewModel
+import com.example.scaffoldsmart.client.CartActivity
 import com.example.scaffoldsmart.client.ClientSettingActivity
 import com.example.scaffoldsmart.client.client_adapters.ClientInventoryRcvAdapter
+import com.example.scaffoldsmart.client.client_bottomsheets.AddToCart
 import com.example.scaffoldsmart.client.client_bottomsheets.UpdateClient
 import com.example.scaffoldsmart.client.client_bottomsheets.SendRentalReq
+import com.example.scaffoldsmart.client.client_models.CartModel
 import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.FragmentClientInventoryBinding
@@ -28,26 +34,24 @@ import com.example.scaffoldsmart.util.Security
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 
 
-class ClientInventoryFragment : Fragment() {
+class ClientInventoryFragment : Fragment(), ClientInventoryRcvAdapter.OnItemActionListener {
     private val binding by lazy {
         FragmentClientInventoryBinding.inflate(layoutInflater)
     }
     private var itemList = ArrayList<InventoryModel>()
     private lateinit var adapter: ClientInventoryRcvAdapter
     private lateinit var viewModel: InventoryViewModel
-    private lateinit var viewModel2: ClientViewModel
-    private var clientObj: ClientModel? = null
-    private var currentDecryptedPassword: String = ""
+    private lateinit var chatPreferences: SharedPreferences
+    private var clientId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[InventoryViewModel::class.java]
         viewModel.retrieveInventory()
-
-        viewModel2 = ViewModelProvider(this)[ClientViewModel::class.java]
-        viewModel2.retrieveClientData()
     }
 
     override fun onCreateView(
@@ -56,7 +60,9 @@ class ClientInventoryFragment : Fragment() {
     ): View {
         setRcv()
         observeInventoryLiveData()
-        observeClientLiveData()
+
+        chatPreferences = requireActivity().getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
+        clientId = chatPreferences.getString("SenderUid", null)
 
         // Inflate the layout for this fragment
         return binding.root
@@ -69,26 +75,8 @@ class ClientInventoryFragment : Fragment() {
             startActivity(Intent(context, ClientSettingActivity::class.java))
         }
 
-        clientObj.let { client ->
-            if (client == null) {
-                // Disable the button if clientObj is null
-                binding.rentalRequestBtn.isEnabled = false
-                binding.rentalRequestBtn.backgroundTintList = ContextCompat.getColorStateList(requireActivity(), R.color.dark_gray)
-            }
-        }
-
-        binding.rentalRequestBtn.setOnClickListener {
-            clientObj?.let { client ->
-                if (client.cnic.isNullOrEmpty() && client.phone.isNullOrEmpty() && client.address.isNullOrEmpty()) {
-                    showVerificationDialog()
-                } else {
-                    if (itemList.isEmpty()) {
-                        Toast.makeText(requireActivity(), "No inventory found. Please contact Admin", Toast.LENGTH_SHORT).show()
-                    } else {
-                        showReqBottomSheet()
-                    }
-                }
-            }
+        binding.viewCartBtn.setOnClickListener {
+            startActivity(Intent(context, CartActivity::class.java))
         }
 
         binding.swipeRefresh.setColorSchemeResources(R.color.item_color)
@@ -102,7 +90,7 @@ class ClientInventoryFragment : Fragment() {
 
     private fun setRcv() {
         binding.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        adapter = ClientInventoryRcvAdapter(requireActivity(), itemList)
+        adapter = ClientInventoryRcvAdapter(requireActivity(), itemList, this)
         binding.rcv.adapter = adapter
         binding.rcv.setHasFixedSize(true)
     }
@@ -120,80 +108,50 @@ class ClientInventoryFragment : Fragment() {
         }
     }
 
-    private fun observeClientLiveData() {
-        binding.loading.visibility = View.VISIBLE
-        viewModel2.observeClientLiveData().observe(viewLifecycleOwner) { client ->
-            binding.loading.visibility = View.GONE
-            if (client != null) {
-                client.pass?.let { currentDecryptedPassword = Security.decrypt(it) }
-                clientObj = client //Passing whole client to the obj
+    override fun onCartButtonClick(item: InventoryModel) {
+        showAddToCartBottomSheet(item)
+    }
 
-                // Enable the button if clientObj is not null
-                binding.rentalRequestBtn.isEnabled = true
-                binding.rentalRequestBtn.backgroundTintList = ContextCompat.getColorStateList(requireActivity(), R.color.buttons_color)
+    private fun showAddToCartBottomSheet(item: InventoryModel) {
+        val bottomSheetDialog: BottomSheetDialogFragment = AddToCart.newInstance(object : AddToCart.OnItemAddedListener {
+            override fun onItemAdded(itemName: String?, quantity: Int?, price: Int?) {
+                storeCartItem(itemName, quantity, price, null)
+            }
+
+            override fun onPipesAdded(itemName: String?, quantity: Int?, price: Int?, pipesLength: Int?) {
+                storeCartItem(itemName, quantity, price, pipesLength)
+            }
+        }, item)
+        bottomSheetDialog.show(requireActivity().supportFragmentManager, "AddToCart")
+    }
+
+    private fun storeCartItem(itemName: String?, quantity: Int?, price: Int?, pipesLength: Int?) {
+        // Reference to the inventory in Firebase
+        clientId?.let { cId ->
+            val databaseRef = Firebase.database.reference.child("Cart").child(cId)
+            val newItemRef = databaseRef.push()
+            val itemId = newItemRef.key // Get the generated key
+
+            val isPipe = itemName?.lowercase()?.contains("pipe") == true
+            val newCartItem = if (isPipe) {
+                CartModel(itemId, itemName, quantity, price, pipesLength)
+            } else {
+                CartModel(itemId, itemName, quantity, price, null)
+            }
+
+            if (itemId != null) {
+                // Store the new item in Firebase
+                newItemRef.setValue(newCartItem)
+                    .addOnSuccessListener {
+                        Toast.makeText(requireActivity(), "Item added to Cart", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(requireActivity(), "Failed to add item to cart", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                Toast.makeText(requireActivity(), "Failed to generate item ID", Toast.LENGTH_SHORT).show()
             }
         }
-    }
-
-    private fun showReqBottomSheet() {
-        val bottomSheetDialog: BottomSheetDialogFragment = SendRentalReq.newInstance(object : SendRentalReq.OnSendReqListener {
-            override fun onReqSendUpdated(
-                rentalAddress: String?,
-                startDuration: String?,
-                endDuration: String?,
-                pipes: Int?,
-                pipesLength: Int?,
-                joints: Int?,
-                wench: Int?,
-                pumps: Int?,
-                motors: Int?,
-                generators: Int?,
-                wheel: Int?,
-                rent: Int?
-            ) {
-                val onesignal = OnesignalService(requireActivity())
-                onesignal.sendReqNotiByOneSignalToSegment(
-                    clientObj?.id, clientObj?.name, clientObj?.address,
-                    clientObj?.email, clientObj?.phone, clientObj?.cnic,
-                    rentalAddress ,startDuration, endDuration, pipes, pipesLength,
-                    joints, wench, pumps, motors, generators, wheel, rent
-                )
-            }
-        }, clientObj, itemList)
-        bottomSheetDialog.show(requireActivity().supportFragmentManager, "RentalReq")
-    }
-
-    private fun showVerificationDialog() {
-        val builder = MaterialAlertDialogBuilder(requireActivity())
-        builder.setTitle("Account Verification")
-            .setBackground(ContextCompat.getDrawable(requireActivity(), R.drawable.msg_view_received))
-            .setMessage("Your account is not verified. Please verify it to send rental request.")
-            .setPositiveButton("Verify") { _, _ -> showVerifyBottomSheet() }
-            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
-
-        val alertDialog = builder.create()
-        alertDialog.apply {
-            show()
-            // Set title text color
-            val titleView = findViewById<TextView>(androidx.appcompat.R.id.alertTitle)
-            titleView?.setTextColor(Color.BLACK)
-            // Set message text color
-            findViewById<TextView>(android.R.id.message)?.setTextColor(Color.BLACK)
-            // Set button color
-            getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLUE)
-            getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.RED)
-        }
-    }
-
-    private fun showVerifyBottomSheet() {
-        val bottomSheetDialog: BottomSheetDialogFragment = UpdateClient.newInstance(object : UpdateClient.OnClientUpdatedListener {
-            override fun onClientUpdated(name: String?, email: String?, pass: String?, cnic: String?, phone: String?, address: String?) {}
-
-            override fun onClientVerified(cnic: String?, phone: String?, address: String?) {
-                ClientSettingActivity.verifyClient(cnic, address, phone, currentDecryptedPassword, requireActivity())
-            }
-        }, true)
-        bottomSheetDialog.show(requireActivity().supportFragmentManager, "Client")
     }
 
     /*private fun sendReqNotificationByFunction(token: String, title: String, body: String) {

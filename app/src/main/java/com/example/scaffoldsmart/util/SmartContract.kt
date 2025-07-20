@@ -7,23 +7,27 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.os.Environment
-import android.text.Layout
 import android.text.Spannable
-import android.text.SpannableString
-import android.text.StaticLayout
-import android.text.TextPaint
+import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import androidx.core.graphics.withTranslation
+import androidx.core.graphics.createBitmap
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.scaffoldsmart.admin.admin_adapters.ContractDetailRcvAdapter
+import com.example.scaffoldsmart.admin.admin_adapters.InvoiceDetailRcvAdapter
+import com.example.scaffoldsmart.admin.admin_models.RentalItem
+import com.example.scaffoldsmart.databinding.ContractItemBinding
 
 class SmartContract {
 
     private val emailToClient = EmailToClient()
+    private lateinit var adapter: ContractDetailRcvAdapter
 
     fun createScaffoldingContractPdf(
         context: Context,
@@ -41,32 +45,65 @@ class SmartContract {
         rentalAddress: String?,
         startDuration: String?,
         endDuration: String?,
-        pipes: String?,
-        pipesLength: String?,
-        joints: String?,
-        wench: String?,
-        motors: String?,
-        pumps: String?,
-        generators: String?,
-        wheel: String?
+        rentalItems: ArrayList<RentalItem>?,
+        contractView: View // Pass the inflated view from your activity/fragment){}
     ) {
-        // Create a new PdfDocument
+
+        // Get binding from the view
+        val binding = ContractItemBinding.bind(contractView)
+
+        // First, update the view with all the data
+        updateContractView(
+            context,
+            binding,
+            ownerName,
+            company,
+            ownerEmail,
+            ownerPhone,
+            companyAddress,
+            clientName,
+            clientPhone,
+            clientEmail,
+            clientCnic,
+            clientAddress,
+            rentalAddress,
+            startDuration,
+            endDuration,
+            rentalItems
+        )
+
+        // Use fixed dimensions that match your contract design
+        val width = 900
+        val height = 1800
+
+        val bitmap = createBitmap(width, height)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(Color.WHITE)
+
+        // Measure and layout with exact dimensions
+        contractView.measure(
+            View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.UNSPECIFIED)
+        )
+        contractView.layout(0, 0, width, contractView.measuredHeight)
+        contractView.draw(canvas)
+
+        // Create PDF document
         val document = PdfDocument()
 
-        // Define page dimensions (A4 size in points: 595 x 842)
-        val pageWidth = 595
-        val pageHeight = 842
+        // Convert pixels to points (1px = 0.75pt at 160dpi)
+        val scale = 595f / bitmap.width // Scale to fit A4 width (595pt)
+        val pageWidth = 595 // A4 width in points
+        val pageHeight = (bitmap.height * scale).toInt()
 
-        // Create Page 1
-        val pageInfo1 = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
-        val page1 = document.startPage(pageInfo1)
-        drawPage1Content(
-            page1.canvas, ownerName, company, ownerEmail, ownerPhone,
-            companyAddress, clientName, clientPhone, clientEmail, clientCnic, clientAddress,
-            rentalAddress, startDuration, endDuration, pipes, pipesLength, joints,
-            wench, motors, pumps, generators, wheel
-        )
-        document.finishPage(page1)
+        // Create Page
+        val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
+        val page = document.startPage(pageInfo)
+
+        // Draw the bitmap on the PDF canvas
+        page.canvas.scale(scale, scale)
+        page.canvas.drawBitmap(bitmap, 0f, 0f, null)
+        document.finishPage(page)
 
         try {
             if (isApproved == true) {
@@ -76,8 +113,8 @@ class SmartContract {
                 val pdfBytes = outputStream.toByteArray()
 
                 // Create a temporary file in cache
-                val tempFile = File.createTempFile("contract", ".pdf", context.cacheDir).apply {
-                    deleteOnExit() // Ensure it gets deleted eventually
+                val tempFile = File.createTempFile("Contract_${System.currentTimeMillis()}", ".pdf", context.cacheDir).apply {
+                    deleteOnExit()
                 }
                 FileOutputStream(tempFile).use { fos ->
                     fos.write(pdfBytes)
@@ -99,11 +136,13 @@ class SmartContract {
         } finally {
             // Close the document in all cases
             document.close()
+            bitmap.recycle()
         }
     }
 
-    private fun drawPage1Content(
-        canvas: Canvas,
+    private fun updateContractView(
+        context: Context,
+        binding: ContractItemBinding,
         ownerName: String?,
         company: String?,
         ownerEmail: String?,
@@ -117,165 +156,79 @@ class SmartContract {
         rentalAddress: String?,
         startDuration: String?,
         endDuration: String?,
-        pipes: String?,
-        pipesLength: String?,
-        joints: String?,
-        wench: String?,
-        motors: String?,
-        pumps: String?,
-        generators: String?,
-        wheel: String?
+        rentalItems: ArrayList<RentalItem>?
     ) {
-        val formatedStartDate = DateFormater.formatDateString(startDuration)
-        val formatedEndDate = DateFormater.formatDateString(endDuration)
+        // Update all text views with the provided data
+        val formatedStartDuration = DateFormater.formatDateString(startDuration)
+        val formatedEndDuration = DateFormater.formatDateString(endDuration)
+
+        binding.agreementClause.text = SpannableStringBuilder().apply {
+            append("This Rental Agreement (the ")
+            // Bold "Agreement"
+            append("Agreement").apply {
+                setSpan(StyleSpan(Typeface.BOLD), length - "Agreement".length, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            append(") is made and entered into as of the ")
+            // Bold formatted date
+            append(formatedStartDuration).apply {
+                setSpan(StyleSpan(Typeface.BOLD), length - formatedStartDuration.length, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            append(". The rental period for the Equipment shall commence on ")
+            append(formatedStartDuration).apply {
+                setSpan(StyleSpan(Typeface.BOLD), length - formatedStartDuration.length, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            append(" and shall end on ")
+            append(formatedEndDuration).apply {
+                setSpan(StyleSpan(Typeface.BOLD), length - formatedEndDuration.length, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            append(", unless terminated earlier in accordance with this Agreement.")
+        }
+
+        binding.ownerName.text = ownerName
+        binding.ownerName.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        binding.companyValue.text = company
+        binding.companyValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        binding.phoneValue.text = ownerPhone
+        binding.phoneValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        binding.addressValue.text = companyAddress
+        binding.addressValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        binding.emailValue.text = ownerEmail
+        binding.emailValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+
+        binding.renterName.text = clientName
+        binding.renterName.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        binding.renterAddressValue.text = clientAddress
+        binding.renterAddressValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        binding.renterCnicValue.text = clientCnic
+        binding.renterCnicValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        binding.renterPhoneValue.text = clientPhone
+        binding.renterPhoneValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        binding.renterEmailValue.text = clientEmail
+        binding.renterEmailValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+
+        binding.placeOfUseValue.text = rentalAddress
+        binding.placeOfUseValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
         val durationInMonths = DateFormater.calculateDurationInMonths(startDuration, endDuration)
+        binding.rentalPeriodValue.text = durationInMonths
+        binding.rentalPeriodValue.paintFlags = Paint.UNDERLINE_TEXT_FLAG
 
-        val titlePaint = TextPaint().apply {
-            color = Color.BLACK
-            textSize = 24f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-        }
+        setRcv(binding, rentalItems, context)
 
-        val textPaint = TextPaint().apply {
-            color = Color.BLACK
-            textSize = 12f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        }
-
-        val conditionTitlePaint = TextPaint().apply {
-            color = Color.BLACK
-            textSize = 14f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
-        }
-
-        val conditionTextPaint = TextPaint().apply {
-            color = Color.BLACK
-            textSize = 11f
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        }
-
-        // Draw the title
-        canvas.drawText("Scaffolding Equipment Rental Contractual Agreement", 60f, 50f, titlePaint)
-
-        // Create the agreement text with all variables
-        val agreementText = "This Rental Agreement (the \"Agreement\") is made and entered into as of the $formatedStartDate. " +
-                "The rental period for the Equipment shall commence on $formatedStartDate and shall end on $formatedEndDate, " +
-                "unless terminated earlier in accordance with this Agreement."
-
-        // Create a SpannableString to apply bold style
-        val spannableString = SpannableString(agreementText)
-
-        // Bold all occurrences of the start date
-        var index = agreementText.indexOf(formatedStartDate)
-        while (index >= 0) {
-            spannableString.setSpan(
-                StyleSpan(Typeface.BOLD),
-                index,
-                index + formatedStartDate.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-            index = agreementText.indexOf(formatedStartDate, index + formatedStartDate.length)
-        }
-
-        // Bold the end date
-        index = agreementText.indexOf(formatedEndDate)
-        if (index >= 0) {
-            spannableString.setSpan(
-                StyleSpan(Typeface.BOLD),
-                index,
-                index + formatedEndDate.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-
-        // Bold "Agreement"
-        index = agreementText.indexOf("\"Agreement\"")
-        if (index >= 0) {
-            spannableString.setSpan(
-                StyleSpan(Typeface.BOLD),
-                index,
-                index + "\"Agreement\"".length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-
-        // Use StaticLayout for the paragraph
-        val textWidth = canvas.width - 100
-        val staticLayout = StaticLayout.Builder.obtain(spannableString, 0, spannableString.length, textPaint, textWidth)
-            .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-            .setLineSpacing(0.0f, 1.0f)
-            .setIncludePad(false)
-            .build()
-
-        // Draw the StaticLayout
-        canvas.withTranslation(50f, 80f) { staticLayout.draw(this) }
-
-        // Draw OWNER section
-        canvas.drawText("OWNER:", 50f, 120f + staticLayout.height, textPaint)
-        ownerName?.let { drawUnderlinedText(canvas, it, 90f, 120f + staticLayout.height, textPaint) }
-        company?.let { drawUnderlinedText(canvas, it, 50f, 140f + staticLayout.height, textPaint) }
-        companyAddress?.let { drawUnderlinedText(canvas, it, 50f, 160f + staticLayout.height, textPaint) }
-        ownerPhone?.let { drawUnderlinedText(canvas, it, 50f, 180f + staticLayout.height, textPaint) }
-        ownerEmail?.let { drawUnderlinedText(canvas, it, 50f, 200f + staticLayout.height, textPaint) }
-
-        // Draw RENTER section
-        canvas.drawText("RENTER: ", 50f, 240f + staticLayout.height, textPaint)
-        clientName?.let { drawUnderlinedText(canvas, it, 93f, 240f + staticLayout.height, textPaint) }
-        canvas.drawText("Address: ", 50f, 260f + staticLayout.height, textPaint)
-        clientAddress?.let { drawUnderlinedText(canvas, it, 90f, 260f + staticLayout.height, textPaint) }
-        canvas.drawText("CNIC: ", 50f, 280f + staticLayout.height, textPaint)
-        clientCnic?.let { drawUnderlinedText(canvas, it, 75f, 280f + staticLayout.height, textPaint) }
-        canvas.drawText("Phone: ", 50f, 300f + staticLayout.height, textPaint)
-        clientPhone?.let { drawUnderlinedText(canvas, it, 85f, 300f + staticLayout.height, textPaint) }
-        canvas.drawText("Email: ", 50f, 320f + staticLayout.height, textPaint)
-        clientEmail?.let { drawUnderlinedText(canvas, it, 82f, 320f + staticLayout.height, textPaint) }
-
-        // Draw Place of Use & Rental Period
-        canvas.drawText("Place of Use: ", 50f, 360f + staticLayout.height, textPaint)
-        rentalAddress?.let { drawUnderlinedText(canvas, it, 110f, 360f + staticLayout.height, textPaint) }
-        canvas.drawText("Rental Period: ", 50f, 380f + staticLayout.height, textPaint)
-        drawUnderlinedText(canvas, durationInMonths, 118f, 380f + staticLayout.height, textPaint)
-
-        // Draw Equipment Rented table
-        canvas.drawText("Equipment Rented", 230f, 420f + staticLayout.height, titlePaint)
-        canvas.drawText("Item                           Quantity                            Length ", 160f, 460f + staticLayout.height, textPaint)
-        canvas.drawText("1.Scaffolding Pipes", 140f, 480f + staticLayout.height, textPaint)
-        pipes?.let { drawUnderlinedText(canvas, it, 275f, 480f + staticLayout.height, textPaint) }
-        pipesLength?.let { drawUnderlinedText(canvas, it, 390f, 480f + staticLayout.height, textPaint) }
-        canvas.drawText("2.Joints", 140f, 500f + staticLayout.height, textPaint)
-        joints?.let { drawUnderlinedText(canvas, it, 275f, 500f + staticLayout.height, textPaint) }
-        canvas.drawText("3.Electric Motors", 140f, 520f + staticLayout.height, textPaint)
-        motors?.let { drawUnderlinedText(canvas, it, 275f, 520f + staticLayout.height, textPaint) }
-        canvas.drawText("4.Generators", 140f, 540f + staticLayout.height, textPaint)
-        generators?.let { drawUnderlinedText(canvas, it, 275f, 540f + staticLayout.height, textPaint) }
-        canvas.drawText("5.Slug Pumps", 140f, 560f + staticLayout.height, textPaint)
-        pumps?.let { drawUnderlinedText(canvas, it, 275f, 560f + staticLayout.height, textPaint) }
-        canvas.drawText("6.Wench", 140f, 580f + staticLayout.height, textPaint)
-        wench?.let { drawUnderlinedText(canvas, it, 275f, 580f + staticLayout.height, textPaint) }
-        canvas.drawText("7.Wheel Barrows", 140f, 600f + staticLayout.height, textPaint)
-        wheel?.let { drawUnderlinedText(canvas, it, 275f, 600f + staticLayout.height, textPaint) }
-
-        // Draw Terms & Conditions
-        canvas.drawText("TERMS & CONDITIONS", 50f, 640f + staticLayout.height, conditionTitlePaint)
-        canvas.drawText("1. Late returns may incur additional charges at the rate of 1000 .Rs per day.", 50f, 660f + staticLayout.height, conditionTextPaint)
-        canvas.drawText("2. The Lessor shall not be liable for any direct or indirect damages resulting from the Equipment's use.", 50f, 680f + staticLayout.height, conditionTextPaint)
-        canvas.drawText("3. Any disputes arising from this Agreement shall be resolved through mediation before seeking legal recourse.", 50f, 700f + staticLayout.height, conditionTextPaint)
-
-        // Draw signature lines
-        canvas.drawText("Owner Signature", 50f, 740f + staticLayout.height, textPaint)
-        ownerName?.let { drawUnderlinedText(canvas, it, 50f, 770f + staticLayout.height, textPaint) }
-        canvas.drawText("Renter Signature", 400f, 740f + staticLayout.height, textPaint)
-        clientName?.let { drawUnderlinedText(canvas, it, 400f, 770f + staticLayout.height, textPaint) }
+        binding.ownerSignature.text = ownerName
+        binding.ownerSignature.paintFlags = Paint.UNDERLINE_TEXT_FLAG
+        binding.renterSignature.text = clientName
+        binding.renterSignature.paintFlags = Paint.UNDERLINE_TEXT_FLAG
     }
 
-    private fun drawUnderlinedText(canvas: Canvas, text: String, x: Float, y: Float, paint: Paint) {
-        // Draw the text
-        canvas.drawText(text, x, y, paint)
-
-        // Calculate the width of the text
-        val textWidth = paint.measureText(text)
-
-        // Draw the underline
-        canvas.drawLine(x, y + 5, x + textWidth, y + 5, paint)
+    private fun setRcv(
+        binding: ContractItemBinding,
+        rentalItems: ArrayList<RentalItem>?,
+        context: Context
+    ) {
+        binding.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        // Provide empty list if items is null
+        adapter = ContractDetailRcvAdapter(context, rentalItems ?: ArrayList())
+        binding.rcv.adapter = adapter
+        binding.rcv.setHasFixedSize(true)
     }
 }

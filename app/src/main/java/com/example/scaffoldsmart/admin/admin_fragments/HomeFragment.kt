@@ -14,7 +14,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,8 +41,10 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.database
 import androidx.core.content.edit
+import androidx.core.widget.NestedScrollView
 import com.example.scaffoldsmart.admin.admin_bottomsheets.ShowRentalReq
-import kotlin.math.log10
+import com.example.scaffoldsmart.admin.admin_models.RentalItem
+import com.example.scaffoldsmart.client.client_adapters.RentalDetailRcvAdapter
 
 class HomeFragment : Fragment() {
 
@@ -62,6 +63,7 @@ class HomeFragment : Fragment() {
     private var infoList = ArrayList<ScaffoldInfoModel>()
     private lateinit var adapter: ScaffoldRcvAdapter
     private var reqList = ArrayList<RentalModel>()
+    private var rentalItemList = ArrayList<RentalItem>()
     private var filteredRentals = ArrayList<RentalModel>()
     private lateinit var viewModel: AdminViewModel
     private lateinit var reqViewModel: RentalViewModel
@@ -71,6 +73,7 @@ class HomeFragment : Fragment() {
     private var itemList = ArrayList<InventoryModel>()
     private lateinit var viewModelI: InventoryViewModel
     private lateinit var dialog: AlertDialog
+    private lateinit var dialogRcvAdapter: RentalDetailRcvAdapter
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -275,6 +278,7 @@ class HomeFragment : Fragment() {
             filteredRequests.let {
                 reqList.addAll(it)
                 Log.d("HomeFragDebug", "observeRentalReqLiveData: ${filteredRequests.size} empty status requests")
+                populateItemList(reqList)
                 showRequestsDialogSequentially(reqList)
             }
             binding.notiAlert.visibility = View.VISIBLE
@@ -287,13 +291,21 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun populateItemList(reqList: List<RentalModel>) {
+        rentalItemList.clear()
+        reqList.forEach { rentalModel ->
+            rentalModel.items?.let { items ->
+                rentalItemList.addAll(items)
+            }
+        }
+    }
+
     private fun showRequestsDialogSequentially(reqList: List<RentalModel>) {
         if (reqList.isNotEmpty()) {
             showReqDetailsDialog(reqList, 0) // Start with the first request
         }
     }
 
-    @SuppressLint("SetTextI18n")
     private fun showReqDetailsDialog(reqList: List<RentalModel>, index: Int) {
         if (reqList.isEmpty()) return // Exit if the list is empty
 
@@ -315,25 +327,7 @@ class HomeFragment : Fragment() {
         binder.rentalDurationFrom.text = currentReq.startDuration
         binder.rentalDurationTo.text = currentReq.endDuration
 
-        // Regular quantities (just numbers)
-        currentReq.pipes?.let { setViewVisibilityAndText(binder.pipes, it, binder.entry8) }
-        currentReq.joints?.let { setViewVisibilityAndText(binder.joints, it, binder.entry10) }
-        currentReq.wench?.let { setViewVisibilityAndText(binder.wench, it, binder.entry11) }
-        currentReq.pumps?.let { setViewVisibilityAndText(binder.slugPumps, it, binder.entry12) }
-        currentReq.motors?.let { setViewVisibilityAndText(binder.motors, it, binder.entry13) }
-        currentReq.generators?.let { setViewVisibilityAndText(binder.generators, it, binder.entry14) }
-        currentReq.wheel?.let { setViewVisibilityAndText(binder.wheel, it, binder.entry15) }
-
-        // Special case for pipe length (with "feet" unit)
-        if (currentReq.pipesLength != 0) {
-            binder.pipesLength.text = buildString {
-                append(currentReq.pipesLength)
-                append(" feet")
-            }
-            binder.entry9.visibility = View.VISIBLE
-        } else {
-            binder.entry9.visibility = View.GONE
-        }
+        setDialogRcv(binder)
 
         dialog = MaterialAlertDialogBuilder(requireContext())
             .setView(customDialog)
@@ -342,13 +336,13 @@ class HomeFragment : Fragment() {
             .setPositiveButton("Approve") { dialog, _ ->
                 approveRentalReq(currentReq)
                 notifyClient(currentReq, true)
+                val contractView = layoutInflater.inflate(R.layout.contract_item, null) as NestedScrollView
                 smartContract?.createScaffoldingContractPdf(
                     requireActivity(), true, name, company, email, phone, address, currentReq.clientName, currentReq.clientPhone,
                     currentReq.clientEmail, currentReq.clientCnic, currentReq.clientAddress, currentReq.rentalAddress, currentReq.startDuration,
-                    currentReq.endDuration, currentReq.pipes.toString(), currentReq.pipesLength.toString(), currentReq.joints.toString(),
-                    currentReq.wench.toString(), currentReq.motors.toString(), currentReq.pumps.toString(), currentReq.generators.toString(), currentReq.wheel.toString()
+                    currentReq.endDuration, currentReq.items, contractView
                 )
-                updateInventory(currentReq.pipes, currentReq.joints, currentReq.wench, currentReq.pumps, currentReq.motors, currentReq.generators, currentReq.wheel)
+                updateInventory()
                 dialog.dismiss()
             }
             .setNegativeButton("Reject") { dialog, _ ->
@@ -382,13 +376,11 @@ class HomeFragment : Fragment() {
             }
     }
 
-    private fun setViewVisibilityAndText(view: TextView, quantity: Int, entry: ConstraintLayout) {
-        if (quantity != 0) {
-            view.text = "$quantity"
-            entry.visibility = View.VISIBLE
-        } else {
-            entry.visibility = View.GONE
-        }
+    private fun setDialogRcv(binder: RentalsDetailsDialogBinding) {
+        binder.rcv.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+        dialogRcvAdapter = RentalDetailRcvAdapter(requireActivity(), rentalItemList)
+        binder.rcv.adapter = dialogRcvAdapter
+        binder.rcv.setHasFixedSize(true)
     }
 
     private fun approveRentalReq(currentReq: RentalModel) {
@@ -463,39 +455,32 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun updateInventory(
-        pipeQuantity: Int?,
-        jointsQuantity: Int?,
-        wenchQuantity: Int?,
-        pumpsQuantity: Int?,
-        motorsQuantity: Int?,
-        generatorsQuantity: Int?,
-        wheelQuantity: Int?
-    ) {
-        // Define quantities in a map (key = keyword, value = quantity to deduct)
-        val quantitiesToDeduct = mapOf(
-            "pipe" to pipeQuantity,
-            "joint" to jointsQuantity,
-            "wench" to wenchQuantity,
-            "pump" to pumpsQuantity,
-            "motor" to motorsQuantity,
-            "generator" to generatorsQuantity,
-            "wheel" to wheelQuantity
-        )
+    private fun updateInventory() {
+        itemList.forEach { inventoryItem ->
+            rentalItemList.forEach { rentalItem ->
+                // Check if the item names match (case-insensitive comparison)
+                if (inventoryItem.itemName.equals(rentalItem.itemName, ignoreCase = true)) {
+                    inventoryItem.itemId?.let { itemId ->
 
-        itemList.forEach { item ->
-            val lowerName = item.itemName?.lowercase()
-            val databaseRef = item.itemId?.let { Firebase.database.reference.child("Inventory").child(it) }
+                        // Calculate new quantity
+                        val currentQuantity = inventoryItem.quantity ?: 0
+                        val rentedQuantity = rentalItem.itemQuantity ?: 0
+                        val newQuantity = currentQuantity - rentedQuantity
 
-            quantitiesToDeduct.forEach { (keyword, deductQuantity) ->
-                if (deductQuantity != null) {
-                    if (lowerName?.contains(keyword) == true && deductQuantity > 0) {
-                        item.quantity?.let {
-                            if (it >= deductQuantity) {
-                                val remaining = item.quantity?.minus(deductQuantity)
-                                databaseRef?.updateChildren(mapOf("quantity" to remaining))
+                        // Ensure we don't go below 0
+                        val updatedQuantity = if (newQuantity >= 0) newQuantity else 0
+
+                        // Update the quantity in Firebase
+                        Firebase.database.reference.child("Inventory").child(itemId).child("quantity").setValue(updatedQuantity)
+                            .addOnSuccessListener {
+                                Log.d("InventoryUpdate", "Successfully updated ${inventoryItem.itemName} quantity to $updatedQuantity")
                             }
-                        }
+                            .addOnFailureListener { e ->
+                                Log.e("InventoryUpdate", "Failed to update ${inventoryItem.itemName} quantity", e)
+                            }
+
+                        // Update local item quantity
+                        inventoryItem.quantity = updatedQuantity
                     }
                 }
             }

@@ -29,7 +29,7 @@ class RentalViewModel: ViewModel() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("InventoryDebug", "Failed to retrieve rentals", error.toException())
+                    Log.e("RentalVMDebug", "Failed to retrieve rentals", error.toException())
                 }
             })
     }

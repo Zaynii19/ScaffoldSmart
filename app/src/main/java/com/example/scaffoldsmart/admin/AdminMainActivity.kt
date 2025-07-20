@@ -29,6 +29,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.scaffoldsmart.ImageProcessingActivity
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.admin_models.RentalItem
 import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.ActivityMainAdminBinding
 import com.example.scaffoldsmart.admin.admin_service.AdminMessageListenerService
@@ -164,8 +165,8 @@ class AdminMainActivity : AppCompatActivity() {
             }
 
         binder.cancel.setOnClickListener { dialog.dismiss() }
-        binder.camera.setOnClickListener {requestPermissionsAndLaunchCamera(dialog)}
-        binder.gallery.setOnClickListener {requestPermissionsAndLaunchGallery(dialog)}
+        binder.camera.setOnClickListener { requestPermissionsAndLaunchCamera(dialog) }
+        binder.gallery.setOnClickListener { requestPermissionsAndLaunchGallery(dialog) }
     }
 
     private fun setupCameraLauncher() {
@@ -335,75 +336,74 @@ class AdminMainActivity : AppCompatActivity() {
                 val rentalAddress = data.optString("rentalAddress", "N/A")
                 val startDuration = data.optString("startDuration", "N/A")
                 val endDuration = data.optString("endDuration", "N/A")
-                val pipes = data.optString("pipes", "N/A")
-                val pipesLength = data.optString("pipesLength", "N/A")
-                val joints = data.optString("joints", "N/A")
-                val wench = data.optString("wench", "N/A")
-                val pumps = data.optString("pumps", "N/A")
-                val motors = data.optString("motors", "N/A")
-                val generators = data.optString("generators", "N/A")
-                val wheel = data.optString("wheel", "N/A")
-                val totalRent = data.optString("rent", "N/A")
+                val totalRent = data.optInt("rent", 0)
+
+                // Get the itemList from JSON reqData
+                val itemList = arrayListOf<RentalItem>()
+                val itemsArray = data.optJSONArray("itemList")
+
+                itemsArray?.let { array ->
+                    for (i in 0 until array.length()) {
+                        val itemObj = array.getJSONObject(i)
+                        val rentalItem = RentalItem(
+                            itemName = itemObj.optString("itemName", "N/A"),
+                            itemQuantity = itemObj.optInt("itemQuantity", 0),
+                            itemPrice = itemObj.optInt("itemPrice", 0),
+                            pipeLength = itemObj.optInt("pipeLength", 0)
+                        )
+                        itemList.add(rentalItem)
+                    }
+                }
 
                 storeRentalReq(clientID, requestId, clientName, clientAddress, clientEmail, clientPhone,
-                    clientCnic, rentalAddress, startDuration, endDuration, pipes.toInt(), pipesLength.toInt(),
-                    joints.toInt(), wench.toInt(), pumps.toInt(), motors.toInt(), generators.toInt(),
-                    wheel.toInt(), totalRent.toInt())
+                    clientCnic, rentalAddress, startDuration, endDuration, totalRent, itemList)
             }
         }
 
         private fun storeRentalReq(
-            clientID: String,
-            requestId: String,
-            clientName: String,
-            clientAddress: String,
-            clientEmail: String,
-            clientPhone: String,
-            clientCnic: String,
-            rentalAddress: String,
-            startDuration: String,
-            endDuration: String,
-            pipes: Int,
-            pipesLength: Int,
-            joints: Int,
-            wench: Int,
-            pumps: Int,
-            motors: Int,
-            generators: Int,
-            wheel: Int,
-            totalRent: Int
+            clientID: String?,
+            requestId: String?,
+            clientName: String?,
+            clientAddress: String?,
+            clientEmail: String?,
+            clientPhone: String?,
+            clientCnic: String?,
+            rentalAddress: String?,
+            startDuration: String?,
+            endDuration: String?,
+            totalRent: Int?,
+            itemList: ArrayList<RentalItem>
         ) {
-            val databaseRef = Firebase.database.reference.child("Rentals")
-
             // Check if rental with this requestId already exists
-            databaseRef.child(requestId).addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        Log.d("AdminMainDebug", "Rental request with ID $requestId already exists")
-                    } else {
-                        // Create new rental request model
-                        val newReq = RentalModel(
-                            clientID, requestId, clientName, clientEmail, clientCnic,
-                            clientPhone, clientAddress, rentalAddress, startDuration,
-                            endDuration, pipes, pipesLength, joints, wench, motors,
-                            pumps, generators, wheel, totalRent, ""
-                        )
+            requestId?.let { Firebase.database.reference.child("Rentals").child(it)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            Log.d("AdminMainDebug", "Rental request with ID $requestId already exists")
+                        } else {
+                            // Create new rental request model
+                            val newReq = RentalModel(
+                                clientID, requestId, clientName, clientEmail, clientCnic,
+                                clientPhone, clientAddress, rentalAddress, startDuration,
+                                endDuration, totalRent, "", itemList
+                            )
 
-                        // Store with requestId as the key
-                        databaseRef.child(requestId).setValue(newReq)
-                            .addOnSuccessListener {
-                                Log.d("AdminMainDebug", "Rental data stored successfully with ID $requestId")
-                            }
-                            .addOnFailureListener {
-                                Log.e("AdminMainDebug", "Failed to store rental data: ${it.message}")
-                            }
+                            // Store with requestId as the key
+                            Firebase.database.reference.child("Rentals").child(requestId).setValue(newReq)
+                                .addOnSuccessListener {
+                                    Log.d("AdminMainDebug", "Rental data stored successfully with ID $requestId")
+                                }
+                                .addOnFailureListener {
+                                    Log.e("AdminMainDebug", "Failed to store rental data: ${it.message}")
+                                }
+                        }
                     }
-                }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.e("AdminMainDebug", "Database query cancelled: ${databaseError.message}")
-                }
-            })
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        Log.e("AdminMainDebug", "Database query cancelled: ${databaseError.message}")
+                    }
+                })
+            }
         }
     }
 }

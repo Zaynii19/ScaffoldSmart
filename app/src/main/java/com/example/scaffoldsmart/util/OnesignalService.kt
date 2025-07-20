@@ -20,6 +20,7 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 import androidx.core.content.edit
+import com.example.scaffoldsmart.admin.admin_models.RentalItem
 
 class OnesignalService(val context: Context) {
 
@@ -176,15 +177,8 @@ class OnesignalService(val context: Context) {
         rentalAddress: String?,
         startDuration: String?,
         endDuration: String?,
-        pipes: Int?,
-        pipesLength: Int?,
-        joints: Int?,
-        wench: Int?,
-        pumps: Int?,
-        motors: Int?,
-        generators: Int?,
-        wheel: Int?,
-        rent: Int?
+        rent: Int?,
+        itemList: ArrayList<RentalItem>?
     ) {
         val message = "A new rental request has been submitted. Click to view rental details."
         val title = "Rental Request Alert"
@@ -200,15 +194,19 @@ class OnesignalService(val context: Context) {
             put("rentalAddress", rentalAddress)
             put("startDuration", startDuration)
             put("endDuration", endDuration)
-            put("pipes", pipes)
-            put("pipesLength", pipesLength)
-            put("joints", joints)
-            put("wench", wench)
-            put("pumps", pumps)
-            put("motors", motors)
-            put("generators", generators)
-            put("wheel", wheel)
             put("rent", rent)
+            // Convert itemList to JSONArray
+            val itemsArray = JSONArray()
+            itemList?.forEach { rentalItem ->
+                val itemObj = JSONObject().apply {
+                    put("itemName", rentalItem.itemName)
+                    put("itemQuantity", rentalItem.itemQuantity)
+                    put("itemPrice", rentalItem.itemPrice)
+                    put("pipeLength", rentalItem.pipeLength)
+                }
+                itemsArray.put(itemObj)
+            }
+            put("itemList", itemsArray)
         }
 
         // Create the notification JSON object for included_segments
@@ -253,7 +251,7 @@ class OnesignalService(val context: Context) {
                     }
                 } else {
                     val responseBody = response.body?.string() ?: "No response body"
-                    Log.e("InventoryReqDebug", "Notification failed: ${response.code}, Response: $responseBody")
+                    Log.e("OneSignalDebug", "Notification failed: ${response.code}, Response: $responseBody")
                 }
             }
         })

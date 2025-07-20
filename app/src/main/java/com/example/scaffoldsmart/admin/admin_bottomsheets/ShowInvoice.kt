@@ -30,7 +30,6 @@ class ShowInvoice : BottomSheetDialogFragment() {
     }
     private lateinit var adapter: InvoiceRcvAdapter
     private var rentalList = ArrayList<RentalModel>()
-    private var itemList = ArrayList<InventoryModel>()
     private lateinit var viewModelR: RentalViewModel
     private lateinit var viewModelA: AdminViewModel
     private lateinit var viewModelI: InventoryViewModel
@@ -43,7 +42,6 @@ class ShowInvoice : BottomSheetDialogFragment() {
     // Flags to track if data is loaded
     private var isRentalLoaded: Boolean? = null
     private var isAdminLoaded: Boolean? = null
-    private var isInventoryLoaded: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,14 +78,12 @@ class ShowInvoice : BottomSheetDialogFragment() {
             fetchingAdminData()
         }
 
-        observeInventoryLiveData()
-
         return binding.root
     }
 
     private fun setRcv() {
         binding.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        adapter = InvoiceRcvAdapter(requireActivity(), ArrayList(), ArrayList(), AdminModel())
+        adapter = InvoiceRcvAdapter(requireActivity(), ArrayList(), AdminModel())
         binding.rcv.adapter = adapter
         binding.rcv.setHasFixedSize(true)
     }
@@ -129,17 +125,6 @@ class ShowInvoice : BottomSheetDialogFragment() {
         }
     }
 
-    private fun observeInventoryLiveData() {
-        viewModelI.observeInventoryLiveData().observe(viewLifecycleOwner) { items ->
-            itemList.clear()
-            items?.let {
-                itemList.addAll(it)
-                isInventoryLoaded = true
-                checkAllDataLoaded()
-            }
-        }
-    }
-
     private fun observeAdminLiveData() {
         viewModelA.observeAdminLiveData().observe(viewLifecycleOwner) { admin ->
             if (admin != null) {
@@ -169,9 +154,9 @@ class ShowInvoice : BottomSheetDialogFragment() {
     }
 
     private fun checkAllDataLoaded() {
-        if (isRentalLoaded == true && isAdminLoaded == true && isInventoryLoaded == true) {
+        if (isRentalLoaded == true && isAdminLoaded == true) {
             // All data is loaded, update the adapter
-            adapter.updateData(rentalList, itemList, adminObj)
+            adapter.updateData(rentalList, adminObj)
         }
     }
 }

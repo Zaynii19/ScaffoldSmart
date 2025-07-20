@@ -10,12 +10,22 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
+import com.example.scaffoldsmart.admin.admin_adapters.InventoryRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.ClientInventoryRcvItemBinding
 import com.example.scaffoldsmart.databinding.InventoryDetailsDialogBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
-class ClientInventoryRcvAdapter (val context: Context, private var itemList: ArrayList<InventoryModel>): RecyclerView.Adapter<ClientInventoryRcvAdapter.MyItemViewHolder>() {
+class ClientInventoryRcvAdapter (
+    val context: Context,
+    private var itemList: ArrayList<InventoryModel>,
+    private val listener: OnItemActionListener
+): RecyclerView.Adapter<ClientInventoryRcvAdapter.MyItemViewHolder>() {
+
+    interface OnItemActionListener {
+        fun onCartButtonClick(item: InventoryModel)
+    }
+
     class MyItemViewHolder(val binding: ClientInventoryRcvItemBinding): RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyItemViewHolder {
@@ -36,6 +46,10 @@ class ClientInventoryRcvAdapter (val context: Context, private var itemList: Arr
 
         holder.binding.root.setOnClickListener {
             inventoryDetailsDialog(currentItem)
+        }
+
+        holder.binding.cartBtn.setOnClickListener {
+            listener.onCartButtonClick(currentItem)
         }
     }
 

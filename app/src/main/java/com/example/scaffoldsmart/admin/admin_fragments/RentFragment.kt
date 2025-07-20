@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -27,7 +28,6 @@ import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.FragmentRentBinding
 import com.example.scaffoldsmart.admin.admin_viewmodel.RentalViewModel
 import com.example.scaffoldsmart.databinding.RentalsCompletionDialogBinding
-import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
 import com.example.scaffoldsmart.util.OnesignalService
 import com.example.scaffoldsmart.util.SmartContract
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -74,7 +74,6 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding.settingBtn.setOnClickListener {
             startActivity(Intent(context, SettingActivity::class.java))
         }
@@ -141,11 +140,11 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
     }
 
     override fun onDownloadButtonClick(rental: RentalModel) {
+        val contractView = layoutInflater.inflate(R.layout.contract_item, null) as NestedScrollView
         smartContract?.createScaffoldingContractPdf(
             requireActivity(), false, adminObj?.name, adminObj?.company, adminObj?.email, adminObj?.phone, adminObj?.address,
             rental.clientName, rental.clientPhone, rental.clientEmail, rental.clientCnic, rental.clientAddress, rental.rentalAddress,
-            rental.startDuration, rental.endDuration, rental.pipes.toString(), rental.pipesLength.toString(), rental.joints.toString(),
-            rental.wench.toString(), rental.motors.toString(), rental.pumps.toString(), rental.generators.toString(), rental.wheel.toString()
+            rental.startDuration, rental.endDuration, rental.items, contractView
         )
     }
 

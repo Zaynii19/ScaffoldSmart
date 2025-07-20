@@ -29,7 +29,7 @@ class InventoryViewModel: ViewModel() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.e("InventoryDebug", "Failed to retrieve inventory", error.toException())
+                    Log.e("InventoryVMDebug", "Failed to retrieve inventory", error.toException())
                 }
             })
     }
