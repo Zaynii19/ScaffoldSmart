@@ -63,14 +63,22 @@ class SignupActivity : AppCompatActivity() {
         if (binding.email.text.toString().contains("@")  || binding.email.text.toString().contains(".com")) {
             email = binding.email.text.toString()
         } else {
-            Toast.makeText(this@SignupActivity, "Enter a valid email", Toast.LENGTH_SHORT).show()
+            binding.email.error = "Enter a valid email"
             binding.email.setText("")
             email = ""
         }
-        pass = binding.pass.text.toString()
+
+        val pattern = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}\$".toRegex()
+        if (binding.pass.text.toString().matches(pattern)) {
+            pass = binding.pass.text.toString()
+        } else {
+            binding.pass.error = "Password must contain: lowercase letters, numbers, symbols, and be at least 8 characters"
+            binding.pass.setText("")
+            pass = ""
+        }
         encryptedPassword = pass?.let { Security.encrypt(it) }
         if (binding.confrmPass.text.toString() != pass) {
-            Toast.makeText(this@SignupActivity, "Confirm password not matched", Toast.LENGTH_SHORT).show()
+            binding.confrmPass.error = "Confirm password not matched"
             binding.confrmPass.setText("")
             confirmPass = ""
         }else {
@@ -79,10 +87,10 @@ class SignupActivity : AppCompatActivity() {
     }
 
     private fun signupClient() {
-        //Checks if fields are empty or not
-        if (binding.clientName.text.toString().isEmpty() &&
-            binding.email.text.toString().isEmpty() &&
-            binding.pass.text.toString().isEmpty() &&
+        //Checks if fields are empty
+        if (binding.clientName.text.toString().isEmpty() ||
+            binding.email.text.toString().isEmpty() ||
+            binding.pass.text.toString().isEmpty() ||
             binding.confrmPass.text.toString().isEmpty()
         ) {
             Toast.makeText(this@SignupActivity, "Please fill all the details first", Toast.LENGTH_SHORT).show()

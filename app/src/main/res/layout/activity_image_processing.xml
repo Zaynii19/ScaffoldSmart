@@ -77,29 +77,103 @@
         app:layout_constraintStart_toStartOf="@+id/imageToProcess"
         app:layout_constraintTop_toBottomOf="@+id/imageToProcess" />
 
-    <TextView
-        android:id="@+id/countText"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/pipeClass"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/number_of_pipes"
-        android:textSize="@dimen/_16ssp"
-        android:textColor="@color/black"
         android:layout_marginTop="@dimen/_10sdp"
-        android:layout_marginEnd="@dimen/_20sdp"
-        app:layout_constraintEnd_toEndOf="@+id/detectButton"
-        app:layout_constraintStart_toStartOf="@+id/detectButton"
-        app:layout_constraintTop_toBottomOf="@+id/detectButton" />
+        android:layout_marginStart="@dimen/_100sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detectButton">
 
-    <TextView
-        android:id="@+id/countResult"
+        <TextView
+            android:id="@+id/pipeCountLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/number_of_pipes"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/pipeCountResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_5sdp"
+            android:text="@string/_0"
+            android:textColor="@color/payment_color"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintBottom_toBottomOf="@+id/pipeCountLabel"
+            app:layout_constraintStart_toEndOf="@+id/pipeCountLabel"
+            app:layout_constraintTop_toTopOf="@+id/pipeCountLabel" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/jointClass"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/_0"
-        android:textColor="@color/payment_color"
-        android:textSize="@dimen/_16ssp"
-        android:layout_marginStart="@dimen/_5sdp"
-        app:layout_constraintBottom_toBottomOf="@+id/countText"
-        app:layout_constraintStart_toEndOf="@+id/countText"
-        app:layout_constraintTop_toTopOf="@+id/countText" />
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginStart="@dimen/_100sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pipeClass" >
+
+        <TextView
+            android:id="@+id/jointCountLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/number_of_joints"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/jointCountResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/_0"
+            android:textColor="@color/payment_color"
+            android:textSize="@dimen/_16ssp"
+            android:layout_marginStart="@dimen/_5sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/jointCountLabel"
+            app:layout_constraintStart_toEndOf="@+id/jointCountLabel"
+            app:layout_constraintTop_toTopOf="@+id/jointCountLabel" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/truckClass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:layout_marginStart="@dimen/_100sdp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/jointClass" >
+
+        <TextView
+            android:id="@+id/truckCountLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/number_of_trucks"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_16ssp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/truckCountResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/_0"
+            android:textColor="@color/payment_color"
+            android:textSize="@dimen/_16ssp"
+            android:layout_marginStart="@dimen/_5sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/truckCountLabel"
+            app:layout_constraintStart_toEndOf="@+id/truckCountLabel"
+            app:layout_constraintTop_toTopOf="@+id/truckCountLabel" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

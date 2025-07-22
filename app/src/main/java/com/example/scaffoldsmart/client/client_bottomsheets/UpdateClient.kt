@@ -62,11 +62,40 @@ class UpdateClient : BottomSheetDialogFragment() {
 
         binding.saveBtn.setOnClickListener {
             val name = binding.clientName.text.toString()
-            val email = binding.email.text.toString()
-            val pass  = binding.password.text.toString()
-            val cnic = binding.cnic.text.toString()
-            val phone = binding.phoneNum.text.toString()
+            var email = ""
+            var pass  = ""
+            var cnic = ""
+            var phone = ""
             val address = binding.address.text.toString()
+
+            if (binding.email.text.toString().contains("@")  || binding.email.text.toString().contains(".com")) {
+                email = binding.email.text.toString()
+            } else {
+                binding.email.error = "Enter a valid email"
+                binding.email.setText("")
+            }
+
+            val pattern = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}\$".toRegex()
+            if (binding.password.text.toString().matches(pattern)) {
+                pass  = binding.password.text.toString()
+            } else {
+                binding.password.error = "Password must contain: lowercase letters, numbers, symbols, and be at least 8 characters"
+                binding.password.setText("")
+            }
+
+            if (binding.cnic.text.toString().length == 13) {
+                cnic = binding.cnic.text.toString()
+            } else {
+                binding.cnic.error = "Enter a valid CNIC"
+                binding.cnic.setText("")
+            }
+
+            if (binding.phoneNum.text.toString().length == 11) {
+                phone  = binding.phoneNum.text.toString()
+            } else {
+                binding.phoneNum.error = "Enter a valid Phone Number"
+                binding.phoneNum.setText("")
+            }
 
             if (isVerify) {
                 if (cnic.isNotEmpty() && phone.isNotEmpty() && address.isNotEmpty()) {

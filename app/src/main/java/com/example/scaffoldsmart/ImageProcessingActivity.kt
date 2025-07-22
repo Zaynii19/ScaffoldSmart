@@ -138,8 +138,8 @@ class ImageProcessingActivity : AppCompatActivity() {
         }
     }
 
-    private fun displayResults(result: RoboflowObjectDetector.PipeDetectionResult) {
-        // Show overlay image with pipe detections
+    private fun displayResults(result: RoboflowObjectDetector.DetectionResult) {
+        // Show overlay image with detections
         result.overlayBitmap?.let { overlay ->
             // Combine original image with overlay
             val combined = createBitmap(originalBitmap!!.width, originalBitmap!!.height)
@@ -149,16 +149,23 @@ class ImageProcessingActivity : AppCompatActivity() {
             binding.imageToProcess.setImageBitmap(combined)
         }
 
-        // Update count display
-        binding.countResult.text = "${result.pipeCount}"
+        // Update count displays
+        binding.pipeCountResult.text = "${result.pipeCount}"
+        binding.jointCountResult.text = "${result.jointCount}"
+        binding.truckCountResult.text = "${result.truckCount}"
 
         // Show appropriate toast
+        val detectedItems = mutableListOf<String>()
+        if (result.pipeCount > 0) detectedItems.add("${result.pipeCount} pipes")
+        if (result.jointCount > 0) detectedItems.add("${result.jointCount} joints")
+        if (result.truckCount > 0) detectedItems.add("${result.truckCount} trucks")
+
         when {
-            result.pipeCount == 0 -> {
-                Toast.makeText(this, "No pipes detected", Toast.LENGTH_SHORT).show()
+            detectedItems.isEmpty() -> {
+                Toast.makeText(this, "No items detected", Toast.LENGTH_SHORT).show()
             }
             else -> {
-                Toast.makeText(this, "Found ${result.pipeCount} pipes", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Found: ${detectedItems.joinToString(", ")}", Toast.LENGTH_SHORT).show()
             }
         }
     }

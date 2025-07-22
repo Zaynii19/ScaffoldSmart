@@ -18,8 +18,8 @@ class RoboflowObjectDetector() {
     private val apiKey = "3GeU4CmPanc8KQlBja53" // Get from Roboflow account settings
     private val modelEndpoint = "pipes-n-joints/5"
     private val detectionUrl = "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey"
-
     private val client = OkHttpClient()
+
     private val paint = Paint().apply {
         color = Color.GREEN
         style = Paint.Style.STROKE
@@ -31,8 +31,10 @@ class RoboflowObjectDetector() {
         textSize = 32f
     }
 
-    data class PipeDetectionResult(
+    data class DetectionResult(
         val pipeCount: Int,
+        val jointCount: Int,
+        val truckCount: Int,
         val overlayBitmap: Bitmap?,
         val allDetections: List<Detection> = emptyList()
     )
@@ -43,7 +45,7 @@ class RoboflowObjectDetector() {
         val boundingBox: RectF
     )
 
-    suspend fun detectPipes(bitmap: Bitmap): PipeDetectionResult? {
+    suspend fun detectPipes(bitmap: Bitmap): DetectionResult? {
         return try {
             withContext(Dispatchers.IO) {
                 // Convert bitmap to base64
@@ -79,7 +81,7 @@ class RoboflowObjectDetector() {
         }
     }
 
-    private fun parseResponse(jsonResponse: String, originalBitmap: Bitmap): PipeDetectionResult {
+    private fun parseResponse(jsonResponse: String, originalBitmap: Bitmap): DetectionResult {
         val jsonObject = JSONObject(jsonResponse)
         val predictions = jsonObject.getJSONArray("predictions")
         val imageWidth = jsonObject.getJSONObject("image").getInt("width")
@@ -90,6 +92,8 @@ class RoboflowObjectDetector() {
 
         val detections = mutableListOf<Detection>()
         var pipeCount = 0
+        var jointCount = 0
+        var truckCount = 0
 
         // Create overlay bitmap
         val overlayBitmap = createBitmap(originalBitmap.width, originalBitmap.height)
@@ -116,33 +120,58 @@ class RoboflowObjectDetector() {
 
             detections.add(Detection(className, confidence, boundingBox))
 
-            // Count pipes and draw bounding boxes
-            if (className == "pipe") {
-                pipeCount++
-                // Draw bounding box
-                canvas.drawRect(boundingBox, paint)
-                // Draw class label and confidence
-                canvas.drawText(
-                    "Pipe ${(confidence * 100).toInt()}%",
-                    left,
-                    top - 10,
-                    textPaint
-                )
-            } else {
-                // Draw other objects with different color
-                paint.color = Color.BLUE
-                canvas.drawRect(boundingBox, paint)
-                canvas.drawText(
-                    "$className ${(confidence * 100).toInt()}%",
-                    left,
-                    top - 10,
-                    textPaint
-                )
-                paint.color = Color.RED
+            // Draw bounding box and count objects
+            when (className) {
+                "pipe" -> {
+                    pipeCount++
+                    paint.color = Color.GREEN
+                    canvas.drawRect(boundingBox, paint)
+                    canvas.drawText(
+                        "Pipe ${(confidence * 100).toInt()}%",
+                        left,
+                        top - 10,
+                        textPaint
+                    )
+                }
+                "joint" -> {
+                    jointCount++
+                    paint.color = Color.BLUE
+                    canvas.drawRect(boundingBox, paint)
+                    canvas.drawText(
+                        "Joint ${(confidence * 100).toInt()}%",
+                        left,
+                        top - 10,
+                        textPaint
+                    )
+                }
+                "truck" -> {
+                    truckCount++
+                    paint.color = Color.YELLOW
+                    canvas.drawRect(boundingBox, paint)
+                    canvas.drawText(
+                        "Truck ${(confidence * 100).toInt()}%",
+                        left,
+                        top - 10,
+                        textPaint
+                    )
+                }
+                else -> {
+                    // Draw other objects with different color
+                    paint.color = Color.RED
+                    canvas.drawRect(boundingBox, paint)
+                    canvas.drawText(
+                        "$className ${(confidence * 100).toInt()}%",
+                        left,
+                        top - 10,
+                        textPaint
+                    )
+                }
             }
+            // Reset paint color for next iteration
+            paint.color = Color.GREEN
         }
 
-        return PipeDetectionResult(pipeCount, overlayBitmap, detections)
+        return DetectionResult(pipeCount, jointCount, truckCount, overlayBitmap, detections)
     }
 
     fun close() {

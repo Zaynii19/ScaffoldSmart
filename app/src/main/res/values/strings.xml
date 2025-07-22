@@ -223,5 +223,7 @@
     <string name="owner_signature">Owner Signature</string>
     <string name="renter_signature">Renter Signature</string>
     <string name="item_threshold">Item Threshold</string>
+    <string name="number_of_joints">Number of Joints:</string>
+    <string name="number_of_trucks">Number of Trucks:</string>
 
 </resources>

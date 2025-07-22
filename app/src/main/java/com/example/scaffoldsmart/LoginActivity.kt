@@ -94,8 +94,23 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun getUserValues() {
-        userEmail = binding.email.text.toString()
+        if (binding.email.text.toString().contains("@")  || binding.email.text.toString().contains(".com")) {
+            userEmail = binding.email.text.toString()
+        } else {
+            binding.email.error = "Enter a valid email"
+            binding.email.setText("")
+            userEmail = ""
+        }
+
         userPass = binding.pass.text.toString()
+        /*val pattern = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}\$".toRegex()
+        if (binding.pass.text.toString().matches(pattern)) {
+            userPass = binding.pass.text.toString()
+        } else {
+            binding.pass.error = "Password must contain: lowercase letters, numbers, symbols, and be at least 8 characters"
+            binding.pass.setText("")
+            userPass = ""
+        }*/
     }
 
     private fun loginUser() {
