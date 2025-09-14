@@ -1,6 +1,5 @@
 package com.example.scaffoldsmart.admin.admin_fragments
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color

@@ -2,41 +2,22 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
-    //id("com.chaquo.python")
+    id ("kotlin-parcelize")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
     namespace = "com.example.scaffoldsmart"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.scaffoldsmart"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
-        versionName = "1.0.1"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        /*ndk {
-            // On Apple silicon, you can omit x86_64.
-            abiFilters += listOf("arm64-v8a", "x86_64")
-        }*/
-
-       /* chaquopy {
-            defaultConfig {
-                pip {
-                    // A requirement specifier, with or without a version number:
-                    install("firebase_admin")
-                }
-            }
-        }*/
-        // default Python source directory is src/main/python
-        // else want to set of yours own
-        /*sourceSets.getByName("main") {
-            setRoot("some/other/main")
-        }*/
-
     }
 
     buildTypes {
@@ -48,15 +29,25 @@ android {
             )
         }
     }
+
+    secrets {
+        propertiesFileName = "local.properties"
+    }
+
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     // for email feature

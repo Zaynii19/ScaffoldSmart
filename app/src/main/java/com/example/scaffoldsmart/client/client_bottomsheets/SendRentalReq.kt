@@ -17,7 +17,6 @@
     import androidx.recyclerview.widget.LinearLayoutManager
     import com.example.scaffoldsmart.R
     import com.example.scaffoldsmart.admin.admin_models.RentalItem
-    import com.example.scaffoldsmart.client.client_adapters.CartRcvAdapter
     import com.example.scaffoldsmart.client.client_adapters.RentalDetailRcvAdapter
     import com.example.scaffoldsmart.client.client_models.CartModel
     import com.example.scaffoldsmart.client.client_models.ClientModel
@@ -25,6 +24,8 @@
     import com.example.scaffoldsmart.databinding.SendRentalReqBinding
     import com.example.scaffoldsmart.util.CheckNetConnectvity
     import com.example.scaffoldsmart.util.DateFormater
+    import com.example.scaffoldsmart.util.parcelable
+    import com.example.scaffoldsmart.util.parcelableArrayList
     import com.google.android.material.bottomsheet.BottomSheetDialogFragment
     import com.google.android.material.dialog.MaterialAlertDialogBuilder
     import java.util.Calendar
@@ -53,7 +54,7 @@
         private lateinit var adapter: RentalDetailRcvAdapter
 
         interface OnSendReqListener {
-            fun onReqSendUpdated(
+            fun onReqSend(
                 rentalAddress: String?,
                 startDuration: String?,
                 endDuration: String?,
@@ -65,10 +66,7 @@
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
             // Retrieve the list of rental requests from arguments safely
-            arguments?.let {
-                cartItemList = it.getSerializable(ARG_LIST) as ArrayList<CartModel>
-                Log.d("RentReqDebug", "Cart size: ${it.size()}")
-            }
+            cartItemList = arguments?.parcelableArrayList<CartModel>(ARG_LIST) ?: arrayListOf()
 
             populateItemList(cartItemList)
         }
@@ -119,7 +117,7 @@
         }
 
         private fun getClientInfo() {
-            val client: ClientModel = arguments?.getSerializable(ARG_CLIENT) as ClientModel
+            val client: ClientModel = arguments?.parcelable<ClientModel>(ARG_CLIENT) ?: ClientModel()
             clientName = client.name
             clientEmail = client.email
             clientPhone = client.phone
@@ -259,7 +257,7 @@
                 .setTitle("Send Rental Request")
                 .setView(customDialog)
                 .setPositiveButton("Send") { _, _ ->
-                    onSendReqListener?.onReqSendUpdated(rentalAddress, durationStart, durationEnd, totalRent, itemList)
+                    onSendReqListener?.onReqSend(rentalAddress, durationStart, durationEnd, totalRent, itemList)
                     Toast.makeText(requireActivity(), "Your rental request sent to Admin", Toast.LENGTH_SHORT).show()
                     dismiss()
                 }
@@ -293,8 +291,8 @@
                 fragment.onSendReqListener = listener
 
                 val args = Bundle()
-                args.putSerializable(ARG_CLIENT, client)  // Pass the client as Serializable
-                args.putSerializable(ARG_LIST, ArrayList(cartItemList))  // Make sure to convert it to ArrayList
+                args.putParcelable(ARG_CLIENT, client)  // Pass the client as Parcelable
+                args.putParcelableArrayList(ARG_LIST, ArrayList(cartItemList))
                 fragment.arguments = args
 
                 return fragment

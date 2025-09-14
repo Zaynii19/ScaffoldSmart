@@ -152,7 +152,7 @@ class ClientCostComparisonActivity : AppCompatActivity() {
                     val (textView, spinner, optionsGenerator) = config
 
                     textView.text = item.itemName
-                    val options = optionsGenerator(quantity.toInt())
+                    val options = optionsGenerator(quantity)
                     val adapter = ArrayAdapter(this@ClientCostComparisonActivity, R.layout.spinner_item, options).apply {
                         setDropDownViewResource(R.layout.spinner_item)
                     }

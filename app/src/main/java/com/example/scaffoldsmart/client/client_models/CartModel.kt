@@ -1,5 +1,9 @@
 package com.example.scaffoldsmart.client.client_models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+/*
 class CartModel {
     var itemId: String? = null
     var itemName: String? = null
@@ -22,4 +26,14 @@ class CartModel {
         this.itemPrice = itemPrice
         this.pipeLength = pipeLength
     }
-}
+}*/
+
+
+@Parcelize
+data class CartModel(
+    var itemId: String? = null,
+    var itemName: String? = null,
+    var itemQuantity: Int? = null,
+    var itemPrice: Int? = null,
+    var pipeLength: Int? = null
+) : Parcelable

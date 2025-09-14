@@ -2,7 +2,7 @@ package com.example.scaffoldsmart.admin.admin_models
 
 import java.io.Serializable
 
-class InventoryModel : Serializable {
+/*class InventoryModel : Serializable {
     var itemId: String? = null
     var itemName: String? = null
     var price: Int? = null
@@ -19,4 +19,17 @@ class InventoryModel : Serializable {
         this.quantity = quantity
         this.availability = availability
     }
-}
+}*/
+
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class InventoryModel(
+    var itemId: String? = null,
+    var itemName: String? = null,
+    var price: Int? = null,
+    var quantity: Int? = null,
+    var availability: String? = null,
+    var threshold: Int? = null
+) : Parcelable

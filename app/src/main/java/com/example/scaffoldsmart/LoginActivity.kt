@@ -12,8 +12,9 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -22,12 +23,11 @@ import com.example.scaffoldsmart.admin.AdminMainActivity
 import com.example.scaffoldsmart.client.ClientMainActivity
 import com.example.scaffoldsmart.client.SignupActivity
 import com.example.scaffoldsmart.databinding.ActivityLoginBinding
-import com.example.scaffoldsmart.util.OnesignalService
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.database.FirebaseDatabase
-import com.onesignal.OneSignal
 import androidx.core.content.edit
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 
 class LoginActivity : AppCompatActivity() {
@@ -37,8 +37,8 @@ class LoginActivity : AppCompatActivity() {
     private var userType: String? = null
     private var userEmail: String? = null
     private var userPass: String? = null
-    private var permissionRequestCount = 0  // Tracks permission request count
     private lateinit var userPreferences: SharedPreferences
+    private lateinit var notiPermissionLauncher: ActivityResultLauncher<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +50,7 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
+        setupPermissionLaunchers()
         requestNotificationPermission()
 
         userPreferences = getSharedPreferences("LOGIN", MODE_PRIVATE)
@@ -94,7 +95,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun getUserValues() {
-        if (binding.email.text.toString().contains("@")  || binding.email.text.toString().contains(".com")) {
+        if (SignupActivity.isEmailValid(binding.email.text.toString())) {
             userEmail = binding.email.text.toString()
         } else {
             binding.email.error = "Enter a valid email"
@@ -102,15 +103,13 @@ class LoginActivity : AppCompatActivity() {
             userEmail = ""
         }
 
-        userPass = binding.pass.text.toString()
-        /*val pattern = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}\$".toRegex()
-        if (binding.pass.text.toString().matches(pattern)) {
+        if (SignupActivity.isPasswordValid(binding.pass.text.toString())) {
             userPass = binding.pass.text.toString()
         } else {
-            binding.pass.error = "Password must contain: lowercase letters, numbers, symbols, and be at least 8 characters"
+            binding.pass.error = "Password must contain: at least one lowercase letter, one uppercase letter, one number, and one special character, and be at least 8 characters"
             binding.pass.setText("")
             userPass = ""
-        }*/
+        }
     }
 
     private fun loginUser() {
@@ -184,29 +183,47 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), PERMISSION_REQUEST_CODE)
+    private fun setupPermissionLaunchers() {
+        notiPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (!isGranted) {
+                handlePermissionDenied()
             }
         }
     }
 
-    // Handle the result of permission requests
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            val deniedPermissions = permissions.filterIndexed { index, _ -> grantResults[index] != PackageManager.PERMISSION_GRANTED }
-            if (deniedPermissions.isNotEmpty()) {
-                permissionRequestCount++
-                if (permissionRequestCount >= 2) {
-                    openAppSettings() // Open settings after the user denies permission twice
-                } else {
-                    Toast.makeText(this, "Notification permission permission is required.", Toast.LENGTH_SHORT).show()
-                }
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this@LoginActivity, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                notiPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+    }
+
+    private fun handlePermissionDenied() {
+        if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+            // User denied before, show explanation
+            showRationaleDialog()
+        } else {
+            // User permanently denied or first time with "Don't ask again"
+            Toast.makeText(this@LoginActivity, "Notification permission is required", Toast.LENGTH_SHORT).show()
+            openAppSettings()
+        }
+    }
+
+    private fun showRationaleDialog() {
+        MaterialAlertDialogBuilder(this@LoginActivity)
+            .setTitle("Permission Needed")
+            .setMessage("Notification permission is required for app functionality")
+            .setBackground(ContextCompat.getDrawable(this@LoginActivity, R.drawable.msg_view_received))
+            .setPositiveButton("Grant") { _, _ ->
+                requestNotificationPermission()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun openAppSettings() {
@@ -214,9 +231,5 @@ class LoginActivity : AppCompatActivity() {
         val uri = Uri.fromParts("package", packageName, null)
         intent.data = uri
         startActivity(intent)
-    }
-
-    companion object {
-        private const val PERMISSION_REQUEST_CODE = 101
     }
 }

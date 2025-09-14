@@ -1,8 +1,9 @@
 package com.example.scaffoldsmart.admin.admin_models
 
-import java.io.Serializable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-class RentalModel : Serializable {
+/*class RentalModel : Serializable {
     var clientID: String? = null
     var rentalId: String? = null
     var clientName: String? = null
@@ -71,4 +72,30 @@ class RentalItem {
         this.itemPrice = itemPrice
         this.pipeLength = pipeLength
     }
-}
+}*/
+
+@Parcelize
+data class RentalModel(
+    var clientID: String? = null,
+    var rentalId: String? = null,
+    var clientName: String? = null,
+    var clientEmail: String? = null,
+    var clientCnic: String? = null,
+    var clientPhone: String? = null,
+    var clientAddress: String? = null,
+    var rentalAddress: String? = null,
+    var startDuration: String? = null,
+    var endDuration: String? = null,
+    var status: String? = null,
+    var rent: Int? = null,
+    var rentStatus: String? = null,
+    var items: ArrayList<RentalItem>? = null
+) : Parcelable
+
+@Parcelize
+data class RentalItem(
+    var itemName: String? = null,
+    var itemQuantity: Int? = null,
+    var itemPrice: Int? = null,
+    var pipeLength: Int? = null
+) : Parcelable

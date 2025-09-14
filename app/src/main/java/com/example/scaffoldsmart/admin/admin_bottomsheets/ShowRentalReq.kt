@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +25,7 @@ import com.example.scaffoldsmart.databinding.RentalsDetailsDialogBinding
 import com.example.scaffoldsmart.databinding.ShowRentalReqBinding
 import com.example.scaffoldsmart.util.OnesignalService
 import com.example.scaffoldsmart.util.SmartContract
+import com.example.scaffoldsmart.util.parcelableArrayList
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.Firebase
@@ -70,9 +70,8 @@ class ShowRentalReq : BottomSheetDialogFragment(), RequestRcvAdapter.OnItemActio
 
     private fun setRcv() {
         // Retrieve the list of rental requests from arguments safely
-        arguments?.let {
-            reqList = it.getSerializable(ARG_LIST) as ArrayList<RentalModel>
-        }
+        reqList = arguments?.parcelableArrayList<RentalModel>(ARG_LIST) ?: arrayListOf()
+
         // Set up the RecyclerView only if reqList is not null
         binding.rcv.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
         adapter = RequestRcvAdapter(requireActivity(), reqList, this)  // Pass the whole list to the adapter
@@ -228,9 +227,9 @@ class ShowRentalReq : BottomSheetDialogFragment(), RequestRcvAdapter.OnItemActio
         fun newInstance(reqList: List<RentalModel>): ShowRentalReq {
             val fragment = ShowRentalReq()
 
-            // Pass the list as Serializable
+            // Pass the list as Parcelable
             val args = Bundle()
-            args.putSerializable(ARG_LIST, ArrayList(reqList))  // Make sure to convert it to ArrayList
+            args.putParcelableArrayList(ARG_LIST, ArrayList(reqList))
             fragment.arguments = args
 
             return fragment

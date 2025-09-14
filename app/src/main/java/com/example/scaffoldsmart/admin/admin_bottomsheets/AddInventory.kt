@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity.MODE_PRIVATE
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.AddInventoryBinding
+import com.example.scaffoldsmart.util.parcelable
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class AddInventory : BottomSheetDialogFragment() {
@@ -103,7 +104,7 @@ class AddInventory : BottomSheetDialogFragment() {
     }
 
     private fun setValuesForUpdate() {
-        val item: InventoryModel = arguments?.getSerializable(ARG_ITEM) as InventoryModel
+        val item: InventoryModel = arguments?.parcelable<InventoryModel>(ARG_ITEM) ?: InventoryModel()
         binding.title.text = getString(R.string.update_inventory)
         item.itemId ?.let { itemId = it }
         binding.itemName.setText(item.itemName)
@@ -121,7 +122,7 @@ class AddInventory : BottomSheetDialogFragment() {
             fragment.onInventoryUpdatedListener = listener
 
             val args = Bundle()
-            args.putSerializable(ARG_ITEM, item)  // Pass the item as Serializable
+            args.putParcelable(ARG_ITEM, item)  // Pass the item as Parcelable
             fragment.arguments = args
 
             return fragment

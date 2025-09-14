@@ -12,10 +12,10 @@ import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import androidx.core.graphics.createBitmap
+import com.example.scaffoldsmart.BuildConfig
 
 class RoboflowObjectDetector() {
-    // Replace these with your actual Roboflow API details
-    private val apiKey = "3GeU4CmPanc8KQlBja53" // Get from Roboflow account settings
+    private val apiKey = BuildConfig.ROBOFLOW_API_KEY // Get from Roboflow account settings
     private val modelEndpoint = "pipes-n-joints/5"
     private val detectionUrl = "https://detect.roboflow.com/$modelEndpoint?api_key=$apiKey"
     private val client = OkHttpClient()

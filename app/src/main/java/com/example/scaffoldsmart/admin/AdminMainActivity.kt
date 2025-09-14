@@ -5,11 +5,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,14 +17,15 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.scaffoldsmart.ImageProcessingActivity
@@ -34,6 +35,7 @@ import com.example.scaffoldsmart.admin.admin_models.RentalModel
 import com.example.scaffoldsmart.databinding.ActivityMainAdminBinding
 import com.example.scaffoldsmart.admin.admin_service.AdminMessageListenerService
 import com.example.scaffoldsmart.admin.admin_service.LowInventoryAlertService
+import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
 import com.example.scaffoldsmart.databinding.ChooseImgDialogBinding
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -45,6 +47,10 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class AdminMainActivity : AppCompatActivity() {
     private val binding by lazy {
@@ -56,10 +62,14 @@ class AdminMainActivity : AppCompatActivity() {
     private var prevNotificationId: String? = null
     private lateinit var reqPreferences: SharedPreferences
     private lateinit var chatPreferences: SharedPreferences
+    private lateinit var viewModel: AdminViewModel
     private var senderUid: String? = null
-    private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
-    private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
-    private var currentImageBitmap: Bitmap? = null
+    private lateinit var cameraPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var storagePermissionLauncher: ActivityResultLauncher<Array<String>>
+    //private lateinit var cameraLauncher: ActivityResultLauncher<Uri>
+    private lateinit var cameraLauncher: ActivityResultLauncher<Void?>
+    private lateinit var galleryLauncher: ActivityResultLauncher<PickVisualMediaRequest>
+    private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,6 +80,14 @@ class AdminMainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        //cleanupImageCache()
+
+        chatPreferences = getSharedPreferences("CHATADMIN", MODE_PRIVATE)
+
+        viewModel = ViewModelProvider(this)[AdminViewModel::class.java]
+        viewModel.retrieveAdminData()
+        observeAdminLiveData()
 
         chatPreferences = getSharedPreferences("CHATADMIN", MODE_PRIVATE)
         reqPreferences = getSharedPreferences("RENTALREQ", MODE_PRIVATE)
@@ -89,6 +107,7 @@ class AdminMainActivity : AppCompatActivity() {
 
         getLowInventoryAlert()
 
+        setupPermissionLaunchers()
         setupCameraLauncher()
         setupGalleryLauncher()
 
@@ -139,6 +158,14 @@ class AdminMainActivity : AppCompatActivity() {
         bottomNav.setupWithNavController(navController)
     }
 
+    private fun observeAdminLiveData() {
+        viewModel.observeAdminLiveData().observe(this) { admin ->
+            if (admin != null) {
+                chatPreferences.edit { putString("SenderUid", admin.id) }
+            }
+        }
+    }
+
     private fun getMessageNoti() {
         val intent = Intent(this, AdminMessageListenerService::class.java)
         intent.putExtra("SenderUid", senderUid)
@@ -165,35 +192,71 @@ class AdminMainActivity : AppCompatActivity() {
             }
 
         binder.cancel.setOnClickListener { dialog.dismiss() }
-        binder.camera.setOnClickListener { requestPermissionsAndLaunchCamera(dialog) }
-        binder.gallery.setOnClickListener { requestPermissionsAndLaunchGallery(dialog) }
+        binder.camera.setOnClickListener {
+            requestCameraPermission()
+            dialog.dismiss()
+        }
+        binder.gallery.setOnClickListener {
+            requestStoragePermission()
+            dialog.dismiss()
+        }
+    }
+
+    private fun setupPermissionLaunchers() {
+        cameraPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                launchCamera()
+            } else {
+                handlePermissionDenied("Camera")
+            }
+        }
+
+        storagePermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            val isGranted = permissions.any { it.value }
+            if (isGranted) {
+                launchGallery()
+            } else {
+                handlePermissionDenied("Storage")
+            }
+        }
     }
 
     private fun setupCameraLauncher() {
-        cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val imageBitmap = result.data?.extras?.get("data") as? Bitmap
-                imageBitmap?.let {
-                    currentImageBitmap = it
-                    launchImageProcessingActivity(it)
+        /*cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+            if (success) {
+                // Load the image from the saved file
+                imageUri?.let { uri ->
+                    val bitmap = contentResolver.openInputStream(uri)?.use {
+                        BitmapFactory.decodeStream(it)
+                    }
+                    bitmap?.let { launchImageProcessingActivity(it) }
                 }
+            }
+        }*/
+        cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            bitmap?.let {
+                launchImageProcessingActivity(it)
             }
         }
     }
 
     private fun setupGalleryLauncher() {
-        galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                result.data?.data?.let { uri ->
-                    try {
-                        // Simple bitmap loading without complex sampling
-                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-                        currentImageBitmap = bitmap
-                        launchImageProcessingActivity(bitmap)
-                    } catch (e: Exception) {
-                        Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show()
-                        Log.e("GalleryError", "Error: ${e.message}")
+        galleryLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                val imageBitmap = try {
+                    contentResolver.openInputStream(uri)?.use { inputStream ->
+                        BitmapFactory.decodeStream(inputStream)
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
+                imageBitmap?.let {
+                    launchImageProcessingActivity(it)
                 }
             }
         }
@@ -215,116 +278,117 @@ class AdminMainActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestPermissionsAndLaunchCamera(dialog: AlertDialog) {
-        if (checkCameraPermission()) {
-            launchCamera()
-            dialog.dismiss()
-        } else {
-            requestCameraPermission()
-            dialog.dismiss()
-        }
-    }
-
-    private fun requestPermissionsAndLaunchGallery(dialog: AlertDialog) {
-        if (checkStoragePermission()) {
-            launchGallery()
-            dialog.dismiss()
-        } else {
-            requestStoragePermission()
-            dialog.dismiss()
-        }
-    }
-
-    private fun launchCamera() {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(packageManager)?.also {
-                cameraLauncher.launch(takePictureIntent)
-            }
-        }
-    }
-
-    private fun launchGallery() {
-        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also { pickImageIntent ->
-            pickImageIntent.type = "image/*"
-            galleryLauncher.launch(pickImageIntent)
-        }
-    }
-
-    private fun checkCameraPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun checkStoragePermission(): Boolean {
-        return when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-                // Android 15+ - check for either full or partial access
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-            }
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                // Android 13-14
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-            }
-            else -> {
-                // Android 12 and below
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-            }
-        }
-    }
-
     private fun requestCameraPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), PERMISSION_REQUEST_CODE)
+        if (ContextCompat.checkSelfPermission(this@AdminMainActivity, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            launchCamera()
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
     }
 
     private fun requestStoragePermission() {
-        val permissionsToRequest = when {
+        val permissionsToRequest = getStoragePermissions()
+
+        // Check if any permission is already granted
+        val shouldRequest = permissionsToRequest.any { permission ->
+            ContextCompat.checkSelfPermission(this@AdminMainActivity, permission)!= PackageManager.PERMISSION_GRANTED
+        }
+
+        if (!shouldRequest) {
+            launchGallery()
+        } else {
+            storagePermissionLauncher.launch(permissionsToRequest)
+        }
+    }
+
+    private fun getStoragePermissions(): Array<String> {
+        return when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-                // Android 15+ - request both for better UX
                 arrayOf(
                     Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
                     Manifest.permission.READ_MEDIA_IMAGES
                 )
             }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                // Android 13-14
                 arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
             }
             else -> {
-                // Android 12 and below
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
         }
-
-        ActivityCompat.requestPermissions(this, permissionsToRequest, PERMISSION_REQUEST_CODE)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
-                when {
-                    permissions.contains(Manifest.permission.CAMERA) -> launchCamera()
-                    permissions.any { it == Manifest.permission.READ_MEDIA_IMAGES ||
-                            it == Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED ||
-                            it == Manifest.permission.READ_EXTERNAL_STORAGE } -> launchGallery()
-                }
-            } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
-                openSettings()
-            }
+    private fun handlePermissionDenied(permissionType: String) {
+        if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+            // User denied before, show explanation
+            showRationaleDialog(permissionType)
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_IMAGES)) {
+            showRationaleDialog(permissionType)
+        } else {
+            // User permanently denied or first time with "Don't ask again"
+            Toast.makeText(this@AdminMainActivity, "$permissionType permission is required", Toast.LENGTH_SHORT).show()
+            openAppSettings()
         }
     }
 
-    private fun openSettings() {
+    private fun showRationaleDialog(permissionType: String) {
+        MaterialAlertDialogBuilder(this@AdminMainActivity)
+            .setTitle("Permission Needed")
+            .setMessage("$permissionType permission is required to use update profile")
+            .setBackground(ContextCompat.getDrawable(this@AdminMainActivity, R.drawable.msg_view_received))
+            .setPositiveButton("Grant") { _, _ ->
+                when (permissionType) {
+                    "Camera" -> requestCameraPermission()
+                    "Storage" -> requestStoragePermission()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun launchCamera() {
+        /*val photoFile = createImageFile()
+        imageUri = FileProvider.getUriForFile(
+            this@AdminMainActivity, "${packageName}.provider", photoFile
+        )
+        imageUri?.let { uri ->
+            cameraLauncher.launch(uri)
+        }*/
+        cameraLauncher.launch(null)
+    }
+
+    private fun launchGallery() {
+        galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    }
+
+    private fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
         intent.data = uri
         startActivity(intent)
     }
 
-    companion object {
-        private const val PERMISSION_REQUEST_CODE = 200
+    private fun createImageFile(): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val storageDir = cacheDir // Use app's cache directory
+        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir)
+    }
 
+    private fun cleanupImageCache() {
+        try {
+            cacheDir.listFiles()?.forEach { file ->
+                if (file.name.startsWith("JPEG_") && file.name.endsWith(".jpg")) {
+                    file.delete()
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("AdminMainDebug", "Error cleaning cache: ${e.message}")
+        }
+    }
+
+    companion object {
         fun handleReqData(reqData: JSONObject, requestId: String) {
             reqData.let { data ->
                 val clientID = data.optString("clientID", "N/A")
@@ -385,7 +449,7 @@ class AdminMainActivity : AppCompatActivity() {
                             val newReq = RentalModel(
                                 clientID, requestId, clientName, clientEmail, clientCnic,
                                 clientPhone, clientAddress, rentalAddress, startDuration,
-                                endDuration, totalRent, "", itemList
+                                endDuration, "", totalRent, "", itemList
                             )
 
                             // Store with requestId as the key
@@ -393,8 +457,8 @@ class AdminMainActivity : AppCompatActivity() {
                                 .addOnSuccessListener {
                                     Log.d("AdminMainDebug", "Rental data stored successfully with ID $requestId")
                                 }
-                                .addOnFailureListener {
-                                    Log.e("AdminMainDebug", "Failed to store rental data: ${it.message}")
+                                .addOnFailureListener { failure ->
+                                    Log.e("AdminMainDebug", "Failed to store rental data: ${failure.message}")
                                 }
                         }
                     }

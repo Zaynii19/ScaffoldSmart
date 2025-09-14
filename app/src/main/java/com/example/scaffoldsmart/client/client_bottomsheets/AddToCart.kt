@@ -5,7 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +19,7 @@ import androidx.core.content.ContextCompat
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.AddToCartBinding
+import com.example.scaffoldsmart.util.parcelable
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -41,7 +41,7 @@ class AddToCart : BottomSheetDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Retrieve the item from arguments safely
-        item = arguments?.getSerializable(ARG_ITEM) as InventoryModel
+        item = arguments?.parcelable<InventoryModel>(ARG_ITEM) ?: InventoryModel()
     }
 
     override fun onCreateView(
@@ -268,7 +268,7 @@ class AddToCart : BottomSheetDialogFragment() {
 
             // Bundle to pass arguments
             val args = Bundle()
-            args.putSerializable(ARG_ITEM, item)  // Pass the item as Serializable
+            args.putParcelable(ARG_ITEM, item)  // Pass the item as Parcelable
             fragment.arguments = args
 
             return fragment

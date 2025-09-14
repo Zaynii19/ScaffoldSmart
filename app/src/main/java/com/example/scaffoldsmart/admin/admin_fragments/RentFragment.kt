@@ -148,8 +148,8 @@ class RentFragment : Fragment(), RentalRcvAdapter.OnItemActionListener {
         )
     }
 
-    override fun onDoneRentalButtonClick(currentRental: RentalModel) {
-        showConfirmationDialog(currentRental)
+    override fun onDoneRentalButtonClick(rental: RentalModel) {
+        showConfirmationDialog(rental)
     }
 
     private fun showConfirmationDialog(currentRental: RentalModel) {

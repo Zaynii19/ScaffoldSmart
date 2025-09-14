@@ -1,25 +1,14 @@
 package com.example.scaffoldsmart.admin.admin_adapters
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.ChatActivity
 import com.example.scaffoldsmart.admin.admin_models.ChatUserModel
-import com.example.scaffoldsmart.admin.admin_models.InventoryModel
 import com.example.scaffoldsmart.databinding.ChatUserItemBinding
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
 
 class ChatUserRcvAdapter(val context: Context, private var userList: ArrayList<ChatUserModel>): RecyclerView.Adapter<ChatUserRcvAdapter.MyChatUserViewHolder>() {
     class MyChatUserViewHolder(val binding: ChatUserItemBinding): RecyclerView.ViewHolder(binding.root)

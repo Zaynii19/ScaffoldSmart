@@ -146,7 +146,7 @@ class CartActivity : AppCompatActivity() {
 
     private fun showReqBottomSheet() {
         val bottomSheetDialog: BottomSheetDialogFragment = SendRentalReq.newInstance(object : SendRentalReq.OnSendReqListener {
-            override fun onReqSendUpdated(
+            override fun onReqSend(
                 rentalAddress: String?,
                 startDuration: String?,
                 endDuration: String?,
@@ -159,9 +159,20 @@ class CartActivity : AppCompatActivity() {
                     clientObj?.email, clientObj?.phone, clientObj?.cnic,
                     rentalAddress ,startDuration, endDuration, rent, itemList
                 )
+                clearCart(clientObj?.id)
+                finish()
             }
         }, clientObj, itemList)
         bottomSheetDialog.show(this.supportFragmentManager, "RentalReq")
+    }
+
+    private fun clearCart(clientId: String?) {
+        clientId?.let { cId ->
+            val databaseRef = Firebase.database.reference.child("Cart").child(cId)
+            databaseRef.removeValue()
+                .addOnSuccessListener {}
+                .addOnFailureListener {}
+        }
     }
 
     private fun showVerificationDialog() {

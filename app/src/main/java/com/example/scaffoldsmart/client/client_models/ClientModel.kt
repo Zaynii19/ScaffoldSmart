@@ -1,7 +1,10 @@
 package com.example.scaffoldsmart.client.client_models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
+/*
 class ClientModel: Serializable {
     var userType: String? = null
     var id: String? = null
@@ -27,4 +30,16 @@ class ClientModel: Serializable {
         this.email = email
         this.pass = pass
     }
-}
+}*/
+
+@Parcelize
+data class ClientModel(
+    var userType: String? = null,
+    var id: String? = null,
+    var name: String? = null,
+    var email: String? = null,
+    var pass: String? = null,
+    var cnic: String? = null,
+    var address: String? = null,
+    var phone: String? = null
+) : Parcelable

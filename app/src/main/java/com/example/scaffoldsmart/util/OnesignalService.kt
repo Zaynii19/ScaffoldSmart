@@ -20,12 +20,13 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 import androidx.core.content.edit
+import com.example.scaffoldsmart.BuildConfig
 import com.example.scaffoldsmart.admin.admin_models.RentalItem
 
 class OnesignalService(val context: Context) {
 
-    private val appId = "4c3f5def-07a5-46b9-9fbb-f8336f1dfa8a"
-    private val apiKey = "os_v2_app_jq7v33yhuvdlth537azw6hp2rir3kktmejgui44gno5haipvnp2bjxn3nfjx4yrhzmcwsj5ajhphiqfwfs7zdltixzcfsuot5av5tki"
+    private val appId = BuildConfig.ONESIGNAL_APP_ID
+    private val apiKey = BuildConfig.ONESIGNAL_API_KEY
     private val reqPreferences = context.getSharedPreferences("RENTALREQ", Context.MODE_PRIVATE)
 
     // Initialize OneSignal

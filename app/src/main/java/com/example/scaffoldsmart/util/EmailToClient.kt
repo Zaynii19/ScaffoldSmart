@@ -1,6 +1,7 @@
 package com.example.scaffoldsmart.util
 
 import android.util.Log
+import com.example.scaffoldsmart.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,10 +57,8 @@ class EmailToClient {
 
             val session = Session.getInstance(props, object : Authenticator() {
                 override fun getPasswordAuthentication(): PasswordAuthentication {
-                    //val senderEmail = "zaynii1911491@gmail.com"
-                    //val senderPassword = "eeyepbpiadbraobu"
                     val senderEmail = "sallarmirza77@gmail.com"
-                    val senderPassword = "frlipnsajtqlcqmu"
+                    val senderPassword = BuildConfig.GOOGLE_APP_PASSWORD
                     return PasswordAuthentication(senderEmail, senderPassword)
                 }
             })

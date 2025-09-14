@@ -2,6 +2,7 @@ package com.example.scaffoldsmart.client
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Patterns
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -12,7 +13,6 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.scaffoldsmart.util.Security
 import com.example.scaffoldsmart.LoginActivity
 import com.example.scaffoldsmart.R
-import com.example.scaffoldsmart.client.client_models.ClientModel
 import com.example.scaffoldsmart.databinding.ActivitySignupBinding
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
@@ -59,8 +59,15 @@ class SignupActivity : AppCompatActivity() {
     }
 
     private fun getClientValues() {
-        name = binding.clientName.text.toString()
-        if (binding.email.text.toString().contains("@")  || binding.email.text.toString().contains(".com")) {
+        if (isValidName(binding.clientName.text.toString())) {
+            name = binding.clientName.text.toString()
+        } else {
+            binding.clientName.error = "Enter a valid name"
+            binding.clientName.setText("")
+            name = ""
+        }
+
+        if (isEmailValid(binding.email.text.toString())) {
             email = binding.email.text.toString()
         } else {
             binding.email.error = "Enter a valid email"
@@ -68,15 +75,16 @@ class SignupActivity : AppCompatActivity() {
             email = ""
         }
 
-        val pattern = "^(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]).{8,}\$".toRegex()
-        if (binding.pass.text.toString().matches(pattern)) {
+        if (isPasswordValid(binding.pass.text.toString())) {
             pass = binding.pass.text.toString()
         } else {
-            binding.pass.error = "Password must contain: lowercase letters, numbers, symbols, and be at least 8 characters"
+            binding.pass.error = "Password must contain: at least one lowercase letter, one uppercase letter, one number, and one special character, and be at least 8 characters"
             binding.pass.setText("")
             pass = ""
         }
+
         encryptedPassword = pass?.let { Security.encrypt(it) }
+
         if (binding.confrmPass.text.toString() != pass) {
             binding.confrmPass.error = "Confirm password not matched"
             binding.confrmPass.setText("")
@@ -107,7 +115,13 @@ class SignupActivity : AppCompatActivity() {
                                 val clientRef = Firebase.database.reference.child("Client").child(userId)
                                 id = clientRef.push().key ?: return@addOnCompleteListener // Safely handle null keys
                                 userType = "Client"
-                                val client = ClientModel(userType, id, name, e, encryptedPassword)
+                                val client = hashMapOf(
+                                    "userType" to userType,
+                                    "id" to id,
+                                    "name" to name,
+                                    "email" to e,
+                                    "pass" to encryptedPassword
+                                )
 
                                 // Store user data in Firebase Database
                                 clientRef.setValue(client).addOnCompleteListener { storeTask ->
@@ -134,5 +148,22 @@ class SignupActivity : AppCompatActivity() {
     //Handles and displays error messages.
     private fun handleError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    companion object {
+        fun isValidName(name: String): Boolean {
+            val namePattern = "^[a-zA-Z\\s]+$"
+            return name.matches(namePattern.toRegex())
+        }
+
+        fun isEmailValid(email: String): Boolean {
+            if (email.length > 254) return false // Quick length check first
+            return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        }
+
+        fun isPasswordValid(password: String): Boolean {
+            val passwordRegex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%?&#])[A-Za-z\\d@$!%?&#]{8,}$")
+            return passwordRegex.matches(password)
+        }
     }
 }

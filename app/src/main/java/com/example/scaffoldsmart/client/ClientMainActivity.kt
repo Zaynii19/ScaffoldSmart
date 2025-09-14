@@ -5,11 +5,11 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,21 +17,22 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.ImageProcessingActivity
-import com.example.scaffoldsmart.admin.AdminMainActivity
 import com.example.scaffoldsmart.databinding.ActivityClientMainBinding
 import com.example.scaffoldsmart.client.client_service.ClientMessageListenerService
+import com.example.scaffoldsmart.client.client_viewmodel.ClientViewModel
 import com.example.scaffoldsmart.databinding.ChooseImgDialogBinding
 import com.example.scaffoldsmart.util.OnesignalService
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -47,10 +48,11 @@ class ClientMainActivity : AppCompatActivity() {
     private lateinit var onesignal: OnesignalService
     private var senderUid: String? = null
     private lateinit var chatPreferences: SharedPreferences
-    private lateinit var cameraLauncher: ActivityResultLauncher<Intent>
-    private lateinit var galleryLauncher: ActivityResultLauncher<Intent>
-    private var currentImageBitmap: Bitmap? = null
-
+    private lateinit var viewModel: ClientViewModel
+    private lateinit var cameraPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var storagePermissionLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var cameraLauncher: ActivityResultLauncher<Void?>
+    private lateinit var galleryLauncher: ActivityResultLauncher<PickVisualMediaRequest>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,8 +64,13 @@ class ClientMainActivity : AppCompatActivity() {
             insets
         }
 
+        //cleanupImageCache()
+
+        viewModel = ViewModelProvider(this)[ClientViewModel::class.java]
+        viewModel.retrieveClientData()
+        observeClientLiveData()
+
         chatPreferences = getSharedPreferences("CHATCLIENT", MODE_PRIVATE)
-        senderUid = chatPreferences.getString("SenderUid", null)
 
         setStatusBarColor()
         setBottomNav()
@@ -72,6 +79,7 @@ class ClientMainActivity : AppCompatActivity() {
 
         getMessageNoti()
 
+        setupPermissionLaunchers()
         setupCameraLauncher()
         setupGalleryLauncher()
 
@@ -83,6 +91,7 @@ class ClientMainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         senderUid = chatPreferences.getString("SenderUid", null)
+        Log.d("ClientMainDebug", "senderUid: $senderUid")
         if (senderUid == null) {
             Log.e("ClientMainDebug", "senderUid is null - Redirecting to login")
         } else {
@@ -117,6 +126,14 @@ class ClientMainActivity : AppCompatActivity() {
         bottomNav.setupWithNavController(navController)
     }
 
+    private fun observeClientLiveData() {
+        viewModel.observeClientLiveData().observe(this) { client ->
+            if (client != null) {
+                chatPreferences.edit { putString("SenderUid", client.id) }
+            }
+        }
+    }
+
     private fun getMessageNoti() {
         val intent = Intent(this, ClientMessageListenerService::class.java)
         intent.putExtra("SenderUid", senderUid)
@@ -138,35 +155,60 @@ class ClientMainActivity : AppCompatActivity() {
             }
 
         binder.cancel.setOnClickListener { dialog.dismiss() }
-        binder.camera.setOnClickListener { requestPermissionsAndLaunchCamera(dialog) }
-        binder.gallery.setOnClickListener { requestPermissionsAndLaunchGallery(dialog) }
+        binder.camera.setOnClickListener {
+            requestCameraPermission()
+            dialog.dismiss()
+        }
+        binder.gallery.setOnClickListener {
+            requestStoragePermission()
+            dialog.dismiss()
+        }
+    }
+
+    private fun setupPermissionLaunchers() {
+        cameraPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                launchCamera()
+            } else {
+                handlePermissionDenied("Camera")
+            }
+        }
+
+        storagePermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            val isGranted = permissions.any { it.value }
+            if (isGranted) {
+                launchGallery()
+            } else {
+                handlePermissionDenied("Storage")
+            }
+        }
     }
 
     private fun setupCameraLauncher() {
-        cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val imageBitmap = result.data?.extras?.get("data") as? Bitmap
-                imageBitmap?.let {
-                    currentImageBitmap = it
-                    launchImageProcessingActivity(it)
-                }
+        cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+            bitmap?.let {
+                launchImageProcessingActivity(it)
             }
         }
     }
 
     private fun setupGalleryLauncher() {
-        galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                result.data?.data?.let { uri ->
-                    try {
-                        // Simple bitmap loading without complex sampling
-                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-                        currentImageBitmap = bitmap
-                        launchImageProcessingActivity(bitmap)
-                    } catch (e: Exception) {
-                        Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show()
-                        Log.e("GalleryError", "Error: ${e.message}")
+        galleryLauncher = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                val imageBitmap = try {
+                    contentResolver.openInputStream(uri)?.use { inputStream ->
+                        BitmapFactory.decodeStream(inputStream)
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
+                imageBitmap?.let {
+                    launchImageProcessingActivity(it)
                 }
             }
         }
@@ -188,114 +230,88 @@ class ClientMainActivity : AppCompatActivity() {
         }
     }
 
-    private fun requestPermissionsAndLaunchCamera(dialog: AlertDialog) {
-        if (checkCameraPermission()) {
-            launchCamera()
-            dialog.dismiss()
-        } else {
-            requestCameraPermission()
-            dialog.dismiss()
-        }
-    }
-
-    private fun requestPermissionsAndLaunchGallery(dialog: AlertDialog) {
-        if (checkStoragePermission()) {
-            launchGallery()
-            dialog.dismiss()
-        } else {
-            requestStoragePermission()
-            dialog.dismiss()
-        }
-    }
-
-    private fun launchCamera() {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(packageManager)?.also {
-                cameraLauncher.launch(takePictureIntent)
-            }
-        }
-    }
-
-    private fun launchGallery() {
-        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).also { pickImageIntent ->
-            pickImageIntent.type = "image/*"
-            galleryLauncher.launch(pickImageIntent)
-        }
-    }
-
-    private fun checkCameraPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun checkStoragePermission(): Boolean {
-        return when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-                // Android 15+ - check for either full or partial access
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-            }
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                // Android 13-14
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-            }
-            else -> {
-                // Android 12 and below
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-            }
-        }
-    }
-
     private fun requestCameraPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), PERMISSION_REQUEST_CODE)
+        if (ContextCompat.checkSelfPermission(this@ClientMainActivity, Manifest.permission.CAMERA)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            launchCamera()
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+        }
     }
 
     private fun requestStoragePermission() {
-        val permissionsToRequest = when {
+        val permissionsToRequest = getStoragePermissions()
+
+        // Check if any permission is already granted
+        val shouldRequest = permissionsToRequest.any { permission ->
+            ContextCompat.checkSelfPermission(this@ClientMainActivity, permission)!= PackageManager.PERMISSION_GRANTED
+        }
+
+        if (!shouldRequest) {
+            launchGallery()
+        } else {
+            storagePermissionLauncher.launch(permissionsToRequest)
+        }
+    }
+
+    private fun getStoragePermissions(): Array<String> {
+        return when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-                // Android 15+ - request both for better UX
                 arrayOf(
                     Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
                     Manifest.permission.READ_MEDIA_IMAGES
                 )
             }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                // Android 13-14
                 arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
             }
             else -> {
-                // Android 12 and below
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
         }
-
-        ActivityCompat.requestPermissions(this, permissionsToRequest, PERMISSION_REQUEST_CODE)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults.any { it == PackageManager.PERMISSION_GRANTED }) {
-                when {
-                    permissions.contains(Manifest.permission.CAMERA) -> launchCamera()
-                    permissions.any { it == Manifest.permission.READ_MEDIA_IMAGES ||
-                            it == Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED ||
-                            it == Manifest.permission.READ_EXTERNAL_STORAGE } -> launchGallery()
-                }
-            } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
-                openSettings()
-            }
+    private fun handlePermissionDenied(permissionType: String) {
+        if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
+            // User denied before, show explanation
+            showRationaleDialog(permissionType)
+        } else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_IMAGES)) {
+            showRationaleDialog(permissionType)
+        } else {
+            // User permanently denied or first time with "Don't ask again"
+            Toast.makeText(this@ClientMainActivity, "$permissionType permission is required", Toast.LENGTH_SHORT).show()
+            openAppSettings()
         }
     }
 
-    private fun openSettings() {
+    private fun showRationaleDialog(permissionType: String) {
+        MaterialAlertDialogBuilder(this@ClientMainActivity)
+            .setTitle("Permission Needed")
+            .setMessage("$permissionType permission is required to use update profile")
+            .setBackground(ContextCompat.getDrawable(this@ClientMainActivity, R.drawable.msg_view_received))
+            .setPositiveButton("Grant") { _, _ ->
+                when (permissionType) {
+                    "Camera" -> requestCameraPermission()
+                    "Storage" -> requestStoragePermission()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun launchCamera() {
+        cameraLauncher.launch(null)
+    }
+
+    private fun launchGallery() {
+        galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    }
+
+    private fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
         intent.data = uri
         startActivity(intent)
-    }
-
-    companion object {
-        private const val PERMISSION_REQUEST_CODE = 200
     }
 }

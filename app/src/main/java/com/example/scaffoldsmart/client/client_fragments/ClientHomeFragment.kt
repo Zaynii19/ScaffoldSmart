@@ -40,7 +40,6 @@ class ClientHomeFragment : Fragment() {
     private lateinit var onesignal: OnesignalService
     private lateinit var rentViewModel: RentalViewModel
     private lateinit var chatPreferences: SharedPreferences
-    private lateinit var viewModelC: ChatViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,10 +52,6 @@ class ClientHomeFragment : Fragment() {
 
         rentViewModel = ViewModelProvider(this)[RentalViewModel::class.java]
         rentViewModel.retrieveRentalReq()
-
-
-        viewModelC = ViewModelProvider(this)[ChatViewModel::class.java]
-        viewModelC.retrieveChatData()
     }
 
     override fun onCreateView(

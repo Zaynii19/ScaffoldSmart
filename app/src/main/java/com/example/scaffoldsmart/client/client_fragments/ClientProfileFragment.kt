@@ -106,6 +106,8 @@ class ClientProfileFragment : Fragment() {
                     presenceMap["lastSeen"] = currentTime
                     senderUid?.let { Firebase.database.reference.child("ChatUser").child(it) }?.updateChildren(presenceMap)
                 }
+                chatPreferences.edit { clear() }
+                invoicePreferences.edit { clear() }
                 Toast.makeText(requireActivity(), "Logout Successful", Toast.LENGTH_SHORT).show()
                 startActivity(Intent(requireActivity(), LoginActivity::class.java))
             } else {

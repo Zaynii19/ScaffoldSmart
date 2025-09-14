@@ -25,7 +25,7 @@ import com.example.scaffoldsmart.R
 import com.example.scaffoldsmart.admin.admin_adapters.MessageRcvAdapter
 import com.example.scaffoldsmart.admin.admin_models.DateHeader
 import com.example.scaffoldsmart.admin.admin_models.MessageModel
-import com.example.scaffoldsmart.admin.admin_viewmodel.AdminViewModel
+import com.example.scaffoldsmart.admin.admin_viewmodel.ChatViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.MessageViewModel
 import com.example.scaffoldsmart.admin.admin_viewmodel.MessageViewModelFactory
 import com.example.scaffoldsmart.databinding.ActivityClientChatBinding
@@ -54,7 +54,7 @@ class ClientChatActivity : AppCompatActivity() {
     private var receiverName: String? = null
     private var senderName: String? = null
     private var isActivityVisible: Boolean? = null
-    private lateinit var viewModelA: AdminViewModel
+    private lateinit var viewModelC: ChatViewModel
     private lateinit var viewModel: MessageViewModel
     private lateinit var chatPreferences: SharedPreferences
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -76,9 +76,6 @@ class ClientChatActivity : AppCompatActivity() {
         }
 
         setStatusBarColor()
-
-        viewModelA = ViewModelProvider(this)[AdminViewModel::class.java]
-        viewModelA.retrieveAdminData()
 
         dialog = ProgressDialog(this@ClientChatActivity)
         messages = ArrayList()
@@ -130,10 +127,10 @@ class ClientChatActivity : AppCompatActivity() {
         senderRoom?.let { viewModel = ViewModelProvider(this, MessageViewModelFactory(it))[MessageViewModel::class.java] }
         viewModel.retrieveMessage()
 
-        observeMsgLiveData(viewModel)
+        observeMsgLiveData()
     }
 
-    private fun observeMsgLiveData(viewModel: MessageViewModel) {
+    private fun observeMsgLiveData() {
         viewModel.observeMessageLiveData().observe(this@ClientChatActivity) { msgs ->
             messages?.let { messageList ->
                 messageList.clear()
@@ -180,12 +177,14 @@ class ClientChatActivity : AppCompatActivity() {
                                     binding.status.visibility = View.VISIBLE
                                     binding.status.text = DateFormater.formatTimestampForLastSeen(lastSeen)
                                 } else {
-                                    binding.status.text = status.toString()
+                                    binding.status.text = status
                                     binding.status.visibility = View.VISIBLE
                                 }
                             } else {
                                 binding.status.visibility = View.GONE
                             }
+                        } else {
+                            binding.status.visibility = View.GONE
                         }
                     }
 

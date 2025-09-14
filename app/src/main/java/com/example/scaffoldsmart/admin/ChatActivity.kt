@@ -185,12 +185,14 @@ class ChatActivity : AppCompatActivity() {
                                 binding.status.visibility = View.VISIBLE
                                 binding.status.text = DateFormater.formatTimestampForLastSeen(lastSeen)
                             } else {
-                                binding.status.text = status.toString()
+                                binding.status.text = status
                                 binding.status.visibility = View.VISIBLE
                             }
                         } else {
                             binding.status.visibility = View.GONE
                         }
+                    } else {
+                        binding.status.visibility = View.GONE
                     }
                 }
 

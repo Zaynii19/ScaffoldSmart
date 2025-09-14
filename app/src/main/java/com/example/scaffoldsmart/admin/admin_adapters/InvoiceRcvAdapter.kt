@@ -126,7 +126,7 @@ class InvoiceRcvAdapter(
     }
 
     private fun setRcv(binder: InvoiceItemBinding, currentRent: RentalModel) {
-        var rentalItems = currentRent.items
+        val rentalItems = currentRent.items
         binder.rcv.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         // Provide empty list if items is null
         adapter = InvoiceDetailRcvAdapter(context, rentalItems ?: ArrayList(), currentRent)

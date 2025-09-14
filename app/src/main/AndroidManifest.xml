@@ -10,19 +10,25 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- For Android 13+ -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
 
-    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" /> <!-- Scoped Storage Permissions -->
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <!-- Scoped Storage Permissions -->
     <uses-permission
         android:name="android.permission.READ_MEDIA_IMAGES"
         android:maxSdkVersion="35" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
 
     <application
         android:allowBackup="true"
@@ -33,7 +39,7 @@
         android:roundIcon="@drawable/app_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.ScaffoldSmart"
-        tools:targetApi="31">
+        tools:targetApi="35">
         <activity
             android:name=".client.CartActivity"
             android:exported="false" />
@@ -96,15 +102,17 @@
         <service
             android:name=".client.client_service.ClientMessageListenerService"
             android:enabled="true"
-            android:exported="false" /> <!-- Alarm Receiver -->
+            android:exported="false" />
+        <!-- Alarm Receiver -->
         <receiver
             android:name=".client.client_receiver.DueDateAlarmReceiver"
             android:enabled="true"
-            android:exported="false"></receiver>
+            android:exported="false"/>
         <receiver
             android:name=".client.client_receiver.OverDueFeeAlarmReceiver"
             android:enabled="true"
-            android:exported="false"></receiver> <!-- Boot Complete Receiver (for re-scheduling alarms after reboot) -->
+            android:exported="false"/>
+        <!-- Boot Complete Receiver (for re-scheduling alarms after reboot) -->
         <receiver
             android:name=".client.client_receiver.BootCompleteReceiver"
             android:enabled="true"
