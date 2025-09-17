@@ -1,10 +1,13 @@
 package com.example.scaffoldsmart.client
 
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.Rect
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,13 +15,15 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.scaffoldsmart.R
@@ -67,15 +72,8 @@ class ClientChatActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        setStatusBarColor()
+        setStatusBarColorWithKeyBoard(this, this, binding.root)
 
         dialog = ProgressDialog(this@ClientChatActivity)
         messages = ArrayList()
@@ -83,9 +81,6 @@ class ClientChatActivity : AppCompatActivity() {
 
         dialog?.setMessage("Uploading image...")
         dialog?.setCancelable(false)
-
-        // Animate CardView when keyboard appears or disappears
-        setupKeyboardVisibilityListener()
 
         initializeChatDetails()
         setRcv()
@@ -98,9 +93,54 @@ class ClientChatActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this@ClientChatActivity, onBackPressedCallback)
     }
 
-    private fun setStatusBarColor() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
+    @Suppress("DEPRECATION")
+    fun setStatusBarColorWithKeyBoard(ctx: Context, activity: AppCompatActivity, rootLayout: View) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            // Enable drawing system bar backgrounds
+            activity.window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            activity.window.statusBarColor = Color.TRANSPARENT // Make it transparent so we draw behind
+
+            ViewCompat.setOnApplyWindowInsetsListener(rootLayout) { v, windowInsets ->
+                val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime())
+                v.updatePadding(
+                    top = insets.top,
+                    bottom = insets.bottom
+                )
+
+                // Avoid adding multiple fake status bar views
+                val existingStatusBar = activity.findViewById<View>(R.id.fake_status_bar)
+                if (existingStatusBar == null) {
+                    val statusBarView = View(ctx).apply {
+                        id = R.id.fake_status_bar // Make sure you define this ID in ids.xml
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            insets.top
+                        )
+                        setBackgroundColor(ContextCompat.getColor(ctx, R.color.white))
+                    }
+                    activity.addContentView(statusBarView, statusBarView.layoutParams)
+                }
+
+                WindowInsetsCompat.CONSUMED
+            }
+        } else {
+            // Android 14 and below
+            activity.window.statusBarColor = ContextCompat.getColor(ctx, R.color.white)
+
+            ViewCompat.setOnApplyWindowInsetsListener(rootLayout) { view, insets ->
+                val systemInsets = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.ime()
+                )
+
+                view.updatePadding(
+                    top = systemInsets.top,
+                    bottom = systemInsets.bottom
+                )
+                insets
+            }
+
+        }
+
     }
 
     private fun setRcv() {
@@ -450,32 +490,5 @@ class ClientChatActivity : AppCompatActivity() {
         presenceMap["status"] = "Offline"
         presenceMap["lastSeen"] = currentTime
         senderUid?.let { Firebase.database.reference.child("ChatUser").child(it).updateChildren(presenceMap) }
-    }
-
-    private fun setupKeyboardVisibilityListener() {
-        // Add a global layout listener to detect keyboard visibility changes
-        binding.root.viewTreeObserver.addOnGlobalLayoutListener {
-            val r = Rect()
-            binding.root.getWindowVisibleDisplayFrame(r)
-
-            val screenHeight: Float = binding.root.rootView.height.toFloat()
-            val toolbarHeight: Float = binding.toolbar.height.toFloat()
-            val keyboardHeight = screenHeight - r.bottom
-
-            // Calculate the maximum translation for the RecyclerView
-            val availableSpaceBelowToolbar = screenHeight - toolbarHeight - binding.messageCardView.height
-
-            if (keyboardHeight > screenHeight * 0.15) { // If keyboard is visible
-                // Translate the message card view up by the keyboard height
-                binding.messageCardView.animate().translationY(-keyboardHeight).setDuration(200).start()
-                // Translate the RecyclerView up but not above the toolbar
-                binding.rcv.animate().translationY(-minOf(keyboardHeight, availableSpaceBelowToolbar)).setDuration(200).start()
-            } else { // If keyboard is hidden
-                // Reset the translation of the message card view
-                binding.messageCardView.animate().translationY(0.0f).setDuration(200).start()
-                // Reset the translation of the RecyclerView
-                binding.rcv.animate().translationY(0.0f).setDuration(200).start()
-            }
-        }
     }
 }
